@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ProyectoCaritas")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+75a302765f21d7d4f20bdd8152cab70f85aa2c34")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+731bbf0caa5d01155854df31cecf2893103362a2")]
 [assembly: System.Reflection.AssemblyProductAttribute("ProyectoCaritas")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ProyectoCaritas")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
