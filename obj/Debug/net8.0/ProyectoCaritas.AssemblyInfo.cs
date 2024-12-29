@@ -7,17 +7,17 @@
 //     se vuelve a generar el código.
 // </auto-generated>
 //------------------------------------------------------------------------------
-/*
-using System;
-using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("ProyectoCaritas")]
-[assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
-[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ed4ea88df50a912259cd71035e2e3cc8b213cb9c")]
-[assembly: System.Reflection.AssemblyProductAttribute("ProyectoCaritas")]
-[assembly: System.Reflection.AssemblyTitleAttribute("ProyectoCaritas")]
-[assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]*/
+//using System;
+//using System.Reflection;
+
+//[assembly: System.Reflection.AssemblyCompanyAttribute("ProyectoCaritas")]
+//[assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
+//[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
+//[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c25b4d9945cc8268f2e64c83832f05a19c2d2dd0")]
+//[assembly: System.Reflection.AssemblyProductAttribute("ProyectoCaritas")]
+//[assembly: System.Reflection.AssemblyTitleAttribute("ProyectoCaritas")]
+//[assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
 
 // Generado por la clase WriteCodeFragment de MSBuild.
 

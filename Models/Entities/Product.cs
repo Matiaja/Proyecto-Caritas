@@ -5,7 +5,7 @@
         public int Id { get; set; }
         public required int CategoryId { get; set; } // Un Producto pertenece solo a una Categoría. 
         public int? OrderLineId {  get; set; } // Un Producto tiene cero o una Linea de pedido.
-        public string Name { get; set; }
+        public required string Name { get; set; }
         public DateTime? ExpirationDate { get; set; }
         public byte[]? Image { get; set; }
 
