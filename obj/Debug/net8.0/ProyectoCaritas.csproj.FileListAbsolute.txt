@@ -90,8 +90,6 @@ C:\Users\Alvar\OneDrive\Facu\32. Proyecto Final\PROYECTO\ProyectoCaritas\bin\Deb
 C:\Users\Alvar\OneDrive\Facu\32. Proyecto Final\PROYECTO\ProyectoCaritas\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.resources.dll
 C:\Users\Alvar\OneDrive\Facu\32. Proyecto Final\PROYECTO\ProyectoCaritas\obj\Debug\net8.0\ProyectoCaritas.csproj.AssemblyReference.cache
 C:\Users\Alvar\OneDrive\Facu\32. Proyecto Final\PROYECTO\ProyectoCaritas\obj\Debug\net8.0\ProyectoCaritas.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\Alvar\OneDrive\Facu\32. Proyecto Final\PROYECTO\ProyectoCaritas\obj\Debug\net8.0\ProyectoCaritas.AssemblyInfoInputs.cache
-C:\Users\Alvar\OneDrive\Facu\32. Proyecto Final\PROYECTO\ProyectoCaritas\obj\Debug\net8.0\ProyectoCaritas.AssemblyInfo.cs
 C:\Users\Alvar\OneDrive\Facu\32. Proyecto Final\PROYECTO\ProyectoCaritas\obj\Debug\net8.0\ProyectoCaritas.csproj.CoreCompileInputs.cache
 C:\Users\Alvar\OneDrive\Facu\32. Proyecto Final\PROYECTO\ProyectoCaritas\obj\Debug\net8.0\ProyectoCaritas.MvcApplicationPartsAssemblyInfo.cs
 C:\Users\Alvar\OneDrive\Facu\32. Proyecto Final\PROYECTO\ProyectoCaritas\obj\Debug\net8.0\ProyectoCaritas.MvcApplicationPartsAssemblyInfo.cache
