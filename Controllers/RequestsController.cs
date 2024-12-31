@@ -40,7 +40,12 @@ namespace ProyectoCaritas.Controllers
 
             if (request == null)
             {
-                return NotFound();
+                return NotFound(new
+                {
+                    Status = "404",
+                    Error = "Not Found",
+                    Message = "Request not found."
+                });
             }
 
             return RequestToDTO(request);
@@ -50,10 +55,25 @@ namespace ProyectoCaritas.Controllers
         [HttpPost]
         public async Task<ActionResult<RequestDTO>> AddRequest(RequestDTO requestDTO)
         {
+            //validaciones correspondientes
+            if (requestDTO.RequestingCenterId < 0 || string.IsNullOrEmpty(requestDTO.UrgencyLevel) || requestDTO.RequestDate == default)
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "Invalid data. Ensure all required fields are provided."
+                });
+            }
             var requestingCenter = await _context.Centers.FindAsync(requestDTO.RequestingCenterId);
             if (requestingCenter == null)
             {
-                return BadRequest("Requesting center not found.");
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "Requesting center not found."
+                });
             }
 
             var request = new Request
@@ -76,14 +96,37 @@ namespace ProyectoCaritas.Controllers
         // PUT: api/Requests/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateRequest(int id, RequestDTO updateRequestDTO)
+        public async Task<IActionResult> UpdateRequest(int id, UpdateRequestDTO updateRequestDTO)
         {
-
+            //validaciones correspondientes
+            if (updateRequestDTO.RequestingCenterId < 0 || string.IsNullOrEmpty(updateRequestDTO.UrgencyLevel) || updateRequestDTO.RequestDate == default)
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "Invalid data. Ensure all required fields are provided."
+                });
+            }
             // Recuperar la entidad existente de la base de datos
             var existingRequest = await _context.Requests.FindAsync(id);
             if (existingRequest == null)
             {
-                return NotFound();
+                return NotFound(new
+                {
+                    Status = "404",
+                    Error = "Not Found",
+                    Message = "Request not found."
+                });
+            }
+            // Validar si el CenterId proporcionado existe en la base de datos
+            var centerExists = await _context.Centers.AnyAsync(c => c.Id == updateRequestDTO.RequestingCenterId);
+            if (!centerExists)
+            {
+                return BadRequest(new { 
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "The provided CenterId does not exist." });
             }
             // Mapear el DTO a la entidad
             existingRequest.RequestingCenterId = updateRequestDTO.RequestingCenterId;
@@ -101,7 +144,12 @@ namespace ProyectoCaritas.Controllers
             {
                 if (!RequestExists(id))
                 {
-                    return NotFound();
+                    return NotFound(new
+                    {
+                        Status = "404",
+                        Error = "Not Found",
+                        Message = "Request not found during concurrency check."
+                    });
                 }
                 else
                 {
@@ -119,7 +167,12 @@ namespace ProyectoCaritas.Controllers
             var request = await _context.Requests.FindAsync(id);
             if (request == null)
             {
-                return NotFound();
+                return NotFound(new
+                {
+                    Status = "404",
+                    Error = "Not Found",
+                    Message = "Request not found."
+                });
             }
 
             _context.Requests.Remove(request);
@@ -136,7 +189,7 @@ namespace ProyectoCaritas.Controllers
         private static RequestDTO RequestToDTO(Request request) =>
            new RequestDTO
            {
-               //Id = request.Id,
+               Id = request.Id,
                RequestingCenterId = request.RequestingCenterId,
                UrgencyLevel = request.UrgencyLevel,
                RequestDate = request.RequestDate
