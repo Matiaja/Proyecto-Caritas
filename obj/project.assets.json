@@ -2574,23 +2574,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Alvar\\.nuget\\packages\\": {},
-    "D:\\Programas\\Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\matia\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Alvar\\OneDrive\\Facu\\32. Proyecto Final\\PROYECTO\\ProyectoCaritas\\ProyectoCaritas.csproj",
+      "projectUniqueName": "C:\\Users\\matia\\Desktop\\Proyecto-Caritas\\ProyectoCaritas.csproj",
       "projectName": "ProyectoCaritas",
-      "projectPath": "C:\\Users\\Alvar\\OneDrive\\Facu\\32. Proyecto Final\\PROYECTO\\ProyectoCaritas\\ProyectoCaritas.csproj",
-      "packagesPath": "C:\\Users\\Alvar\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Alvar\\OneDrive\\Facu\\32. Proyecto Final\\PROYECTO\\ProyectoCaritas\\obj\\",
+      "projectPath": "C:\\Users\\matia\\Desktop\\Proyecto-Caritas\\ProyectoCaritas.csproj",
+      "packagesPath": "C:\\Users\\matia\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\matia\\Desktop\\Proyecto-Caritas\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "D:\\Programas\\Visual Studio\\Shared\\NuGetPackages"
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\Alvar\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\matia\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -2599,7 +2599,6 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
