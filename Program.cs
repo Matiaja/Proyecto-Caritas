@@ -1,6 +1,7 @@
-
+﻿
 using Microsoft.EntityFrameworkCore;
 using ProyectoCaritas.Data; // Importa el namespace del contexto
+using ProyectoCaritas.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 

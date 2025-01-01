@@ -32,7 +32,7 @@ namespace ProyectoCaritas.Controllers
                 .ToListAsync();
         }
 
-        // GET: api/Requests/id
+        // GET: api/Requests/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<RequestDTO>> GetRequestById(int id)
         {
@@ -94,7 +94,6 @@ namespace ProyectoCaritas.Controllers
         }
 
         // PUT: api/Requests/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateRequest(int id, UpdateRequestDTO updateRequestDTO)
         {
