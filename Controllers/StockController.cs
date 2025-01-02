@@ -75,7 +75,19 @@ namespace ProyectoCaritas.Controllers
                     Message = "Center not found."
                 });
             }
-
+            if (StockDTO.ProductId.HasValue)
+            {
+                var product = await _context.Products.FindAsync(StockDTO.ProductId);
+                if (product == null)
+                {
+                    return BadRequest(new
+                    {
+                        Status = "400",
+                        Error = "Bad Request",
+                        Message = "Product not found."
+                    });
+                }
+            }
             var stock = new Stock
             {
                 CenterId = StockDTO.CenterId,
@@ -129,6 +141,19 @@ namespace ProyectoCaritas.Controllers
                     Error = "Bad Request",
                     Message = "The provided CenterId does not exist."
                 });
+            }
+            if (updateGetStockDTO.ProductId.HasValue)
+            {
+                var productExists = await _context.Products.AnyAsync(p => p.Id == updateGetStockDTO.ProductId);
+                if (!productExists)
+                {
+                    return BadRequest(new
+                    {
+                        Status = "400",
+                        Error = "Bad Request",
+                        Message = "The provided ProductId does not exist."
+                    });
+                }
             }
 
             existingStock.CenterId = updateGetStockDTO.CenterId;
