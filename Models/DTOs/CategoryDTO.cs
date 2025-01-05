@@ -1,6 +1,8 @@
-﻿namespace ProyectoCaritas.Models
+﻿using ProyectoCaritas.Models.Entities;
+
+namespace ProyectoCaritas.Models.DTOs
 {
-    public class AddCategoryDto
+    public class CategoryDTO
     {
         public required string Name { get; set; }
         public string? Description { get; set; }

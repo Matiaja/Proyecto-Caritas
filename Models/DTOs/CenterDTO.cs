@@ -1,6 +1,8 @@
-﻿namespace ProyectoCaritas.Models
+﻿using ProyectoCaritas.Models.Entities;
+
+namespace ProyectoCaritas.Models.DTOs
 {
-    public class AddCenterDto
+    public class CenterDTO
     {
         public required string Name { get; set; }
         public required string Location { get; set; }

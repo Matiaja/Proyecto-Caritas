@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ProyectoCaritas.Data;
-using ProyectoCaritas.Models;
+using ProyectoCaritas.Models.DTOs;
 using ProyectoCaritas.Models.Entities;
 
 namespace ProyectoCaritas.Controllers
@@ -10,71 +11,119 @@ namespace ProyectoCaritas.Controllers
     [ApiController]
     public class CategoriesController : ControllerBase
     {
-        private readonly ApplicationDbContext dbContext;
+        private readonly ApplicationDbContext _context;
 
-        public CategoriesController(ApplicationDbContext dbContext) {
-            this.dbContext = dbContext;
-        }
-        [HttpGet]
-        public IActionResult GetAllCateogies()
-        {
-           var allCategories = dbContext.Categories.ToList();
-
-           return Ok(allCategories);
+        public CategoriesController(ApplicationDbContext context) {
+            _context = context;
         }
 
+        // GET: api/Categories
         [HttpGet]
-        [Route("{id:guid}")]
-        public IActionResult GetCategoryById(Guid id)
+        public async Task<ActionResult<IEnumerable<GetCategoryDTO>>> GetAllCategories()
         {
-            var category = dbContext.Categories.Find(id);
+            return await _context.Categories
+                .Include(c => c.Products)
+                .Select(c => CategoryToDto(c))
+                .ToListAsync();
+        }
+
+        // GET: api/Categories/{id}
+        [HttpGet("{id}")]
+        public async Task<ActionResult<GetCategoryDTO>> GetCategoryById(int id)
+        {
+            var category = await _context.Categories
+                .Include(c => c.Products)
+                .FirstOrDefaultAsync(c => c.Id == id);
+
             if (category == null)
             {
-                return NotFound();
+                return NotFound(new
+                {
+                    Status = "404",
+                    Error = "Not Found",
+                    Message = "Category not found."
+                });
             }
-            return Ok(category);
+
+            return CategoryToDto(category);
+
+
         }
 
+        // POST: api/Categories
         [HttpPost]
-        public IActionResult CreateCategory(AddCategoryDto addCategoryDto)
+        public async Task<ActionResult<CategoryDTO>> CreateCategory(CategoryDTO addCategoryDto)
         {
-            var newCategory = new Category
+            if (addCategoryDto == null)
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "Category data is required."
+                });
+            }
+
+            var category = new Category
             {
                 Name = addCategoryDto.Name,
                 Description = addCategoryDto.Description
             };
-            dbContext.Categories.Add(newCategory);
-            dbContext.SaveChanges();
-            return StatusCode(StatusCodes.Status201Created);
+
+            _context.Categories.Add(category);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetCategoryById), new { id = category.Id }, CategoryToDto(category));
+
         }
 
-        [HttpPut]
-        [Route("{id:guid}")]
-        public IActionResult UpdateCategory(Guid id, UpdateCategoryDto updateCategoryDto)
+        // PUT: api/Categories/{id}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateCategory(int id, CategoryDTO updateCategoryDto)
         {
-            var category = dbContext.Categories.Find(id);
+            var category = await _context.Categories.FindAsync(id);
             if (category == null)
             {
-                return NotFound();
+                return NotFound(new
+                {
+                    Status = "404",
+                    Error = "Not Found",
+                    Message = "Category not found."
+                });
             }
             category.Name = updateCategoryDto.Name;
             category.Description = updateCategoryDto.Description;
-            dbContext.SaveChanges();
-            return Ok();
+            await _context.SaveChangesAsync();
+            return NoContent();
         }
 
-        [HttpDelete]
-        [Route("{id:guid}")]
-        public IActionResult DeleteCategory(Guid id)
+        // DELETE: api/Categories/{id}
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteCategory(int id)
         {
-            var category = dbContext.Categories.Find(id);
+            var category = await _context.Categories.FindAsync(id);
             if (category == null)
             {
-                return NotFound();
+                return NotFound(new
+                {
+                    Status = "404",
+                    Error = "Not Found",
+                    Message = "Category not found."
+                });
             }
-            dbContext.Categories.Remove(category);
-            dbContext.SaveChanges();
-            return Ok();
+            _context.Categories.Remove(category);
+            await _context.SaveChangesAsync();
+            return NoContent();
         }
+
+
+        private static GetCategoryDTO CategoryToDto(Category category) =>
+            new GetCategoryDTO
+            {
+                Id = category.Id,
+                Name = category.Name,
+                Description = category.Description,
+                Products = category.Products
+            };
     }
 }

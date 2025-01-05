@@ -40,6 +40,33 @@ namespace ProyectoCaritas.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Alimentos"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Ropa"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Calzado"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Juguetes"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Material escolar"
+                        });
                 });
 
             modelBuilder.Entity("ProyectoCaritas.Models.Entities.Center", b =>
@@ -75,6 +102,26 @@ namespace ProyectoCaritas.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Centers");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CapacityLimit = 100,
+                            Location = "Calle de la Caridad, 1",
+                            Manager = "Juan Pérez",
+                            Name = "Centro Caritas 1",
+                            Phone = "123456789"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CapacityLimit = 150,
+                            Location = "Calle de Dios, 2",
+                            Manager = "María López",
+                            Name = "Centro Caritas 2",
+                            Phone = "987654321"
+                        });
                 });
 
             modelBuilder.Entity("ProyectoCaritas.Models.Entities.DonationRequest", b =>
@@ -103,6 +150,24 @@ namespace ProyectoCaritas.Migrations
                     b.HasIndex("AssignedCenterId");
 
                     b.ToTable("DonationRequests");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AssignedCenterId = 1,
+                            ReceptionDate = new DateTime(2025, 1, 2, 16, 42, 33, 236, DateTimeKind.Local).AddTicks(6704),
+                            ShipmentDate = new DateTime(2025, 1, 2, 16, 42, 33, 236, DateTimeKind.Local).AddTicks(6689),
+                            Status = "Recibido"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            AssignedCenterId = 2,
+                            ReceptionDate = new DateTime(2025, 1, 2, 16, 42, 33, 236, DateTimeKind.Local).AddTicks(6709),
+                            ShipmentDate = new DateTime(2025, 1, 2, 16, 42, 33, 236, DateTimeKind.Local).AddTicks(6708),
+                            Status = "Recibido"
+                        });
                 });
 
             modelBuilder.Entity("ProyectoCaritas.Models.Entities.OrderLine", b =>

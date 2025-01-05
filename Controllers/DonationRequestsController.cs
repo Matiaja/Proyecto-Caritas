@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ProyectoCaritas.Data;
-using ProyectoCaritas.Models;
+using ProyectoCaritas.Models.DTOs;
 using ProyectoCaritas.Models.Entities;
 
 namespace ProyectoCaritas.Controllers
@@ -10,74 +11,171 @@ namespace ProyectoCaritas.Controllers
     [ApiController]
     public class DonationRequestsController : ControllerBase
     {
-        private readonly ApplicationDbContext dbContext;
+        private readonly ApplicationDbContext _context;
 
-        public DonationRequestsController(ApplicationDbContext dbContext) 
+        public DonationRequestsController(ApplicationDbContext context)
         {
-            this.dbContext = dbContext;
+            _context = context;
         }
 
+        // GET: api/DonationRequests
         [HttpGet]
-        public IActionResult GetAllDonationRequests()
+        public async Task<ActionResult<IEnumerable<GetDonationRequestDTO>>> GetAllDonationRequests()
         {
-            var allDonationRequests = dbContext.DonationRequests.ToList();
-            return Ok(allDonationRequests);
+            return await _context.DonationRequests
+                .Include(dr => dr.AssignedCenter)
+                .Include(dr => dr.OrderLines)
+                .Select(dr => DonationRequestToDto(dr))
+                .ToListAsync();
         }
 
-        [HttpGet]
-        [Route("{id:guid}")]
-        public IActionResult GetDonationRequestById(Guid id)
+        // GET: api/DonationRequests/{id}
+        [HttpGet("{id}")]
+        public async Task<ActionResult<GetDonationRequestDTO>> GetDonationRequestById(int id)
         {
-            var donationRequest = dbContext.DonationRequests.Find(id);
+            var donationRequest = await _context.DonationRequests
+                .Include(dr => dr.AssignedCenter)
+                .Include(dr => dr.OrderLines)
+                .FirstOrDefaultAsync(dr => dr.Id == id);
+
             if (donationRequest == null)
             {
-                return NotFound();
+                return NotFound(new
+                {
+                    Status = "404",
+                    Error = "Not Found",
+                    Message = "Donation Request not found."
+                });
             }
-            return Ok(donationRequest);
+
+            return DonationRequestToDto(donationRequest);
         }
 
+        // POST: api/DonationRequests
         [HttpPost]
-        public IActionResult CreateDonationRequest(AddDonationRequestDto addDonationRequestDto)
+        public async Task<ActionResult<DonationRequestDTO>> CreateDonationRequest(DonationRequestDTO addDonationRequestDto)
         {
-            var newDonationRequest = new DonationRequest
+            if (addDonationRequestDto == null)
             {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "Donation Request data is required."
+                });
+            }
+
+            if (addDonationRequestDto.AssignedCenterId.HasValue)
+            {
+                var centerExists = await _context.Centers
+                .AnyAsync(c => c.Id == addDonationRequestDto.AssignedCenterId.Value);
+
+                if (!centerExists)
+                {
+                    return BadRequest(new
+                    {
+                        Status = "400",
+                        Error = "Bad Request",
+                        Message = $"The Assigned Center with ID {addDonationRequestDto.AssignedCenterId} does not exist."
+                    });
+                }
+            }
+
+            var donationRequest = new DonationRequest
+            {
+                AssignedCenterId = addDonationRequestDto.AssignedCenterId,
                 ShipmentDate = addDonationRequestDto.ShipmentDate,
                 ReceptionDate = addDonationRequestDto.ReceptionDate,
                 Status = addDonationRequestDto.Status
             };
-            dbContext.DonationRequests.Add(newDonationRequest);
-            dbContext.SaveChanges();
-            return StatusCode(StatusCodes.Status201Created);
+            _context.DonationRequests.Add(donationRequest);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetDonationRequestById), new { id = donationRequest.Id }, DonationRequestToDto(donationRequest));
+
         }
 
-        [HttpPut]
-        [Route("{id:guid}")]
-        public IActionResult UpdateDonationRequest(Guid id, UpdateDonationRequestDto updateDonationRequestDto)
+        // PUT: api/DonationRequests/{id}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateDonationRequest(int id, DonationRequestDTO updateDonationRequestDto)
         {
-            var donationRequest = dbContext.DonationRequests.Find(id);
+            var donationRequest = await _context.DonationRequests.FindAsync(id);
             if (donationRequest == null)
             {
-                return NotFound();
+                return NotFound(new
+                {
+                    Status = "404",
+                    Error = "Not Found",
+                    Message = "Donation Request not found."
+                });
             }
+            if (updateDonationRequestDto.AssignedCenterId.HasValue)
+            {
+                var centerExists = await _context.Centers
+                .AnyAsync(c => c.Id == updateDonationRequestDto.AssignedCenterId.Value);
+                if (!centerExists)
+                {
+                    return BadRequest(new
+                    {
+                        Status = "400",
+                        Error = "Bad Request",
+                        Message = $"The Assigned Center with ID {updateDonationRequestDto.AssignedCenterId} does not exist."
+                    });
+                }
+            }
+
+            donationRequest.AssignedCenterId = updateDonationRequestDto.AssignedCenterId;
             donationRequest.ShipmentDate = updateDonationRequestDto.ShipmentDate;
             donationRequest.ReceptionDate = updateDonationRequestDto.ReceptionDate;
             donationRequest.Status = updateDonationRequestDto.Status;
-            dbContext.SaveChanges();
-            return Ok(donationRequest);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = ex.Message
+                });
+
+            }
+
+            return NoContent();
         }
 
-        [HttpDelete]
-        [Route("{id:guid}")]
-        public IActionResult DeleteDonationRequest(Guid id)
+
+        // DELETE: api/DonationRequests/{id}
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteDonationRequest(int id)
         {
-            var donationRequest = dbContext.DonationRequests.Find(id);
+            var donationRequest = await _context.DonationRequests.FindAsync(id);
             if (donationRequest == null)
             {
-                return NotFound();
+                return NotFound(new
+                {
+                    Status = "404",
+                    Error = "Not Found",
+                    Message = "Donation Request not found."
+                });
             }
-            dbContext.DonationRequests.Remove(donationRequest);
-            dbContext.SaveChanges();
-            return Ok();
+            _context.DonationRequests.Remove(donationRequest);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
+
+        private static GetDonationRequestDTO DonationRequestToDto(DonationRequest donationRequest) =>
+            new GetDonationRequestDTO
+            {
+                Id = donationRequest.Id,
+                AssignedCenterId = donationRequest.AssignedCenterId,
+                ShipmentDate = donationRequest.ShipmentDate,
+                ReceptionDate = donationRequest.ReceptionDate,
+                Status = donationRequest.Status,
+                OrderLines = donationRequest.OrderLines
+            };
     }
 }
