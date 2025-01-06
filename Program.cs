@@ -1,13 +1,15 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 using ProyectoCaritas.Data; // Importa el namespace del contexto
-using ProyectoCaritas.Controllers;
+using Microsoft.AspNetCore.Identity;
+using ProyectoCaritas.Models.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+// Configurar Swagger (OpenAPI)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -15,11 +17,32 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
-        new MySqlServerVersion(new Version(8, 0, 40)) // Especifica la versión de MySQL
+        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection")) // Especifica la versión de MySQL
     ));
 
-var app = builder.Build();
+// Configurar Identity
+builder.Services.AddIdentity<User, IdentityRole>(
+    options =>
+    {
+        //Password
+        options.Password.RequireDigit = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequiredLength = 8;
 
+        //Require Email 
+        options.User.RequireUniqueEmail = true; // Requiere un email único
+        options. SignIn.RequireConfirmedEmail = false;
+
+        //Lockout
+        options.Lockout.AllowedForNewUsers = false;
+        options.Lockout.MaxFailedAccessAttempts = 5;
+    })
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
+var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -28,10 +51,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Habilitar redirección HTTP
 app.UseHttpsRedirection();
 
+// Agrega autenticación antes de la autorización.
+app.UseAuthentication(); 
 app.UseAuthorization();
 
+// Mapear controladores
 app.MapControllers();
 
 app.Run();

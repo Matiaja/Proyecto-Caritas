@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using ProyectoCaritas.Models.Entities;
 
 namespace ProyectoCaritas.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<User>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
@@ -15,7 +16,7 @@ namespace ProyectoCaritas.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<Request> Requests { get; set; }
         public DbSet<Stock> Stocks { get; set; }
-        public DbSet<User> Users { get; set; }
+        // public DbSet<User> Users { get; set; } se maneja con identity, no se necesita
 
 
     }

@@ -1,15 +1,15 @@
-﻿namespace ProyectoCaritas.Models.Entities
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace ProyectoCaritas.Models.Entities
 {
-    public class User
+    public class User : IdentityUser
     {
-        public int Id { get; set; }
+        // public int Id { get; set; } se maneja con identity, no se necesita
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
-        public required string Username { get; set; }
-        public required string Password { get; set; }
         public required string Role { get; set; }
         public int? StorageCenterId { get; set; }
-        public string? Email { get; set; }
+        // public string? Email { get; set; } se maneja con identity, no se necesita
         public required string Phone { get; set; }
         public int? CenterId { get; set; } // Un Usuario está en cero o un Centro.
 
