@@ -11,6 +11,7 @@
         public int Quantity { get; set; }
         public double Weight { get; set; }
         public required string Status { get; set; }
+        public byte[]? Image { get; set; }
 
         public required Center Center { get; set; } // Un Stock pertenece a solo a un Centro.
         public Product? Product { get; set; } // Un Stock tiene cero o un Producto.
