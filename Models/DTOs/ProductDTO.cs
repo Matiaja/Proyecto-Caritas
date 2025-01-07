@@ -1,3 +1,5 @@
+using ProyectoCaritas.Models.Entities;
+
 namespace ProyectoCaritas.Models.DTOs
 {
     public class ProductDTO

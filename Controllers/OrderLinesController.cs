@@ -16,9 +16,9 @@ namespace ProyectoCaritas.Controllers
     [Route("api/[controller]")]
     public class OrderLinesController : ControllerBase
     {
-        private readonly YourDbContext context;
+        private readonly ApplicationDbContext context;
 
-        public OrderLinesController(YourDbContext context)
+        public OrderLinesController(ApplicationDbContext context)
         {
             this.context = context;
         }
