@@ -10,6 +10,6 @@
 
         public Request? Request { get; set; } // Una Línea de Pedido tiene cero o una Solicitud.
         public DonationRequest? DonationRequest { get; set; } // Una línea de pedido tiene cero o una Solicitud de donación.
-        public ICollection<Product>? Products { get; set; } // Una Línea de pedido está compuesta por cero o más Productos.
+        public Product? Product { get; set; } // Una Línea de pedido está compuesta por cero o un Producto.
     }
 }
