@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using ProyectoCaritas.Data;
 using ProyectoCaritas.Models.DTOs;
 using ProyectoCaritas.Models.Entities;
@@ -14,11 +17,13 @@ namespace ProyectoCaritas.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ApplicationDbContext _context;
-        public UserController(UserManager<User> userManager, SignInManager<User> signInManager, ApplicationDbContext context)
+        public UserController(UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager, ApplicationDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _roleManager = roleManager;
             _context = context;
         }
 
@@ -47,7 +52,7 @@ namespace ProyectoCaritas.Controllers
         }
 
         // GET: api/User/{id}
-        [HttpGet("{id}")]
+        [HttpGet("id/{id}")]
         public async Task<ActionResult<UserDTO>> GetUserById(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -70,8 +75,9 @@ namespace ProyectoCaritas.Controllers
 
             return Ok(userDTO);
         }
+
         // GET: api/User/username/{username}
-        [HttpGet("{username}")]
+        [HttpGet("username/{username}")]
         public async Task<ActionResult<UserDTO>> GetUserByUsername(string username)
         {
             var user = await _userManager.Users.SingleOrDefaultAsync(u => u.UserName == username);
@@ -107,7 +113,10 @@ namespace ProyectoCaritas.Controllers
             {
                 return BadRequest(new { message = "FirstName, LastName, Role, and Phone are required fields." });
             }
-
+            if (!await _roleManager.RoleExistsAsync(userRegisterDTO.Role))
+            {
+                return BadRequest(new { message = "Specified role does not exist." });
+            }
             if (userRegisterDTO.CenterId.HasValue && !await _context.Centers.AnyAsync(c => c.Id == userRegisterDTO.CenterId.Value))
             {
                 return BadRequest(new { message = "Specified Center does not exist." });
@@ -124,6 +133,7 @@ namespace ProyectoCaritas.Controllers
             };
 
             var result = await _userManager.CreateAsync(user, userRegisterDTO.Password);
+            var rolassign = await _userManager.AddToRoleAsync(user, userRegisterDTO.Role);
 
             if (!result.Succeeded)
             {
@@ -137,18 +147,35 @@ namespace ProyectoCaritas.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserLoginDTO userLoginDTO)
         {
-            var result = await _signInManager.PasswordSignInAsync(userLoginDTO.UserName, userLoginDTO.Password, false, false);
-
-            if (!result.Succeeded)
+            var user = await _userManager.FindByNameAsync(userLoginDTO.UserName);
+            if (user == null || !await _userManager.CheckPasswordAsync(user, userLoginDTO.Password))
             {
                 return Unauthorized(new { message = "Invalid login attempt" });
             }
 
-            return Ok(new { message = "Login successful" });
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes("SuperSecureKey1234!·$%&/()=asdfasdf"); // Use a secure key
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[]
+                {
+            new Claim(ClaimTypes.Name, user.UserName),
+            new Claim(ClaimTypes.Role, user.Role)
+        }),
+                Expires = DateTime.UtcNow.AddHours(1),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var tokenString = tokenHandler.WriteToken(token);
+
+            return Ok(new { token = tokenString });
         }
 
         // PUT: api/User/{id}
         [HttpPut("{id}")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateUser(string id, UserRegisterDTO userDTO)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -165,12 +192,16 @@ namespace ProyectoCaritas.Controllers
             {
                 return BadRequest(new { message = "UserName, FirstName, LastName, Role, and Phone are required fields." });
             }
-
+            if (!await _roleManager.RoleExistsAsync(userDTO.Role))
+            {
+                return BadRequest(new { message = "Specified role does not exist." });
+            }
             if (userDTO.CenterId.HasValue && !await _context.Centers.AnyAsync(c => c.Id == userDTO.CenterId.Value))
             {
                 return BadRequest(new { message = "Specified Center does not exist." });
             }
 
+            // Update user properties
             user.UserName = userDTO.UserName;
             user.Email = userDTO.Email;
             user.FirstName = userDTO.FirstName;
@@ -179,14 +210,47 @@ namespace ProyectoCaritas.Controllers
             user.Phone = userDTO.Phone;
             user.CenterId = userDTO.CenterId;
 
-            var result = await _userManager.UpdateAsync(user);
+            // Actualizar la contraseña si se proporciona
+            if (!string.IsNullOrWhiteSpace(userDTO.Password))
+            {
+                var removePasswordResult = await _userManager.RemovePasswordAsync(user);
+                if (!removePasswordResult.Succeeded)
+                {
+                    return BadRequest(removePasswordResult.Errors);
+                }
 
+                var addPasswordResult = await _userManager.AddPasswordAsync(user, userDTO.Password);
+                if (!addPasswordResult.Succeeded)
+                {
+                    return BadRequest(addPasswordResult.Errors);
+                }
+            }
+
+            // Update user in the database
+            var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
             {
                 return BadRequest(result.Errors);
             }
 
-            return NoContent();
+            // Remove all roles and add the new role
+            var currentRoles = await _userManager.GetRolesAsync(user);
+            if (!currentRoles.Contains(userDTO.Role))
+            {
+                var removeRolesResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+                if (!removeRolesResult.Succeeded)
+                {
+                    return BadRequest(removeRolesResult.Errors);
+                }
+
+                var roleResult = await _userManager.AddToRoleAsync(user, userDTO.Role);
+                if (!roleResult.Succeeded)
+                {
+                    return BadRequest(roleResult.Errors);
+                }
+            }
+
+            return Ok(new { message = "User updated successfully" });
         }
 
         // DELETE: api/User/{id}
@@ -206,7 +270,7 @@ namespace ProyectoCaritas.Controllers
                 return BadRequest(result.Errors);
             }
 
-            return NoContent();
+            return Ok(new { message = "User deleted successfully" });
         }
     }
 }

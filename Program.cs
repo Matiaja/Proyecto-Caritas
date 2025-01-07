@@ -3,6 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using ProyectoCaritas.Data; // Importa el namespace del contexto
 using Microsoft.AspNetCore.Identity;
 using ProyectoCaritas.Models.Entities;
+using ProyectoCaritas.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,7 +46,37 @@ builder.Services.AddIdentity<User, IdentityRole>(
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
+// Clave secreta para firmar el token (usa una clave segura)
+var key = Encoding.ASCII.GetBytes("SuperSecureKey1234!·$%&/()=asdfasdf");
+
+// Configuración de la autenticación JWT
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = false, // Puedes ajustar según tu necesidad
+        ValidateAudience = false, // Puedes ajustar según tu necesidad
+        RequireExpirationTime = true,
+        ValidateLifetime = true
+    };
+});
+
+
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await RoleInitializer.CreateRoles(services);
+}
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

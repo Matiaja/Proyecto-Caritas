@@ -239,32 +239,6 @@
   },
   {
     "ContainingType": "ProyectoCaritas.Controllers.UserController",
-    "Method": "GetUserById",
-    "RelativePath": "api/User/{id}",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "id",
-        "Type": "System.String",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "ProyectoCaritas.Models.DTOs.UserDTO",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "ProyectoCaritas.Controllers.UserController",
     "Method": "UpdateUser",
     "RelativePath": "api/User/{id}",
     "HttpMethod": "PUT",
@@ -302,14 +276,14 @@
   },
   {
     "ContainingType": "ProyectoCaritas.Controllers.UserController",
-    "Method": "GetUserByUsername",
-    "RelativePath": "api/User/{username}",
+    "Method": "GetUserById",
+    "RelativePath": "api/User/id/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "username",
+        "Name": "id",
         "Type": "System.String",
         "IsRequired": true
       }
@@ -357,6 +331,32 @@
       }
     ],
     "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ProyectoCaritas.Controllers.UserController",
+    "Method": "GetUserByUsername",
+    "RelativePath": "api/User/username/{username}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "username",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "ProyectoCaritas.Models.DTOs.UserDTO",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
     "ContainingType": "ProyectoCaritas.Controllers.WeatherForecastController",
