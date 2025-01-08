@@ -800,7 +800,7 @@
           "firstName",
           "id",
           "lastName",
-          "phone",
+          "phoneNumber",
           "role",
           "userName"
         ],
@@ -830,7 +830,7 @@
             "type": "string",
             "nullable": true
           },
-          "phone": {
+          "phoneNumber": {
             "type": "string",
             "nullable": true
           },
@@ -866,7 +866,7 @@
           "firstName",
           "lastName",
           "password",
-          "phone",
+          "phoneNumber",
           "role",
           "userName"
         ],
@@ -897,7 +897,7 @@
             "type": "string",
             "nullable": true
           },
-          "phone": {
+          "phoneNumber": {
             "type": "string",
             "nullable": true
           },

@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -39,12 +40,12 @@ namespace ProyectoCaritas.Controllers
             var userDTOs = users.Select(u => new UserDTO
             {
                 Id = u.Id,
-                UserName = u.UserName,
-                Email = u.Email,
+                UserName = u.UserName ?? string.Empty,
+                Email = u.Email ?? string.Empty,
                 FirstName = u.FirstName,
                 LastName = u.LastName,
                 Role = u.Role,
-                Phone = u.Phone,
+                PhoneNumber = u.PhoneNumber ?? string.Empty,
                 CenterId = u.CenterId
             }).ToList();
 
@@ -64,12 +65,12 @@ namespace ProyectoCaritas.Controllers
             var userDTO = new UserDTO
             {
                 Id = user.Id,
-                UserName = user.UserName,
-                Email = user.Email,
+                UserName = user.UserName ?? string.Empty,
+                Email = user.Email ?? string.Empty,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Role = user.Role,
-                Phone = user.Phone,
+                PhoneNumber = user.PhoneNumber ?? string.Empty,
                 CenterId = user.CenterId
             };
 
@@ -89,12 +90,12 @@ namespace ProyectoCaritas.Controllers
             var userDTO = new UserDTO
             {
                 Id = user.Id,
-                UserName = user.UserName,
-                Email = user.Email,
+                UserName = user.UserName ?? string.Empty,
+                Email = user.Email ?? string.Empty,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Role = user.Role,
-                Phone = user.Phone,
+                PhoneNumber = user.PhoneNumber ?? string.Empty,
                 CenterId = user.CenterId
             };
 
@@ -109,7 +110,7 @@ namespace ProyectoCaritas.Controllers
             {
                 return BadRequest(new { message = "Email is required." });
             }
-            if (string.IsNullOrWhiteSpace(userRegisterDTO.FirstName) || string.IsNullOrWhiteSpace(userRegisterDTO.LastName) || string.IsNullOrWhiteSpace(userRegisterDTO.Role) || string.IsNullOrWhiteSpace(userRegisterDTO.Phone))
+            if (string.IsNullOrWhiteSpace(userRegisterDTO.FirstName) || string.IsNullOrWhiteSpace(userRegisterDTO.LastName) || string.IsNullOrWhiteSpace(userRegisterDTO.Role) || string.IsNullOrWhiteSpace(userRegisterDTO.PhoneNumber))
             {
                 return BadRequest(new { message = "FirstName, LastName, Role, and Phone are required fields." });
             }
@@ -121,6 +122,8 @@ namespace ProyectoCaritas.Controllers
             {
                 return BadRequest(new { message = "Specified Center does not exist." });
             }
+            userRegisterDTO.Role = char.ToUpper(userRegisterDTO.Role[0]) + userRegisterDTO.Role.Substring(1).ToLower(); // Normalize role name
+
             var user = new User
             {
                 UserName = userRegisterDTO.UserName,
@@ -128,16 +131,22 @@ namespace ProyectoCaritas.Controllers
                 FirstName = userRegisterDTO.FirstName,
                 LastName = userRegisterDTO.LastName,
                 Role = userRegisterDTO.Role,
-                Phone = userRegisterDTO.Phone,
+                PhoneNumber = userRegisterDTO.PhoneNumber,
                 CenterId = userRegisterDTO.CenterId
             };
 
             var result = await _userManager.CreateAsync(user, userRegisterDTO.Password);
-            var rolassign = await _userManager.AddToRoleAsync(user, userRegisterDTO.Role);
-
             if (!result.Succeeded)
             {
                 return BadRequest(result.Errors);
+            }
+
+            // Normalizar el nombre del rol antes de asignarlo
+            var normalizedRole = _roleManager.NormalizeKey(userRegisterDTO.Role);
+            var rolassign = await _userManager.AddToRoleAsync(user, normalizedRole);
+            if (!rolassign.Succeeded)
+            {
+                return BadRequest(rolassign.Errors);
             }
 
             return Ok(new { message = "User registered successfully" });
@@ -160,9 +169,9 @@ namespace ProyectoCaritas.Controllers
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-            new Claim(ClaimTypes.Name, user.UserName),
-            new Claim(ClaimTypes.Role, user.Role)
-        }),
+                new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
+                new Claim(ClaimTypes.Role, user.Role)
+                }),
                 Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
@@ -175,7 +184,7 @@ namespace ProyectoCaritas.Controllers
 
         // PUT: api/User/{id}
         [HttpPut("{id}")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateUser(string id, UserRegisterDTO userDTO)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -187,8 +196,7 @@ namespace ProyectoCaritas.Controllers
             {
                 return BadRequest(new { message = "Email is required." });
             }
-
-            if (string.IsNullOrWhiteSpace(userDTO.UserName) || string.IsNullOrWhiteSpace(userDTO.FirstName) || string.IsNullOrWhiteSpace(userDTO.LastName) || string.IsNullOrWhiteSpace(userDTO.Role) || string.IsNullOrWhiteSpace(userDTO.Phone))
+            if (string.IsNullOrWhiteSpace(userDTO.UserName) || string.IsNullOrWhiteSpace(userDTO.FirstName) || string.IsNullOrWhiteSpace(userDTO.LastName) || string.IsNullOrWhiteSpace(userDTO.Role) || string.IsNullOrWhiteSpace(userDTO.PhoneNumber))
             {
                 return BadRequest(new { message = "UserName, FirstName, LastName, Role, and Phone are required fields." });
             }
@@ -200,6 +208,7 @@ namespace ProyectoCaritas.Controllers
             {
                 return BadRequest(new { message = "Specified Center does not exist." });
             }
+            userDTO.Role = char.ToUpper(userDTO.Role[0]) + userDTO.Role.Substring(1).ToLower(); // Normalize role name
 
             // Update user properties
             user.UserName = userDTO.UserName;
@@ -207,7 +216,7 @@ namespace ProyectoCaritas.Controllers
             user.FirstName = userDTO.FirstName;
             user.LastName = userDTO.LastName;
             user.Role = userDTO.Role;
-            user.Phone = userDTO.Phone;
+            user.PhoneNumber = userDTO.PhoneNumber;
             user.CenterId = userDTO.CenterId;
 
             // Actualizar la contraseña si se proporciona
@@ -235,7 +244,8 @@ namespace ProyectoCaritas.Controllers
 
             // Remove all roles and add the new role
             var currentRoles = await _userManager.GetRolesAsync(user);
-            if (!currentRoles.Contains(userDTO.Role))
+            var normalizedRole = _roleManager.NormalizeKey(userDTO.Role);
+            if (!currentRoles.Any(role => _roleManager.NormalizeKey(role) == normalizedRole))
             {
                 var removeRolesResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
                 if (!removeRolesResult.Succeeded)
