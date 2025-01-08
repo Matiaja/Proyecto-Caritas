@@ -11,6 +11,6 @@ namespace ProyectoCaritas.Models.DTOs
         public required string Status { get; set; }
 
         public Center? AssignedCenter { get; set; }
-        public ICollection<OrderLine>? OrderLines { get; set; }
+        public OrderLine? OrderLine { get; set; }
     }
 }

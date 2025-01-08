@@ -24,7 +24,7 @@ namespace ProyectoCaritas.Controllers
         {
             return await _context.DonationRequests
                 .Include(dr => dr.AssignedCenter)
-                .Include(dr => dr.OrderLines)
+                .Include(dr => dr.OrderLine)
                 .Select(dr => DonationRequestToDto(dr))
                 .ToListAsync();
         }
@@ -35,7 +35,7 @@ namespace ProyectoCaritas.Controllers
         {
             var donationRequest = await _context.DonationRequests
                 .Include(dr => dr.AssignedCenter)
-                .Include(dr => dr.OrderLines)
+                .Include(dr => dr.OrderLine)
                 .FirstOrDefaultAsync(dr => dr.Id == id);
 
             if (donationRequest == null)
@@ -175,7 +175,7 @@ namespace ProyectoCaritas.Controllers
                 ShipmentDate = donationRequest.ShipmentDate,
                 ReceptionDate = donationRequest.ReceptionDate,
                 Status = donationRequest.Status,
-                OrderLines = donationRequest.OrderLines
+                OrderLine = donationRequest.OrderLine
             };
     }
 }
