@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProyectoCaritas.Data;
 
@@ -11,9 +12,11 @@ using ProyectoCaritas.Data;
 namespace ProyectoCaritas.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250108195156_PhoneNumber.atribute")]
+    partial class PhoneNumberatribute
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -220,9 +223,6 @@ namespace ProyectoCaritas.Migrations
                     b.Property<int?>("AssignedCenterId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("OrderLineId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("ReceptionDate")
                         .HasColumnType("datetime(6)");
 
@@ -254,9 +254,6 @@ namespace ProyectoCaritas.Migrations
                     b.Property<int?>("DonationRequestId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ProductId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
@@ -265,10 +262,7 @@ namespace ProyectoCaritas.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DonationRequestId")
-                        .IsUnique();
-
-                    b.HasIndex("ProductId");
+                    b.HasIndex("DonationRequestId");
 
                     b.HasIndex("RequestId");
 
@@ -286,6 +280,12 @@ namespace ProyectoCaritas.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("ExpirationDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("longblob");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -296,6 +296,8 @@ namespace ProyectoCaritas.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("OrderLineId");
 
                     b.ToTable("Products");
                 });
@@ -344,9 +346,6 @@ namespace ProyectoCaritas.Migrations
 
                     b.Property<DateTime?>("ExpirationDate")
                         .HasColumnType("datetime(6)");
-
-                    b.Property<byte[]>("Image")
-                        .HasColumnType("longblob");
 
                     b.Property<int?>("ProductId")
                         .HasColumnType("int");
@@ -529,21 +528,14 @@ namespace ProyectoCaritas.Migrations
             modelBuilder.Entity("ProyectoCaritas.Models.Entities.OrderLine", b =>
                 {
                     b.HasOne("ProyectoCaritas.Models.Entities.DonationRequest", "DonationRequest")
-                        .WithOne("OrderLine")
-                        .HasForeignKey("ProyectoCaritas.Models.Entities.OrderLine", "DonationRequestId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("ProyectoCaritas.Models.Entities.Product", "Product")
                         .WithMany("OrderLines")
-                        .HasForeignKey("ProductId");
+                        .HasForeignKey("DonationRequestId");
 
                     b.HasOne("ProyectoCaritas.Models.Entities.Request", "Request")
                         .WithMany("OrderLines")
                         .HasForeignKey("RequestId");
 
                     b.Navigation("DonationRequest");
-
-                    b.Navigation("Product");
 
                     b.Navigation("Request");
                 });
@@ -556,7 +548,13 @@ namespace ProyectoCaritas.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ProyectoCaritas.Models.Entities.OrderLine", "OrderLine")
+                        .WithMany("Products")
+                        .HasForeignKey("OrderLineId");
+
                     b.Navigation("Category");
+
+                    b.Navigation("OrderLine");
                 });
 
             modelBuilder.Entity("ProyectoCaritas.Models.Entities.Request", b =>
@@ -627,13 +625,16 @@ namespace ProyectoCaritas.Migrations
 
             modelBuilder.Entity("ProyectoCaritas.Models.Entities.DonationRequest", b =>
                 {
-                    b.Navigation("OrderLine");
+                    b.Navigation("OrderLines");
+                });
+
+            modelBuilder.Entity("ProyectoCaritas.Models.Entities.OrderLine", b =>
+                {
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("ProyectoCaritas.Models.Entities.Product", b =>
                 {
-                    b.Navigation("OrderLines");
-
                     b.Navigation("Stocks");
                 });
 

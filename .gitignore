@@ -1,4 +1,23 @@
 .vs/
 bin/
 obj/
-ProyectoCaritas/obj/
+**/obj/
+# Ignorar archivos de configuración de usuario en proyectos .NET
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+
+# Ignorar archivos de dependencias de NuGet
+.nuget/
+
+# Ignorar archivos generados de compilación
+*.dll
+*.pdb
+*.exe
+*.cache
+*.msi
+*.cab
+
+# Ignorar archivos de logs
+*.log
