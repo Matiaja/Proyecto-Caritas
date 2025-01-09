@@ -34,7 +34,7 @@ namespace ProyectoCaritas.Controllers
 
         // GET: api/Products/id
         [HttpGet("{id}")]
-        public async Task<ActionResult<Product>> GetProductById(int id)
+        public async Task<ActionResult<ProductDTO>> GetProductById(int id)
         {
             var prod = await context.Products.FindAsync(id);
 

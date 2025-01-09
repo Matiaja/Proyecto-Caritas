@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProyectoCaritas.Data;
 
@@ -11,9 +12,11 @@ using ProyectoCaritas.Data;
 namespace ProyectoCaritas.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250103212143_IdentityEF")]
+    partial class IdentityEF
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -71,6 +74,79 @@ namespace ProyectoCaritas.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetRoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(13)
+                        .HasColumnType("varchar(13)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex");
+
+                    b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasDiscriminator().HasValue("IdentityUser");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -220,9 +296,6 @@ namespace ProyectoCaritas.Migrations
                     b.Property<int?>("AssignedCenterId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("OrderLineId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("ReceptionDate")
                         .HasColumnType("datetime(6)");
 
@@ -254,9 +327,6 @@ namespace ProyectoCaritas.Migrations
                     b.Property<int?>("DonationRequestId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ProductId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
@@ -265,10 +335,7 @@ namespace ProyectoCaritas.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DonationRequestId")
-                        .IsUnique();
-
-                    b.HasIndex("ProductId");
+                    b.HasIndex("DonationRequestId");
 
                     b.HasIndex("RequestId");
 
@@ -286,6 +353,12 @@ namespace ProyectoCaritas.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("ExpirationDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("longblob");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -296,6 +369,8 @@ namespace ProyectoCaritas.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("OrderLineId");
 
                     b.ToTable("Products");
                 });
@@ -345,9 +420,6 @@ namespace ProyectoCaritas.Migrations
                     b.Property<DateTime?>("ExpirationDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<byte[]>("Image")
-                        .HasColumnType("longblob");
-
                     b.Property<int?>("ProductId")
                         .HasColumnType("int");
 
@@ -370,87 +442,6 @@ namespace ProyectoCaritas.Migrations
                     b.ToTable("Stocks");
                 });
 
-            modelBuilder.Entity("ProyectoCaritas.Models.Entities.User", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("CenterId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("varchar(256)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("varchar(256)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("varchar(256)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("longtext");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("longtext");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("varchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CenterId");
-
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex");
-
-                    b.ToTable("AspNetUsers", (string)null);
-                });
-
             modelBuilder.Entity("RequestUser", b =>
                 {
                     b.Property<int>("RequestsId")
@@ -466,6 +457,37 @@ namespace ProyectoCaritas.Migrations
                     b.ToTable("RequestUser");
                 });
 
+            modelBuilder.Entity("ProyectoCaritas.Models.Entities.User", b =>
+                {
+                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
+
+                    b.Property<int?>("CenterId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("StorageCenterId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("CenterId");
+
+                    b.HasDiscriminator().HasValue("User");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -477,7 +499,7 @@ namespace ProyectoCaritas.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("ProyectoCaritas.Models.Entities.User", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -486,7 +508,7 @@ namespace ProyectoCaritas.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("ProyectoCaritas.Models.Entities.User", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -501,7 +523,7 @@ namespace ProyectoCaritas.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ProyectoCaritas.Models.Entities.User", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -510,7 +532,7 @@ namespace ProyectoCaritas.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("ProyectoCaritas.Models.Entities.User", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -529,21 +551,14 @@ namespace ProyectoCaritas.Migrations
             modelBuilder.Entity("ProyectoCaritas.Models.Entities.OrderLine", b =>
                 {
                     b.HasOne("ProyectoCaritas.Models.Entities.DonationRequest", "DonationRequest")
-                        .WithOne("OrderLine")
-                        .HasForeignKey("ProyectoCaritas.Models.Entities.OrderLine", "DonationRequestId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("ProyectoCaritas.Models.Entities.Product", "Product")
                         .WithMany("OrderLines")
-                        .HasForeignKey("ProductId");
+                        .HasForeignKey("DonationRequestId");
 
                     b.HasOne("ProyectoCaritas.Models.Entities.Request", "Request")
                         .WithMany("OrderLines")
                         .HasForeignKey("RequestId");
 
                     b.Navigation("DonationRequest");
-
-                    b.Navigation("Product");
 
                     b.Navigation("Request");
                 });
@@ -556,7 +571,13 @@ namespace ProyectoCaritas.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ProyectoCaritas.Models.Entities.OrderLine", "OrderLine")
+                        .WithMany("Products")
+                        .HasForeignKey("OrderLineId");
+
                     b.Navigation("Category");
+
+                    b.Navigation("OrderLine");
                 });
 
             modelBuilder.Entity("ProyectoCaritas.Models.Entities.Request", b =>
@@ -587,15 +608,6 @@ namespace ProyectoCaritas.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("ProyectoCaritas.Models.Entities.User", b =>
-                {
-                    b.HasOne("ProyectoCaritas.Models.Entities.Center", "Center")
-                        .WithMany("Users")
-                        .HasForeignKey("CenterId");
-
-                    b.Navigation("Center");
-                });
-
             modelBuilder.Entity("RequestUser", b =>
                 {
                     b.HasOne("ProyectoCaritas.Models.Entities.Request", null)
@@ -609,6 +621,15 @@ namespace ProyectoCaritas.Migrations
                         .HasForeignKey("UsersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("ProyectoCaritas.Models.Entities.User", b =>
+                {
+                    b.HasOne("ProyectoCaritas.Models.Entities.Center", "Center")
+                        .WithMany("Users")
+                        .HasForeignKey("CenterId");
+
+                    b.Navigation("Center");
                 });
 
             modelBuilder.Entity("ProyectoCaritas.Models.Entities.Category", b =>
@@ -627,13 +648,16 @@ namespace ProyectoCaritas.Migrations
 
             modelBuilder.Entity("ProyectoCaritas.Models.Entities.DonationRequest", b =>
                 {
-                    b.Navigation("OrderLine");
+                    b.Navigation("OrderLines");
+                });
+
+            modelBuilder.Entity("ProyectoCaritas.Models.Entities.OrderLine", b =>
+                {
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("ProyectoCaritas.Models.Entities.Product", b =>
                 {
-                    b.Navigation("OrderLines");
-
                     b.Navigation("Stocks");
                 });
 
