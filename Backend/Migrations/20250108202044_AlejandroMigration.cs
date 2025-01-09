@@ -170,36 +170,6 @@ namespace ProyectoCaritas.Migrations
                 type: "longblob",
                 nullable: true);
 
-            migrationBuilder.InsertData(
-                table: "Categories",
-                columns: new[] { "Id", "Description", "Name" },
-                values: new object[,]
-                {
-                    { 1, null, "Alimentos" },
-                    { 2, null, "Ropa" },
-                    { 3, null, "Calzado" },
-                    { 4, null, "Juguetes" },
-                    { 5, null, "Material escolar" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Centers",
-                columns: new[] { "Id", "CapacityLimit", "Email", "Location", "Manager", "Name", "Phone" },
-                values: new object[,]
-                {
-                    { 1, 100, null, "Calle de la Caridad, 1", "Juan Pérez", "Centro Caritas 1", "123456789" },
-                    { 2, 150, null, "Calle de Dios, 2", "María López", "Centro Caritas 2", "987654321" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "DonationRequests",
-                columns: new[] { "Id", "AssignedCenterId", "ReceptionDate", "ShipmentDate", "Status" },
-                values: new object[,]
-                {
-                    { 1, 1, new DateTime(2025, 1, 2, 16, 42, 33, 236, DateTimeKind.Local).AddTicks(6704), new DateTime(2025, 1, 2, 16, 42, 33, 236, DateTimeKind.Local).AddTicks(6689), "Recibido" },
-                    { 2, 2, new DateTime(2025, 1, 2, 16, 42, 33, 236, DateTimeKind.Local).AddTicks(6709), new DateTime(2025, 1, 2, 16, 42, 33, 236, DateTimeKind.Local).AddTicks(6708), "Recibido" }
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Products_OrderLineId",
                 table: "Products",
