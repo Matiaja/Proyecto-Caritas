@@ -1,0 +1,44 @@
+/* Cambiar color del navbar */
+.navbar {
+    background-color: #36337f;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+
+  @media (max-width: 767px) {
+    .hidden {
+        transform: translateY(-100%);
+        transition: transform 0.3s ease-in-out;
+      }
+  }
+    
+  
+  /* Hacerlo fijo en móviles */
+  @media (max-width: 767px) {
+    .navbar {
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+    }
+  }
+  
+  .navbar-brand {
+    font-weight: bold;
+    color: #686a74;
+  }
+  
+  .nav-link {
+    color: #98999b;
+  }
+  
+  .nav-link:hover {
+    color: #5ba4f1;
+  }
+  
+  .nav-link.active {
+    color: #ffffff;
+    font-weight: bold;
+  }
+  
