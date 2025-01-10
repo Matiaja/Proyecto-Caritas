@@ -22,16 +22,29 @@ export class LoginComponent {
   });
 
   onSubmit() {
-    if (this.loginForm.valid) {
-      console.log('Form Submitted!', this.loginForm.value);
-      this.authService.login(this.loginForm.value)
-      .subscribe(
-        (data: any) => {
-          if(this.authService.isLoggedIn()) {
-            this.router.navigate(['/admin']);
-          }
-        console.log('Data: ', data);
-      });
-    }
+    console.log('Form Submitted!', this.loginForm.value);
+    this.authService.login(this.loginForm.value).subscribe(
+      (data: any) => {
+        if (data && data.token) {
+          localStorage.setItem('authUser', JSON.stringify(data)); // Almacena el token
+          this.router.navigate(['/admin']);
+        }
+      },
+      (error) => {
+        console.error('Login error:', error);
+      }
+    );
+
+    // if (this.loginForm.valid) {
+    //   console.log('Form Submitted!', this.loginForm.value);
+    //   this.authService.login(this.loginForm.value)
+    //   .subscribe(
+    //     (data: any) => {
+    //       if(this.authService.isLoggedIn()) {
+    //         this.router.navigate(['/admin']);
+    //       }
+    //     console.log('Data: ', data);
+    //   });
+    // }
   }
 }

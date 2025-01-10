@@ -21,7 +21,7 @@ export class SignupComponent {
     firstname: new FormControl('', [Validators.required]),
     lastname: new FormControl('', [Validators.required]),
     username: new FormControl('', [Validators.required]),
-    phone: new FormControl('', [Validators.required]),
+    phonenumber: new FormControl('', [Validators.required]),
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required]),
     confirmPassword: new FormControl('', [Validators.required])
@@ -36,8 +36,12 @@ export class SignupComponent {
     }
 
     if (this.signupForm.valid) {
-      console.log('Form Submitted!', this.signupForm.value);
-      this.authService.signup(this.signupForm.value)
+      const formData = {
+        ...this.signupForm.value,
+        role: 'User',
+      };
+      console.log('Form Submitted!', formData);
+      this.authService.signup(formData)
         .subscribe({
           next: (data: any) => {
             console.log('Data: ', data);
