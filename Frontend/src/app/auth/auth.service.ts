@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { jwtDecode } from 'jwt-decode';
 
 @Injectable({
   providedIn: 'root'
@@ -42,6 +43,16 @@ export class AuthService {
 
   isLoggedIn() {
     return localStorage.getItem('authUser') !== null;
+  }
+
+  getUserRole(): string | null {
+    const token = localStorage.getItem('authUser');
+    if (token) {
+      const decoded: any = jwtDecode(token);
+      const userRol = decoded.role;
+      return userRol;
+    }
+    return null;
   }
 
 }

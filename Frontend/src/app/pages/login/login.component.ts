@@ -23,17 +23,17 @@ export class LoginComponent {
 
   onSubmit() {
     console.log('Form Submitted!', this.loginForm.value);
-    this.authService.login(this.loginForm.value).subscribe(
-      (data: any) => {
+    this.authService.login(this.loginForm.value).subscribe({
+      next: (data: any) => {
         if (data && data.token) {
           localStorage.setItem('authUser', JSON.stringify(data)); // Almacena el token
-          this.router.navigate(['/admin']);
+          this.router.navigate(['/home']);
         }
       },
-      (error) => {
+      error: (error) => {
         console.error('Login error:', error);
-      }
-    );
+      },
+  });
 
     // if (this.loginForm.valid) {
     //   console.log('Form Submitted!', this.loginForm.value);

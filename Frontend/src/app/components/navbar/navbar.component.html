@@ -19,9 +19,11 @@
         <li class="nav-item">
           <a class="nav-link" routerLink="/home" routerLinkActive="active">Inicio</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/requests" routerLinkActive="active">Solicitudes</a>
-        </li>
+        @if (checkUserRole("Admin")) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/requests" routerLinkActive="active">Solicitudes</a>
+          </li>
+        }
         <li class="nav-item">
           <a class="nav-link" routerLink="/centers" routerLinkActive="active">Centros</a>
         </li>

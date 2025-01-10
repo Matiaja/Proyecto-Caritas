@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, HostListener } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -10,7 +11,7 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
   styleUrl: './navbar.component.css'
 })
 export class NavbarComponent {
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
   isVisible: boolean = true; // Controla si el navbar es visible
   lastScrollPosition: number = 0; // Almacena la última posición del scroll
@@ -30,10 +31,12 @@ export class NavbarComponent {
     this.lastScrollPosition = currentScrollPosition;
   }
 
+  checkUserRole(role: string): boolean {
+    return this.authService.getUserRole() === role;
+  }
+
   logout() {
-    // Aquí puedes agregar lógica para cerrar sesión
-    // Por ejemplo, borrar el token o cambiar el estado de autenticación
-    console.log('Cerrando sesión...');
+    this.authService.logout();
     this.router.navigate(['/login']); // Redirigir al login
   }
 
