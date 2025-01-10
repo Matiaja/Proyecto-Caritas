@@ -3,6 +3,9 @@ import { LoginComponent } from './pages/login/login.component';
 import { SignupComponent } from './pages/signup/signup.component';
 import { AdminComponent } from './pages/admin/admin.component';
 import { authGuard } from './auth/auth.guard';
+import { HomeComponent } from './pages/home/home.component';
+import { RequestComponent } from './pages/request/request.component';
+import { CenterComponent } from './pages/center/center.component';
 
 export const routes: Routes = [
     {
@@ -16,5 +19,8 @@ export const routes: Routes = [
     },
     {
         path: 'admin', component: AdminComponent, canActivate: [authGuard]
-    }
+    },
+    { path: 'home', component: HomeComponent },
+    { path: 'requests', component: RequestComponent },
+    { path: 'centers', component: CenterComponent }
 ];
