@@ -178,7 +178,23 @@ namespace ProyectoCaritas.Controllers
                Id = p.Id,
                CategoryId = p.CategoryId,
                Name = p.Name,
-               Category = p.Category
+                Stocks = p.Stocks?.Select(x => new GetStockDTO
+                {
+                     Id = x.Id,
+                     ProductId = x.ProductId,
+                     CenterId = x.CenterId,
+                     Quantity = x.Quantity,
+                     Status = x.Status
+                }).ToList() ?? new List<GetStockDTO>(),
+                OrderLines = p.OrderLines?.Select(x => new OrderLineDTO
+                {
+                    Id = x.Id,
+                    RequestId = x.RequestId,
+                    DonationRequestId = x.DonationRequestId,
+                    Quantity = x.Quantity,
+                    Description = x.Description,
+                    ProductId = x.ProductId
+                }).ToList() ?? new List<OrderLineDTO>()
            };
     }
 }
