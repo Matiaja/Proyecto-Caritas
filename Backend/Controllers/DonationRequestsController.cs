@@ -23,7 +23,6 @@ namespace ProyectoCaritas.Controllers
         public async Task<ActionResult<IEnumerable<GetDonationRequestDTO>>> GetAllDonationRequests()
         {
             return await _context.DonationRequests
-                .Include(dr => dr.AssignedCenter)
                 .Include(dr => dr.OrderLine)
                 .Select(dr => DonationRequestToDto(dr))
                 .ToListAsync();
@@ -34,7 +33,6 @@ namespace ProyectoCaritas.Controllers
         public async Task<ActionResult<GetDonationRequestDTO>> GetDonationRequestById(int id)
         {
             var donationRequest = await _context.DonationRequests
-                .Include(dr => dr.AssignedCenter)
                 .Include(dr => dr.OrderLine)
                 .FirstOrDefaultAsync(dr => dr.Id == id);
 
@@ -175,7 +173,15 @@ namespace ProyectoCaritas.Controllers
                 ShipmentDate = donationRequest.ShipmentDate,
                 ReceptionDate = donationRequest.ReceptionDate,
                 Status = donationRequest.Status,
-                OrderLine = donationRequest.OrderLine
+                OrderLine = donationRequest.OrderLine != null ? new OrderLineDTO
+                {
+                    Id = donationRequest.OrderLine.Id,
+                    RequestId = donationRequest.OrderLine.RequestId,
+                    DonationRequestId = donationRequest.OrderLine.DonationRequestId,
+                    Quantity = donationRequest.OrderLine.Quantity,
+                    Description = donationRequest.OrderLine.Description,
+                    ProductId = donationRequest.OrderLine.ProductId
+                } : null
             };
     }
 }

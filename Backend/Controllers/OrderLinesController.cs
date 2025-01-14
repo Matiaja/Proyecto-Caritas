@@ -190,7 +190,7 @@ namespace ProyectoCaritas.Controllers
                 DonationRequestId = orderLine.DonationRequestId,
                 Quantity = orderLine.Quantity,
                 Description = orderLine.Description,
-                ProductId = orderLine.Product?.Id
+                ProductId = orderLine.ProductId
             };
         }
     }

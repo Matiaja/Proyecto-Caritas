@@ -123,7 +123,12 @@ namespace ProyectoCaritas.Controllers
                 Id = category.Id,
                 Name = category.Name,
                 Description = category.Description,
-                Products = category.Products
+                Products = category.Products?.Select(p => new ProductDTO
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    CategoryId = p.CategoryId
+                }).ToList() ?? new List<ProductDTO>()
             };
     }
 }

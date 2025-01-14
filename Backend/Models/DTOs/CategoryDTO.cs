@@ -6,5 +6,7 @@ namespace ProyectoCaritas.Models.DTOs
     {
         public required string Name { get; set; }
         public string? Description { get; set; }
+
+        public ICollection<ProductDTO>? Products {get; set;}
     }
 }
