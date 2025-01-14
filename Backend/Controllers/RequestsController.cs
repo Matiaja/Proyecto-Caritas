@@ -22,7 +22,9 @@ namespace ProyectoCaritas.Controllers
         public async Task<ActionResult<IEnumerable<RequestDTO>>> GetAllRequests()
         {
             return await _context.Requests
-                .Select(x => RequestToDTO(x))
+                .Include(r => r.RequestingCenter)
+                .Include(r => r.OrderLines)
+                .Select(r => RequestToDTO(r))
                 .ToListAsync();
         }
 
@@ -185,7 +187,16 @@ namespace ProyectoCaritas.Controllers
                Id = request.Id,
                RequestingCenterId = request.RequestingCenterId,
                UrgencyLevel = request.UrgencyLevel,
-               RequestDate = request.RequestDate
+               RequestDate = request.RequestDate,
+               OrderLines = request.OrderLines?.Select(ol => new OrderLineDTO
+                {
+                     Id = ol.Id,
+                     RequestId = ol.RequestId,
+                     DonationRequestId = ol.DonationRequestId,
+                     Quantity = ol.Quantity,
+                     Description = ol.Description,
+                     ProductId = ol.ProductId
+                }).ToList() ?? new List<OrderLineDTO>()
            };
     }
 }

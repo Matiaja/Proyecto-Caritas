@@ -126,6 +126,32 @@ namespace ProyectoCaritas.Controllers
                 CapacityLimit = center.CapacityLimit,
                 Phone = center.Phone,
                 Email = center.Email,
+                DonationRequests = center.DonationRequests?.Select(dr => new GetDonationRequestDTO
+                {
+                    Id = dr.Id,
+                    AssignedCenterId = dr.AssignedCenterId,
+                    ShipmentDate = dr.ShipmentDate,
+                    ReceptionDate = dr.ReceptionDate,
+                    Status = dr.Status
+                }).ToList() ?? new List<GetDonationRequestDTO>(),
+                Stocks = center.Stocks?.Select(s => new GetStockDTO
+                {
+                    Id = s.Id,
+                    ProductId = s.ProductId,
+                    CenterId = s.CenterId,
+                    Quantity = s.Quantity,
+                    Status = s.Status
+                }).ToList() ?? new List<GetStockDTO>(),
+                Users = center.Users?.Select(u => new UserDTO
+                {
+                    Id = u.Id,
+                    UserName = u.UserName ?? string.Empty,
+                    Email = u.Email ?? string.Empty,
+                    Role = u.Role,
+                    PhoneNumber = u.PhoneNumber ?? string.Empty,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName
+                }).ToList() ?? new List<UserDTO>()
             };
     }
 }

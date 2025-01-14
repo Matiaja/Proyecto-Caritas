@@ -9,8 +9,6 @@ namespace ProyectoCaritas.Models.DTOs
         public DateTime ShipmentDate { get; set; }
         public DateTime? ReceptionDate { get; set; }
         public required string Status { get; set; }
-
-        public Center? AssignedCenter { get; set; }
-        public OrderLine? OrderLine { get; set; }
+        public OrderLineDTO? OrderLine { get; set; }
     }
 }
