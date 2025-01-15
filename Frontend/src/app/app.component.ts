@@ -14,15 +14,14 @@ export class AppComponent {
   showNavbar = true;
 
   constructor(private router: Router) {
-    // Escuchar cambios de ruta
+    // escuchar cambios de ruta
     this.router.events.subscribe(() => {
       this.updateNavbarVisibility();
     });
   }
 
   private updateNavbarVisibility() {
-    // Condicionar la visibilidad según la ruta activa
-    const excludedRoutes = ['/login']; // Rutas donde no se muestra el navbar
+    const excludedRoutes = ['/login']; // rutas sin el navbar
     this.showNavbar = !excludedRoutes.includes(this.router.url);
   }
 }
