@@ -1,4 +1,9 @@
-<p>category works!</p>
-
-<ui-table [displayedColumns]="displayedColumns" [dataSource]="categories"></ui-table>
+<ui-table [title]="title" 
+[displayedColumns]="displayedColumns" 
+[dataSource]="categories" 
+[columnHeaders]="columnHeaders"
+(onAddElement)="onAddCategory()"
+(onEditElement)="onEditCategory($event)"
+(onDeleteElement)="onDeleteCategory($event)"
+></ui-table>
 
