@@ -17,4 +17,38 @@ export class CategoryService {
       : undefined;
       return this.http.get<any[]>(this.baseUrl, { headers });
     }
+
+    getCategory(id: number): Observable<any> {
+      const token = localStorage.getItem('authUser');
+      const headers = token
+        ? new HttpHeaders().set('Authorization', `Bearer ${token}`)
+        : undefined;
+        return this.http.get<any>(`${this.baseUrl}/${id}`, { headers });
+    }
+
+    createCategory(category: any): Observable<any> {
+      const token = localStorage.getItem('authUser');
+      const headers = token
+        ? new HttpHeaders().set('Authorization', `Bearer ${token}`)
+        : undefined;
+        return this.http.post(this.baseUrl, category, { headers });
+    }
+
+    updateCategory(id: number, category: any): Observable<any> {
+      const token = localStorage.getItem('authUser');
+      const headers = token
+        ? new HttpHeaders().set('Authorization', `Bearer ${token}`)
+        : undefined;
+        return this.http.put(`${this.baseUrl}/${id}`, category, { headers });
+    }
+
+    deleteCategory(id: number): Observable<any> {
+      const token = localStorage.getItem('authUser');
+      const headers = token
+        ? new HttpHeaders().set('Authorization', `Bearer ${token}`)
+        : undefined;
+        return this.http.delete(`${this.baseUrl}/${id}`, { headers });
+    }
+
+    
 }
