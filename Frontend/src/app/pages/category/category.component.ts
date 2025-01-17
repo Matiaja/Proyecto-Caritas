@@ -5,11 +5,12 @@ import { MatDialog } from '@angular/material/dialog';
 import { GenericFormModalComponent } from '../../shared/components/generic-form-modal/generic-form-modal.component';
 import { Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { BreadcrumbComponent } from '../../shared/components/breadcrumbs/breadcrumbs.component';
 
 @Component({
   selector: 'app-category',
   standalone: true,
-  imports: [ UiTableComponent ],
+  imports: [ UiTableComponent, BreadcrumbComponent ],
   templateUrl: './category.component.html',
   styleUrl: './category.component.css'
 })
@@ -65,7 +66,7 @@ export class CategoryComponent implements OnInit {
     // });
 
   onEditCategory(category: any) {
-    console.log('Edit category', category);
+    this.router.navigate(['/categories/edit', category.id]);
   }
   onDeleteCategory(category: any) {
     console.log('Delete category', category);

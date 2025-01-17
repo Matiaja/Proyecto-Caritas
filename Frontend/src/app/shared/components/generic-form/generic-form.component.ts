@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, OnChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -10,7 +10,7 @@ import { ReactiveFormsModule } from '@angular/forms';
   templateUrl: './generic-form.component.html',
   styleUrl: './generic-form.component.css'
 })
-export class GenericFormComponent implements OnInit {
+export class GenericFormComponent implements OnChanges {
   @Input() data!: {
     title: string;
     fields: {
@@ -27,13 +27,17 @@ export class GenericFormComponent implements OnInit {
 
   @Output() formSubmit = new EventEmitter<any>();
   @Output() formCancel = new EventEmitter<void>();
+  @Output() formChange = new EventEmitter<any>();
 
   form!: FormGroup;
 
   constructor(private fb: FormBuilder) {}
 
-  ngOnInit(): void {
-    this.initializeForm();
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['data'] && this.data) {
+      this.initializeForm();
+      this.formChange.emit(this.form);
+    }
   }
 
   private initializeForm(): void {

@@ -4,11 +4,12 @@ import { GenericFormComponent } from '../../../shared/components/generic-form/ge
 import { CategoryService } from '../../../services/category/category.service';
 import { Router } from '@angular/router';
 import { Validators } from '@angular/forms';
+import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
 
 @Component({
   selector: 'app-add-category',
   standalone: true,
-  imports: [CommonModule, GenericFormComponent],
+  imports: [CommonModule, GenericFormComponent, BreadcrumbComponent],
   templateUrl: './add-category.component.html',
   styleUrl: './add-category.component.css'
 })
