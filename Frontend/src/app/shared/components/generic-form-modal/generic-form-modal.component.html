@@ -1,0 +1,38 @@
+<h2 mat-dialog-title class="d-flex justify-content-between align-items-center">
+    {{ data.title }}
+    <button mat-icon-button (click)="onCancel()" class="close-button">
+        <mat-icon>close</mat-icon>
+      </button>
+</h2>
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div mat-dialog-content>
+    <div *ngFor="let field of data.fields" class="mb-3">
+      <label [for]="field.name" class="form-label">{{ field.label }}</label>
+      <input
+        *ngIf="field.type === 'text'"
+        [id]="field.name"
+        [formControlName]="field.name"
+        class="form-control"
+        [type]="field.type"
+        [placeholder]="field.placeholder || ''"
+      />
+      <select
+        *ngIf="field.type === 'select'"
+        [id]="field.name"
+        [formControlName]="field.name"
+        class="form-select"
+      >
+        <option *ngFor="let option of field.options" [value]="option.value">
+          {{ option.label }}
+        </option>
+      </select>
+      <div *ngIf="form.get(field.name)?.invalid && form.get(field.name)?.touched" class="text-danger">
+        {{ field.errorMessage }}
+      </div>
+    </div>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button type="button" (click)="onCancel()">Cancelar</button>
+    <button mat-button type="submit" [disabled]="form.invalid">Guardar</button>
+  </div>
+</form>

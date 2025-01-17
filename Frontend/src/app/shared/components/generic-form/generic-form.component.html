@@ -1,0 +1,43 @@
+<div class="generic-form">
+    <h2 class="form-title">{{ data.title }}</h2>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-group" *ngFor="let field of data.fields">
+        <label [for]="field.name" class="form-label">{{ field.label }}</label>
+        <ng-container [ngSwitch]="field.type">
+          <input
+            *ngSwitchCase="'text'"
+            [id]="field.name"
+            [formControlName]="field.name"
+            class="form-control"
+            [type]="field.type"
+            [placeholder]="field.placeholder || ''"
+          />
+          <select
+            *ngSwitchCase="'select'"
+            [id]="field.name"
+            [formControlName]="field.name"
+            class="form-select"
+          >
+            <option *ngFor="let option of field.options" [value]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+        </ng-container>
+        <div
+          *ngIf="form.get(field.name)?.invalid && form.get(field.name)?.touched"
+          class="text-danger"
+        >
+          {{ field.errorMessage }}
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="onCancel()">
+          Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
+          Guardar
+        </button>
+      </div>
+    </form>
+  </div>
+  

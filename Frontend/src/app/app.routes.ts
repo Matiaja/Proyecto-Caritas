@@ -7,6 +7,7 @@ import { HomeComponent } from './pages/home/home.component';
 import { RequestComponent } from './pages/request/request.component';
 import { CenterComponent } from './pages/center/center.component';
 import { CategoryComponent } from './pages/category/category.component';
+import { AddCategoryComponent } from './pages/category/add-category/add-category.component';
 
 export const routes: Routes = [
     {
@@ -32,5 +33,8 @@ export const routes: Routes = [
     },
     { 
         path: 'categories', component: CategoryComponent, canActivate: [authGuard]
+    },
+    {
+        path: 'categories/add', component: AddCategoryComponent, canActivate: [authGuard]
     }
 ];
