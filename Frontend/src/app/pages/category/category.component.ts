@@ -6,7 +6,7 @@ import { GenericFormModalComponent } from '../../shared/components/generic-form-
 import { Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BreadcrumbComponent } from '../../shared/components/breadcrumbs/breadcrumbs.component';
-
+import { ConfirmModalService } from '../../services/confirmModal/confirm-modal.service';
 @Component({
   selector: 'app-category',
   standalone: true,
@@ -23,53 +23,32 @@ export class CategoryComponent implements OnInit {
     description: 'Descripción',
   };
 
-  constructor(private categoryService: CategoryService, private router: Router,private dialog: MatDialog,) {}
+  constructor(private categoryService: CategoryService, private router: Router,private dialog: MatDialog,private modalService: ConfirmModalService) {}
   ngOnInit() {
-    this.categoryService.getCategories().subscribe(categories => {
+    this.categoryService.categories$.subscribe(categories => {
       this.categories = categories;
     });
+    this.categoryService.getCategories();
   }
 
   onAddCategory(): void {
     this.router.navigate(['/categories/add']);
   }
-    // console.log('onAddCategory called in CategoryComponent');
-    // const dialogRef = this.dialog.open(GenericFormModalComponent, {
-    //   width: '500px',
-    //   data: {
-    //     title: 'Agregar Categoría',
-    //     fields: [
-    //       {
-    //         name: 'name',
-    //         label: 'Nombre',
-    //         type: 'text',
-    //         value: '',
-    //         validators: [Validators.required],
-    //         errorMessage: 'El nombre es requerido',
-    //       },
-    //       {
-    //         name: 'description',
-    //         label: 'Descripción',
-    //         type: 'text',
-    //         value: '',
-    //       },
-    //     ],
-    //   },
-    // });
-
-    // dialogRef.afterClosed().subscribe((result) => {
-    //   if (result) {
-    //     this.categoryService.createCategory(result).subscribe((category) => {
-    //       this.categories.push(category);
-    //     });
-    //   }
-    // });
 
   onEditCategory(category: any) {
     this.router.navigate(['/categories/edit', category.id]);
   }
-  onDeleteCategory(category: any) {
-    console.log('Delete category', category);
-  }
 
+  async onDeleteCategory(category: any) {
+    const confirmed = await this.modalService.confirm('Eliminar categoría', 
+      '¿Estás seguro de que quieres eliminar esta categoría?'
+    );
+
+    if (confirmed) {
+      this.categoryService.deleteCategory(category.id).subscribe(() => {
+        this.categories = this.categories.filter((c) => c.id !== category.id);
+      });
+    }
+
+  }
 }
