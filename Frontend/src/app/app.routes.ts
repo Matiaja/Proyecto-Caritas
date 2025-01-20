@@ -7,6 +7,8 @@ import { HomeComponent } from './pages/home/home.component';
 import { RequestComponent } from './pages/request/request.component';
 import { CenterComponent } from './pages/center/center.component';
 import { CategoryComponent } from './pages/category/category.component';
+import { AddCategoryComponent } from './pages/category/add-category/add-category.component';
+import { EditCategoryComponent } from './pages/category/edit-category/edit-category.component';
 
 export const routes: Routes = [
     {
@@ -35,7 +37,14 @@ export const routes: Routes = [
     { 
         path: 'centers', component: CenterComponent, canActivate: [authGuard] 
     },
-    { 
-        path: 'categories', component: CategoryComponent, canActivate: [authGuard]
-    }
+    {
+        path: 'categories',
+        data: { breadcrumb: 'Categorías' },
+        canActivate: [authGuard],
+        children: [
+          { path: '', component: CategoryComponent },
+          { path: 'add', component: AddCategoryComponent, data: { breadcrumb: 'Agregar Categoría' } },
+          { path: 'edit/:id', component: EditCategoryComponent, data: { breadcrumb: 'Editar Categoría' } }
+        ]
+      }
 ];

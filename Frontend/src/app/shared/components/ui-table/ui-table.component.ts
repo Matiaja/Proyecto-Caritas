@@ -17,7 +17,7 @@ export class UiTableComponent<T> {
   @Output() addElement = new EventEmitter<void>();
   @Output() editElement = new EventEmitter<T>();
   @Output() deleteElement = new EventEmitter<T>();
-
+  
   get columnsToDisplay(): string[] {
     return [...this.displayedColumns, 'actions'];
   }
