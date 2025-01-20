@@ -24,7 +24,6 @@ namespace ProyectoCaritas.Controllers
             return await _context.Requests
                 .Include(r => r.RequestingCenter)
                 .Include(r => r.OrderLines)
-                .Include(r => r.RequestingCenter)
                 .Select(r => RequestToDTO(r))
                 .ToListAsync();
         }
@@ -33,7 +32,10 @@ namespace ProyectoCaritas.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<RequestDTO>> GetRequestById(int id)
         {
-            var request = await _context.Requests.FindAsync(id);
+            var request = await _context.Requests
+                .Include(r => r.RequestingCenter)
+                .Include(r => r.OrderLines)
+                .FirstOrDefaultAsync(r => r.Id == id);
 
             if (request == null)
             {

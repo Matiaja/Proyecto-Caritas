@@ -1,4 +1,6 @@
-export interface Request {
+import { OrderLine } from "./orderLine.model";
+
+export interface RequestModel {
     id: number;
     requestingCenterId: number;
     urgencyLevel: string;
@@ -7,4 +9,5 @@ export interface Request {
         id: number;
         name: string;
     };
+    orderLines: OrderLine[];
 }

@@ -6,12 +6,6 @@
     box-sizing: border-box;
     font-family: "Poppins", sans-serif;
   }
-
-  @media (max-width: 767px) {
-    body {
-      padding-top: 70px;
-    }
-  }
   
   /* Elimina el padding-top para pantallas grandes */
   @media (min-width: 768px) {

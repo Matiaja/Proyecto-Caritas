@@ -1,8 +1,21 @@
-<ui-table [displayedColumns]="displayedColumns" [dataSource]="requests"></ui-table>
+<ui-table 
+  [title]="title" 
+  [displayedColumns]="displayedColumns" 
+  [dataSource]="requests"
+  [columnHeaders]="columnHeaders" 
+  [showAddButton]="true"
+  [showEditButton]="true"
+  [showDeleteButton]="true"
+  [showSelectButton]="true"
+  (addElement)="onAddRequest()"
+  (editElement)="onEditRequest($event)"
+  (deleteElement)="onDeleteRequest($event)"
+  (selectElement)="onSelectRequest($event)">
+</ui-table>
 
 <!-- <div class="shadow rounded m-5 p-3 table-responsive">
     <table class="table table-hover align-middle">
-        <thead class="table-secondary">
+        <thead class="table-secondary"S>
           <tr>
             <th scope="col">Id</th>
             <th scope="col">Centro solicitante</th>

@@ -28,6 +28,7 @@ namespace ProyectoCaritas.Controllers
         public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAllProducts()
         {
             return await context.Products
+                .Include(x => x.Stocks)
                 .Select(x => ProductToDTO(x))
                 .ToListAsync();
         }
@@ -36,7 +37,9 @@ namespace ProyectoCaritas.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductDTO>> GetProductById(int id)
         {
-            var prod = await context.Products.FindAsync(id);
+            var prod = await context.Products
+                .Include(x => x.Stocks)
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             if (prod == null)
             {
@@ -178,23 +181,26 @@ namespace ProyectoCaritas.Controllers
                Id = p.Id,
                CategoryId = p.CategoryId,
                Name = p.Name,
-                Stocks = p.Stocks?.Select(x => new GetStockDTO
-                {
-                     Id = x.Id,
-                     ProductId = x.ProductId,
-                     CenterId = x.CenterId,
-                     Quantity = x.Quantity,
-                     Status = x.Status
-                }).ToList() ?? new List<GetStockDTO>(),
-                OrderLines = p.OrderLines?.Select(x => new OrderLineDTO
-                {
-                    Id = x.Id,
-                    RequestId = x.RequestId,
-                    DonationRequestId = x.DonationRequestId,
-                    Quantity = x.Quantity,
-                    Description = x.Description,
-                    ProductId = x.ProductId
-                }).ToList() ?? new List<OrderLineDTO>()
+               Stocks = p.Stocks?.Select(x => new GetStockDTO
+               {
+                   Id = x.Id,
+                   ProductId = x.ProductId,
+                   CenterId = x.CenterId,
+                   Quantity = x.Quantity,
+                   Status = x.Status,
+                   Description = x.Description,
+                   EntryDate = x.EntryDate,
+                   ExpirationDate = x.ExpirationDate
+               }).ToList() ?? new List<GetStockDTO>(),
+               OrderLines = p.OrderLines?.Select(x => new OrderLineDTO
+               {
+                   Id = x.Id,
+                   RequestId = x.RequestId,
+                   DonationRequestId = x.DonationRequestId,
+                   Quantity = x.Quantity,
+                   Description = x.Description,
+                   ProductId = x.ProductId
+               }).ToList() ?? new List<OrderLineDTO>()
            };
     }
 }

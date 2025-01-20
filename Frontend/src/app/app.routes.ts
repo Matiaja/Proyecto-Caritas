@@ -7,6 +7,8 @@ import { HomeComponent } from './pages/home/home.component';
 import { RequestComponent } from './pages/request/request.component';
 import { CenterComponent } from './pages/center/center.component';
 import { CategoryComponent } from './pages/category/category.component';
+import { RequestDetailComponent } from './pages/request/request-detail/request-detail.component';
+import { RequestAssignComponent } from './pages/request/request-assign/request-assign.component';
 
 export const routes: Routes = [
     {
@@ -31,6 +33,12 @@ export const routes: Routes = [
     },
     { 
         path: 'requests', component: RequestComponent, canActivate: [authGuard] 
+    },
+    { 
+        path: 'requests/:id', component: RequestDetailComponent 
+    },
+    { 
+        path: 'requests/:id/assign', component: RequestAssignComponent 
     },
     { 
         path: 'centers', component: CenterComponent, canActivate: [authGuard] 

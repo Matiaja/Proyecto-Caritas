@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
-import { Request } from '../models/request';
+import { RequestModel } from '../models/request.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,15 +12,15 @@ export class RequestService {
   baseUrl = environment.baseUrl;
   constructor(private http: HttpClient) { }
 
-  getRequests(): Observable<Request[]> {
-    return this.http.get<Request[]>(this.baseUrl + 'requests');
+  getRequests(): Observable<RequestModel[]> {
+    return this.http.get<RequestModel[]>(this.baseUrl + 'requests');
   }
 
-  getRequestsByCenter(centerId: number): Observable<Request[]> {
-    return this.http.get<Request[]>(this.baseUrl + 'requests/center/' + centerId);
+  getRequestsByCenter(centerId: number): Observable<RequestModel[]> {
+    return this.http.get<RequestModel[]>(this.baseUrl + 'requests/center/' + centerId);
   }
 
-  getRequestById(requestId: number): Observable<Request> {
-    return this.http.get<Request>(this.baseUrl + 'requests/' + requestId);
+  getRequestById(requestId: number): Observable<RequestModel> {
+    return this.http.get<RequestModel>(this.baseUrl + 'requests/' + requestId);
   }
 }

@@ -41,4 +41,11 @@
     color: #ffffff;
     font-weight: bold;
   }
+
+  .logout-link:hover {
+    color: #ff4040de;
+  }
   
+  .logout-link {
+    color: #ff0000;
+  }

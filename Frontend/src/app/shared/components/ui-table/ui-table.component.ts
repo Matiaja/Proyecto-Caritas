@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter  } from '@angular/core';
+import { Component, Input, Output, EventEmitter, TemplateRef } from '@angular/core';
 import { MatTableModule } from '@angular/material/table';
 import { CommonModule } from '@angular/common';
 
@@ -14,9 +14,18 @@ export class UiTableComponent<T> {
   @Input() displayedColumns: string[] = []; 
   @Input() dataSource: T[] = [];
   @Input() columnHeaders: { [key: string]: string } = {};
+
+  @Input() customActions?: TemplateRef<any>;
+
+  @Input() showAddButton = false;
+  @Input() showEditButton = false;
+  @Input() showDeleteButton = false;
+  @Input() showSelectButton = true;
+
   @Output() addElement = new EventEmitter<void>();
   @Output() editElement = new EventEmitter<T>();
   @Output() deleteElement = new EventEmitter<T>();
+  @Output() selectElement = new EventEmitter<T>();
 
   get columnsToDisplay(): string[] {
     return [...this.displayedColumns, 'actions'];
@@ -32,5 +41,9 @@ export class UiTableComponent<T> {
 
   onDeleteElement(element: T): void {
     this.deleteElement.emit(element);
+  }
+
+  onSelectElement(element: T): void {
+    this.selectElement.emit(element);
   }
 }
