@@ -1,8 +1,10 @@
-<div class="card">
-  <div class="d-flex flex-column align-items-center">
-    <h2 class="form-title mb-4 text-center">{{ data.title }}</h2>
-    <form [formGroup]="form" (ngSubmit)="onSubmit()">
-      <div class="form-group" *ngFor="let field of data.fields">
+<div class="d-flex justify-content-center mt-5">
+<div class="card container p-md-3 shadow-sm">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h4 class="text-center mb-0">{{ data.title }}</h4>
+  </div>
+    <form [formGroup]="form" class="py-3 px-2" (ngSubmit)="onSubmit()">
+      <div class="form-group mb-3" *ngFor="let field of data.fields">
         <label [for]="field.name" class="form-label">{{ field.label }}</label>
         <ng-container [ngSwitch]="field.type">
           <input
@@ -31,7 +33,7 @@
           {{ field.errorMessage }}
         </div>
       </div>
-      <div class="form-actions d-flex justify-content-between mt-3">
+      <div class="form-actions d-flex justify-content-end gap-4 mt-3">
         <button type="button" class="btn btn-secondary" (click)="onCancel()">
           Cancelar
         </button>
@@ -42,5 +44,6 @@
     </form>
   </div>
 </div>
+
 
   
