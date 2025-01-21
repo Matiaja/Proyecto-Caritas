@@ -1,0 +1,41 @@
+<div class="mb-md-3">
+    <div class="d-flex justify-content-center mt-5">
+        <div class="card container w-100 w-md-75 mx-auto p-md-3 shadow-sm">
+            <div class="card-header d-md-flex justify-content-md-between align-items-center ">
+                <h5 class="mb-md-0">Asignar linea de pedido Nro. {{ orderLineId }}</h5>
+                <button class="btn btn-outline-secondary btn-sm" (click)="goBack()">Volver</button>
+            </div>
+            <div class="row align-items-center py-4 g-4 px-3">
+                <div class="col-sm-6">
+                    <label class="fw-medium">Centro solicitante:</label>
+                    <span class="ps-2">{{ request.requestingCenter.name }}</span>
+                </div>
+                <div class="col-sm-6">
+                    <label class="fw-medium">Fecha:</label>
+                    <span class="ps-2">{{ request.requestDate | date:'dd/MM/yyyy'}}</span>
+                </div>
+                <div class="col-sm-6">
+                    <label class="fw-medium">Nivel de urgencia:</label>
+                    <span class="ps-2">{{ request.urgencyLevel }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if(request.id) {
+    <ui-table 
+        [title]="title" 
+        [displayedColumns]="displayedColumns"
+        [dataSource]="stocks" 
+        [columnHeaders]="columnHeaders"
+        [showAddButton]="false"
+        [showEditButton]="false"
+        [showDeleteButton]="false"
+        [showSelectButton]="false"
+        (addElement)="onAddElement" 
+        (editElement)="onEditElement" 
+        (deleteElement)="onDeleteElement"
+        (selectElement)="onSelectElement">
+    </ui-table>
+}

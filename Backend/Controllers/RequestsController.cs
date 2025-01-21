@@ -32,7 +32,10 @@ namespace ProyectoCaritas.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<RequestDTO>> GetRequestById(int id)
         {
-            var request = await _context.Requests.FindAsync(id);
+            var request = await _context.Requests
+                .Include(r => r.RequestingCenter)
+                .Include(r => r.OrderLines)
+                .FirstOrDefaultAsync(r => r.Id == id);
 
             if (request == null)
             {
@@ -118,10 +121,12 @@ namespace ProyectoCaritas.Controllers
             var centerExists = await _context.Centers.AnyAsync(c => c.Id == updateRequestDTO.RequestingCenterId);
             if (!centerExists)
             {
-                return BadRequest(new { 
+                return BadRequest(new
+                {
                     Status = "400",
                     Error = "Bad Request",
-                    Message = "The provided CenterId does not exist." });
+                    Message = "The provided CenterId does not exist."
+                });
             }
             // Mapear el DTO a la entidad
             existingRequest.RequestingCenterId = updateRequestDTO.RequestingCenterId;
@@ -189,14 +194,22 @@ namespace ProyectoCaritas.Controllers
                UrgencyLevel = request.UrgencyLevel,
                RequestDate = request.RequestDate,
                OrderLines = request.OrderLines?.Select(ol => new OrderLineDTO
-                {
-                     Id = ol.Id,
-                     RequestId = ol.RequestId,
-                     DonationRequestId = ol.DonationRequestId,
-                     Quantity = ol.Quantity,
-                     Description = ol.Description,
-                     ProductId = ol.ProductId
-                }).ToList() ?? new List<OrderLineDTO>()
+               {
+                   Id = ol.Id,
+                   RequestId = ol.RequestId,
+                   DonationRequestId = ol.DonationRequestId,
+                   Quantity = ol.Quantity,
+                   Description = ol.Description,
+                   ProductId = ol.ProductId
+               }).ToList() ?? new List<OrderLineDTO>(),
+               RequestingCenter = request.RequestingCenter != null ? new GetCenterDTO
+               {
+                   Id = request.RequestingCenter.Id,
+                   Name = request.RequestingCenter.Name,
+                   Location = request.RequestingCenter.Location,
+                   Manager = request.RequestingCenter.Manager,
+                   Phone = request.RequestingCenter.Phone,
+               } : null
            };
     }
 }
