@@ -11,6 +11,8 @@ import { AddCategoryComponent } from './pages/category/add-category/add-category
 import { EditCategoryComponent } from './pages/category/edit-category/edit-category.component';
 import { RequestDetailComponent } from './pages/request/request-detail/request-detail.component';
 import { RequestAssignComponent } from './pages/request/request-assign/request-assign.component';
+import { ProductComponent } from './pages/product/product.component';
+import { ProductAddComponent } from './pages/product/product-add/product-add.component';
 
 export const routes: Routes = [
     {
@@ -54,5 +56,14 @@ export const routes: Routes = [
           { path: 'add', component: AddCategoryComponent, data: { breadcrumb: 'Agregar Categoría' } },
           { path: 'edit/:id', component: EditCategoryComponent, data: { breadcrumb: 'Editar Categoría' } }
         ]
-      }
+    },
+    {
+        path: 'products',
+        data: { breadcrumb: 'Productos' },
+        canActivate: [authGuard],
+        children: [
+            { path: '', component: ProductComponent },
+            { path: 'add', component: ProductAddComponent, data: { breadcrumb: 'Agregar Producto' } },
+        ]
+    }
 ];

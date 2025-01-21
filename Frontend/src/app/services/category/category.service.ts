@@ -15,11 +15,11 @@ export class CategoryService {
   categories$ = this.categoriesSubject.asObservable();
 
   constructor(private http: HttpClient) {}
-  getCategories() {
-    this.http.get<any[]>(this.baseUrl).subscribe((categories) => {
-      this.categoriesSubject.next(categories);
-    });
-  }
+    getCategories() {
+      this.http.get<any[]>(this.baseUrl).subscribe((categories) => {
+        this.categoriesSubject.next(categories);
+      });
+    }
 
     getCategory(id: number): Observable<any> {
       const token = localStorage.getItem('authUser');

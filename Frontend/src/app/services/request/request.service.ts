@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
-import { RequestModel } from '../models/request.model';
+import { RequestModel } from '../../models/request.model';
 
 @Injectable({
   providedIn: 'root'
@@ -22,5 +22,9 @@ export class RequestService {
 
   getRequestById(requestId: number): Observable<RequestModel> {
     return this.http.get<RequestModel>(this.baseUrl + 'requests/' + requestId);
+  }
+
+  createRequest(request: RequestModel): Observable<RequestModel> {
+    return this.http.post<RequestModel>(this.baseUrl + 'requests', request);
   }
 }

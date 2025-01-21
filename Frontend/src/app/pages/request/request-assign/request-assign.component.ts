@@ -4,14 +4,15 @@ import { ProductService } from '../../../services/product/product.service';
 import { Product } from '../../../models/product.model';
 import { CommonModule, Location } from '@angular/common';
 import { RequestModel } from '../../../models/request.model';
-import { RequestService } from '../../../services/request.service';
+import { RequestService } from '../../../services/request/request.service';
 import { OrderLine } from '../../../models/orderLine.model';
 import { UiTableComponent } from '../../../shared/components/ui-table/ui-table.component';
+import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
 
 @Component({
   selector: 'app-request-assign',
   standalone: true,
-  imports: [UiTableComponent, CommonModule],
+  imports: [UiTableComponent, CommonModule, BreadcrumbComponent],
   templateUrl: './request-assign.component.html',
   styleUrl: './request-assign.component.css'
 })
