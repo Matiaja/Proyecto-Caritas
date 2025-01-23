@@ -39,6 +39,10 @@ export class CategoryComponent implements OnInit {
     this.router.navigate(['/categories/edit', category.id]);
   }
 
+  onSelectCategory(category: any) {
+    this.router.navigate(['/categories/detail', category.id]);
+  }
+
   async onDeleteCategory(category: any) {
     const confirmed = await this.modalService.confirm('Eliminar categoría', 
       '¿Estás seguro de que quieres eliminar esta categoría?'

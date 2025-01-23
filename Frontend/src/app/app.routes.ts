@@ -13,6 +13,8 @@ import { RequestDetailComponent } from './pages/request/request-detail/request-d
 import { RequestAssignComponent } from './pages/request/request-assign/request-assign.component';
 import { ProductComponent } from './pages/product/product.component';
 import { ProductAddComponent } from './pages/product/product-add/product-add.component';
+import { CategoryDetailComponent } from './pages/category/category-detail/category-detail.component';
+import { ProductDetailComponent } from './pages/product/product-detail/product-detail.component';
 
 export const routes: Routes = [
     {
@@ -54,7 +56,8 @@ export const routes: Routes = [
         children: [
           { path: '', component: CategoryComponent },
           { path: 'add', component: AddCategoryComponent, data: { breadcrumb: 'Agregar Categoría' } },
-          { path: 'edit/:id', component: EditCategoryComponent, data: { breadcrumb: 'Editar Categoría' } }
+          { path: 'edit/:id', component: EditCategoryComponent, data: { breadcrumb: 'Editar Categoría' } },
+          { path: 'detail/:id', component: CategoryDetailComponent, data: { breadcrumb: 'Detalle de Categoría' } }
         ]
     },
     {
@@ -64,6 +67,7 @@ export const routes: Routes = [
         children: [
             { path: '', component: ProductComponent },
             { path: 'add', component: ProductAddComponent, data: { breadcrumb: 'Agregar Producto' } },
+            { path: 'detail/:id', component: ProductDetailComponent, data: { breadcrumb: 'Detalle de Producto' } }
         ]
     }
 ];
