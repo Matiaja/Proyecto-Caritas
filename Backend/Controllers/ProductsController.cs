@@ -86,7 +86,8 @@ namespace ProyectoCaritas.Controllers
             {
                 Name = prod.Name,
                 CategoryId = prod.CategoryId,
-                Category = category
+                Category = category,
+                Code = prod.Code
             };
 
             // Agregar el producto al contexto
@@ -141,6 +142,7 @@ namespace ProyectoCaritas.Controllers
 
             // Actualizar las propiedades del producto
             product.Name = productDTO.Name;
+            product.Code = productDTO.Code;
             product.CategoryId = productDTO.CategoryId;
             product.Category = category;
 
@@ -181,15 +183,17 @@ namespace ProyectoCaritas.Controllers
                Id = p.Id,
                CategoryId = p.CategoryId,
                Name = p.Name,
+               Code = p.Code,
                Stocks = p.Stocks?.Select(x => new GetStockDTO
                {
                    Id = x.Id,
                    ProductId = x.ProductId,
                    CenterId = x.CenterId,
                    Quantity = x.Quantity,
-                   Status = x.Status,
+                   Type = x.Type,
+                   //Status = x.Status,
                    Description = x.Description,
-                   EntryDate = x.EntryDate,
+                   Date = x.Date,
                    ExpirationDate = x.ExpirationDate
                }).ToList() ?? new List<GetStockDTO>(),
                OrderLines = p.OrderLines?.Select(x => new OrderLineDTO

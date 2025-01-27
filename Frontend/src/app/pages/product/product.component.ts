@@ -18,12 +18,11 @@ import { ProductService } from '../../services/product/product.service';
 
 export class ProductComponent implements OnInit {
   title = 'Productos';
-  displayedColumns = ['name', 'description', 'stock'];
+  displayedColumns = ['name', 'code'];
   products: any[] = [];
   columnHeaders: { [key: string]: string } = {
     name: 'Nombre',
-    description: 'Descripción',
-    stock: 'Stock',
+    code: 'Code',
   };
 
   constructor(private productService: ProductService, private router: Router, private modalService: ConfirmModalService) { }

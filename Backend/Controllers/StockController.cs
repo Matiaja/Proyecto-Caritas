@@ -55,15 +55,15 @@ namespace ProyectoCaritas.Controllers
         public async Task<ActionResult<StockDTO>> AddStock(StockDTO StockDTO)
         {
             // Validaciones
-            if (StockDTO.CenterId <= 0 || string.IsNullOrEmpty(StockDTO.Status))
-            {
-                return BadRequest(new
-                {
-                    Status = "400",
-                    Error = "Bad Request",
-                    Message = "Invalid data. Ensure all required fields are provided."
-                });
-            }
+            //if (StockDTO.CenterId <= 0 || string.IsNullOrEmpty(StockDTO.Status))
+            //{
+            //    return BadRequest(new
+            //    {
+            //        Status = "400",
+            //        Error = "Bad Request",
+            //        Message = "Invalid data. Ensure all required fields are provided."
+            //    });
+            //}
 
             var center = await _context.Centers.FindAsync(StockDTO.CenterId);
             if (center == null)
@@ -92,12 +92,13 @@ namespace ProyectoCaritas.Controllers
             {
                 CenterId = StockDTO.CenterId,
                 ProductId = StockDTO.ProductId,
-                EntryDate = StockDTO.EntryDate,
+                Date = StockDTO.Date,
                 ExpirationDate = StockDTO.ExpirationDate,
                 Description = StockDTO.Description,
                 Quantity = StockDTO.Quantity,
                 Weight = StockDTO.Weight,
-                Status = StockDTO.Status,
+                Type = StockDTO.Type,
+                //Status = StockDTO.Status,
                 Center = center
             };
 
@@ -111,15 +112,15 @@ namespace ProyectoCaritas.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateStock(int id, StockDTO updateGetStockDTO)
         {
-            if (updateGetStockDTO.CenterId < 0 || string.IsNullOrEmpty(updateGetStockDTO.Status))
-            {
-                return BadRequest(new
-                {
-                    Status = "400",
-                    Error = "Bad Request",
-                    Message = "Invalid data. Ensure all required fields are provided."
-                });
-            }
+            //if (updateGetStockDTO.CenterId < 0 || string.IsNullOrEmpty(updateGetStockDTO.Status))
+            //{
+            //    return BadRequest(new
+            //    {
+            //        Status = "400",
+            //        Error = "Bad Request",
+            //        Message = "Invalid data. Ensure all required fields are provided."
+            //    });
+            //}
 
             var existingStock = await _context.Stocks.FindAsync(id);
             if (existingStock == null)
@@ -158,12 +159,13 @@ namespace ProyectoCaritas.Controllers
 
             existingStock.CenterId = updateGetStockDTO.CenterId;
             existingStock.ProductId = updateGetStockDTO.ProductId;
-            existingStock.EntryDate = updateGetStockDTO.EntryDate;
+            existingStock.Date = updateGetStockDTO.Date;
             existingStock.ExpirationDate = updateGetStockDTO.ExpirationDate;
             existingStock.Description = updateGetStockDTO.Description;
             existingStock.Quantity = updateGetStockDTO.Quantity;
             existingStock.Weight = updateGetStockDTO.Weight;
-            existingStock.Status = updateGetStockDTO.Status;
+            //existingStock.Status = updateGetStockDTO.Status;
+            existingStock.Type = updateGetStockDTO.Type;
 
             _context.Entry(existingStock).State = EntityState.Modified;
 
@@ -223,12 +225,13 @@ namespace ProyectoCaritas.Controllers
                 Id = stock.Id,
                 CenterId = stock.CenterId,
                 ProductId = stock.ProductId,
-                EntryDate = stock.EntryDate,
+                Date = stock.Date,
                 ExpirationDate = stock.ExpirationDate,
                 Description = stock.Description,
                 Quantity = stock.Quantity,
                 Weight = stock.Weight,
-                Status = stock.Status
+                Type = stock.Type,
+                //Status = stock.Status
             };
     }
 }

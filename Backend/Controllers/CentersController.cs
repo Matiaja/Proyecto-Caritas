@@ -140,7 +140,8 @@ namespace ProyectoCaritas.Controllers
                     ProductId = s.ProductId,
                     CenterId = s.CenterId,
                     Quantity = s.Quantity,
-                    Status = s.Status
+                    Type = s.Type,
+                    //Status = s.Status
                 }).ToList() ?? new List<GetStockDTO>(),
                 Users = center.Users?.Select(u => new UserDTO
                 {
