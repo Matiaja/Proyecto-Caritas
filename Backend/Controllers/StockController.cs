@@ -231,6 +231,12 @@ namespace ProyectoCaritas.Controllers
                 Quantity = stock.Quantity,
                 Weight = stock.Weight,
                 Type = stock.Type,
+                Product = stock.Product != null ? new GetProductDTO
+                {
+                    Name = stock.Product.Name,
+                    Code = stock.Product.Code,
+                    CategoryId = stock.Product.CategoryId,
+                } : null
                 //Status = stock.Status
             };
     }

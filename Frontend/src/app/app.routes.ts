@@ -15,6 +15,9 @@ import { ProductComponent } from './pages/product/product.component';
 import { ProductAddComponent } from './pages/product/product-add/product-add.component';
 import { CategoryDetailComponent } from './pages/category/category-detail/category-detail.component';
 import { ProductDetailComponent } from './pages/product/product-detail/product-detail.component';
+import { StorageComponent } from './pages/storage/storage.component';
+import { StorageAddComponent } from './pages/storage/storage-add/storage-add.component';
+import { StorageDetailComponent } from './pages/storage/storage-detail/storage-detail.component';
 
 export const routes: Routes = [
     {
@@ -68,6 +71,16 @@ export const routes: Routes = [
             { path: '', component: ProductComponent },
             { path: 'add', component: ProductAddComponent, data: { breadcrumb: 'Agregar Producto' } },
             { path: 'detail/:id', component: ProductDetailComponent, data: { breadcrumb: 'Detalle de Producto' } }
+        ]
+    },
+    {
+        path: 'storage',
+        data: { breadcrumb: 'Almacén' },
+        canActivate: [authGuard],
+        children: [
+            {path: '', component: StorageComponent},
+            {path: 'add', component: StorageAddComponent, data: { breadcrumb: 'Agregar Stock' }},
+            {path: 'detail/:id', component: StorageDetailComponent, data: { breadcrumb: 'Detalle de Stock' }}
         ]
     }
 ];

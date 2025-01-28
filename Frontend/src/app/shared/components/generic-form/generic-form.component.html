@@ -8,7 +8,31 @@
         <label [for]="field.name" class="form-label">{{ field.label }}</label>
         <ng-container [ngSwitch]="field.type">
           <input
+            *ngSwitchCase="'date'"
+            [id]="field.name"
+            [formControlName]="field.name"
+            class="form-control"
+            [type]="field.type"
+            [placeholder]="field.placeholder || ''"
+          />
+          <input
+            *ngSwitchCase="'number'"
+            [id]="field.name"
+            [formControlName]="field.name"
+            class="form-control"
+            [type]="field.type"
+            [placeholder]="field.placeholder || ''"
+          />
+          <input 
             *ngSwitchCase="'text'"
+            [id]="field.name"
+            [formControlName]="field.name"
+            class="form-control"
+            [type]="field.type"
+            [placeholder]="field.placeholder || ''"
+          />
+          <input
+            *ngSwitchCase="'textarea'"
             [id]="field.name"
             [formControlName]="field.name"
             class="form-control"
