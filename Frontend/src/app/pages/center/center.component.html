@@ -1,1 +1,15 @@
-<p>center works!</p>
+<app-breadcrumbs></app-breadcrumbs>
+<ui-table 
+  [title]="title" 
+  [displayedColumns]="displayedColumns" 
+  [dataSource]="centers"
+  [columnHeaders]="columnHeaders" 
+  [showAddButton]="true"
+  [showEditButton]="true"
+  [showDeleteButton]="true"
+  [showSelectButton]="true"
+  (addElement)="onAddCenter()"
+  (editElement)="onEditCenter($event)"
+  (deleteElement)="onDeleteCenter($event)"
+  (selectElement)="onSelectCenter($event)">
+</ui-table>
