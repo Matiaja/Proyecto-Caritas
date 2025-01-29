@@ -26,7 +26,10 @@ export class ProductComponent implements OnInit {
     price: 'Precio',
   };
 
-  constructor(private productService: ProductService, private router: Router, private modalService: ConfirmModalService) { }
+  constructor(
+    private productService: ProductService, 
+    private router: Router, 
+    private modalService: ConfirmModalService) { }
   ngOnInit() {
     this.productService.products$.subscribe(products => {
       this.products = products;

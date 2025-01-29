@@ -13,6 +13,9 @@ import { RequestDetailComponent } from './pages/request/request-detail/request-d
 import { RequestAssignComponent } from './pages/request/request-assign/request-assign.component';
 import { ProductComponent } from './pages/product/product.component';
 import { ProductAddComponent } from './pages/product/product-add/product-add.component';
+import { CenterAddComponent } from './pages/center/center-add/center-add.component';
+import { CenterEditComponent } from './pages/center/center-edit/center-edit.component';
+import { CenterDetailComponent } from './pages/center/center-detail/center-detail.component';
 
 export const routes: Routes = [
     {
@@ -44,8 +47,17 @@ export const routes: Routes = [
     { 
         path: 'requests/:id/assign', component: RequestAssignComponent 
     },
+    {path: 'center/:id', component: CenterDetailComponent, data: { breadcrumb: 'Detalle de Centro' }} ,
     { 
-        path: 'centers', component: CenterComponent, canActivate: [authGuard] 
+        path: 'centers',
+        data: { breadcrumb: 'Centros' },  
+        canActivate: [authGuard],
+         children: [
+            {path: '', component: CenterComponent},
+            {path: 'add', component: CenterAddComponent, data: { breadcrumb: 'Agregar Centro' } },
+            {path: 'edit/:id', component: CenterEditComponent, data: { breadcrumb: 'Editar Centro' } },
+            //{path: 'center/:id', component: CenterDetailComponent, data: { breadcrumb: 'Detalle de Centro' }} 
+        ]
     },
     {
         path: 'categories',

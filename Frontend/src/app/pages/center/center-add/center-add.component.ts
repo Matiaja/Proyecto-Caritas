@@ -1,0 +1,99 @@
+import { Component, OnInit } from '@angular/core';
+import { Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { GenericFormComponent } from '../../../shared/components/generic-form/generic-form.component';
+import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
+import { CenterService } from '../../../services/center/center.service';
+
+@Component({
+  selector: 'app-center-add',
+  standalone: true,
+  imports: [GenericFormComponent, BreadcrumbComponent],
+  templateUrl: './center-add.component.html',
+  styleUrl: './center-add.component.css',
+})
+export class CenterAddComponent implements OnInit {
+  formConfig = {
+    title: 'Agregar Centro',
+    fields: [
+      {
+        name: 'name',
+        label: 'Nombre del Centro',
+        type: 'text',
+        value: '',
+        placeholder: 'Ingrese el nombre del centro',
+        validators: [Validators.required],
+        errorMessage: 'El nombre del centro es requerido',
+      },
+      {
+        name: 'location',
+        label: 'Ubicación',
+        type: 'text',
+        value: '',
+        placeholder: 'Ingrese la ubicación',
+        validators: [Validators.required],
+        errorMessage: 'La ubicación es requerida',
+      },
+      {
+        name: 'manager',
+        label: 'Encargado',
+        type: 'text',
+        value: '',
+        placeholder: 'Nombre del encargado',
+        validators: [Validators.required],
+        errorMessage: 'El nombre del encargado es requerido',
+      },
+      {
+        name: 'capacityLimit',
+        label: 'Capacidad Máxima',
+        type: 'number',
+        value: '',
+        placeholder: 'Ingrese la capacidad máxima',
+        validators: [Validators.required, Validators.min(1)],
+        errorMessage: 'La capacidad máxima es requerida y debe ser mayor a 0',
+      },
+      {
+        name: 'phone',
+        label: 'Teléfono',
+        type: 'text',
+        value: '',
+        placeholder: 'Ingrese el teléfono de contacto',
+        validators: [Validators.required],
+        errorMessage: 'El teléfono es requerido',
+      },
+      {
+        name: 'email',
+        label: 'Correo Electrónico',
+        type: 'email',
+        value: '',
+        placeholder: 'Ingrese el correo electrónico (opcional)',
+        validators: [Validators.email],
+        errorMessage: '',
+      },
+    ],
+  };
+
+  constructor(private centerService: CenterService, private router: Router) {}
+
+  ngOnInit(): void {}
+
+  onSubmit(formData: any): void {
+    console.log('Datos del formulario:', formData);
+    const payload = {
+      name: formData.name,
+      location: formData.location,
+      manager: formData.manager,
+      capacityLimit: formData.capacityLimit,
+      phone: formData.phone,
+      email: formData.email,
+    };
+
+    this.centerService.createCenter(payload).subscribe(() => {
+      this.router.navigate(['/centers']);
+    });
+  }
+
+  onCancel(): void {
+    this.router.navigate(['/centers']);
+  }
+}
