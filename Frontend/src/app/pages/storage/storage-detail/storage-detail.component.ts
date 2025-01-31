@@ -15,7 +15,7 @@ import { ProductService } from '../../../services/product/product.service';
   styleUrl: './storage-detail.component.css'
 })
 export class StorageDetailComponent implements OnInit{
-  stock: any = {
+  stock: any[] = [{
     id: 0,
     product: {
       name: '',
@@ -26,7 +26,7 @@ export class StorageDetailComponent implements OnInit{
     expirationDate: '',
     description: '',
     weight: 0,
-  };
+  }];
 
   constructor(
     private stockService: StockService,
@@ -38,17 +38,24 @@ export class StorageDetailComponent implements OnInit{
 
   ngOnInit(): void {
     this.route.params.subscribe((params) => {
-      const stockId = params['id'];
-      this.loadStockDetails(stockId);
+      const productId = params['id'];
+      this.loadProductStockDetails(productId);
     });
   }
 
-  loadStockDetails(stockId: any): void {
-    this.stockService.getStockById(stockId).subscribe({
-      next: (stock) => {
-        this.stock = stock;
+  centerId = Number(localStorage.getItem('currentCenterId'));
+
+
+  loadProductStockDetails(productId: any): void {
+    this.stockService.getProductWithStockById(productId, this.centerId).subscribe(
+      (response) => {
+        console.log(response);
+        this.stock = response;
+      },
+      (error) => {
+        console.error('Error al cargar los detalles del stock', error);
       }
-    });
+    );
   }
 
   goBack() {

@@ -19,52 +19,29 @@ import { ProductService } from '../../services/product/product.service';
 export class StorageComponent implements OnInit{
   product = '';
   title = 'Almacén';
-  displayedColumns = ['productName', 'productCode', 'stockQuantity', 'stockDate'];
+  displayedColumns = ['productName', 'productCode', 'stockQuantity'];
   stocks: any[] = [];
   columnHeaders: { [key: string]: string } = {
     productName: 'Nombre del producto',
     productCode: 'Código del producto',
     stockQuantity: 'Cantidad',
-    stockDate: 'Fecha',
   };
+
+  centerId = Number(localStorage.getItem('currentCenterId'));
 
   constructor(private stockService: StockService, private router: Router, private modalService: ConfirmModalService) { }
   ngOnInit() {
-    this.stockService.stocks$.subscribe((stocks) => {
-      this.stocks = stocks.map((stock) => ({
-        ...stock,
-        productName: stock.product.name,
-        productCode: stock.product.code,
-        stockQuantity: stock.quantity,
-        stockDate: stock.date,
-      }));
+    this.stockService.getProductWithStock(this.centerId).subscribe((stocks) => {
+      this.stocks = stocks;
     });
-  
-    this.stockService.getStocks();
   }
 
   onAddStock(): void {
     this.router.navigate(['/storage/add']);
   }
 
-  onEditStock(stock: any) {
-  }
-
   onSelectStock(stock: any) {
-    this.router.navigate(['/storage/detail', stock.id]);
+    this.router.navigate(['/storage/detail', stock.productId]);
   }
-
-  async onDeleteStock(stock: any) {
-    const confirmed = await this.modalService.confirm('Eliminar stock',
-      '¿Estás seguro de que quieres eliminar este stock?'
-    );
-
-    if (confirmed) {
-      this.stockService.deleteStock(stock.id).subscribe(() => {
-        this.stocks = this.stocks.filter((s) => s.id !== stock.id);
-      });
-    }
-  }
-
 
 }

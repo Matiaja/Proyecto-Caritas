@@ -4,11 +4,7 @@
     [dataSource]="stocks"
     [columnHeaders]="columnHeaders"
     [showAddButton]="true"
-    [showEditButton]="true"
-    [showDeleteButton]="true"
     [showSelectButton]="true"
     (addElement)="onAddStock()"
-    (editElement)="onEditStock($event)"
-    (deleteElement)="onDeleteStock($event)"
     (selectElement)="onSelectStock($event)">
 </ui-table>
