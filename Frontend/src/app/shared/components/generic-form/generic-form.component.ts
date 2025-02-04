@@ -25,9 +25,11 @@ export class GenericFormComponent implements OnChanges {
     }[];
   };
 
+  @Input() showButtons = true;
+
   @Output() formSubmit = new EventEmitter<any>();
   @Output() formCancel = new EventEmitter<void>();
-  @Output() formChange = new EventEmitter<any>();
+  @Output() formChange = new EventEmitter<FormGroup>();
 
   form!: FormGroup;
 

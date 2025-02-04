@@ -23,4 +23,8 @@ export class RequestService {
   getRequestById(requestId: number): Observable<RequestModel> {
     return this.http.get<RequestModel>(this.baseUrl + 'requests/' + requestId);
   }
+
+  addRequest(request: RequestModel): Observable<RequestModel> {
+    return this.http.post<RequestModel>(this.baseUrl + 'requests', request);
+  }
 }

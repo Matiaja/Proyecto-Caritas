@@ -51,19 +51,6 @@ namespace ProyectoCaritas.Controllers
                 });
             }
 
-            var donationRequest = orderLineDTO.DonationRequestId.HasValue
-                ? await context.DonationRequests.FindAsync(orderLineDTO.DonationRequestId)
-                : null;
-            if (orderLineDTO.DonationRequestId.HasValue && donationRequest == null)
-            {
-                return BadRequest(new
-                {
-                    Status = "400",
-                    Error = "Bad Request",
-                    Message = "Donation Request not found."
-                });
-            }
-
             var product = orderLineDTO.ProductId.HasValue
                 ? await context.Products.FindAsync(orderLineDTO.ProductId)
                 : null;

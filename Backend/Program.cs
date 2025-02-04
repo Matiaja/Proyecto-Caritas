@@ -23,6 +23,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection"),
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection")) // Especifica la versión de MySQL
     ));
+builder.Services.AddScoped<OrderLineService>();
 
 // Configurar Identity
 builder.Services.AddIdentity<User, IdentityRole>(
@@ -37,7 +38,7 @@ builder.Services.AddIdentity<User, IdentityRole>(
 
         //Require Email 
         options.User.RequireUniqueEmail = true; // Requiere un email único
-        options. SignIn.RequireConfirmedEmail = false;
+        options.SignIn.RequireConfirmedEmail = false;
 
         //Lockout
         options.Lockout.AllowedForNewUsers = false;
@@ -104,7 +105,7 @@ app.UseCors("AllowAngular");
 app.UseHttpsRedirection();
 
 // Agrega autenticación antes de la autorización.
-app.UseAuthentication(); 
+app.UseAuthentication();
 app.UseAuthorization();
 
 // Mapear controladores

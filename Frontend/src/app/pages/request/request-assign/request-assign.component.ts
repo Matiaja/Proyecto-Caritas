@@ -113,13 +113,17 @@ export class RequestAssignComponent implements OnInit {
       this.stocks = this.product.stocks.map((stock) => ({
         ...stock,
         productName: this.product.name,
-        centerName: this.request.requestingCenter.name
+        centerName: this.request.requestingCenter?.name
       }));
     }
   }
 
   goBack() {
     this.location.back();
+  }
+
+  assign(row: any): void {
+
   }
 
   onAddElement = null;

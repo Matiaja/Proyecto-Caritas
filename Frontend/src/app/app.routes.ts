@@ -11,6 +11,7 @@ import { AddCategoryComponent } from './pages/category/add-category/add-category
 import { EditCategoryComponent } from './pages/category/edit-category/edit-category.component';
 import { RequestDetailComponent } from './pages/request/request-detail/request-detail.component';
 import { RequestAssignComponent } from './pages/request/request-assign/request-assign.component';
+import { RequestAddComponent } from './pages/request/request-add/request-add.component';
 
 export const routes: Routes = [
     {
@@ -34,13 +35,13 @@ export const routes: Routes = [
         path: 'home', component: HomeComponent, canActivate: [authGuard]
     },
     { 
-        path: 'requests', component: RequestComponent, canActivate: [authGuard] 
-    },
-    { 
-        path: 'requests/:id', component: RequestDetailComponent 
-    },
-    { 
-        path: 'requests/:id/assign', component: RequestAssignComponent 
+        path: 'requests', canActivate: [authGuard],
+        children: [
+            { path: '', component: RequestComponent },
+            { path: 'add', component: RequestAddComponent },
+            { path: ':id', component: RequestDetailComponent },
+            { path: ':id/assign', component: RequestAssignComponent }
+        ]
     },
     { 
         path: 'centers', component: CenterComponent, canActivate: [authGuard] 

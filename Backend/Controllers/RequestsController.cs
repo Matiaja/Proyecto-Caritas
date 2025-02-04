@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using ProyectoCaritas.Data;
 using ProyectoCaritas.Models.DTOs;
 using ProyectoCaritas.Models.Entities;
@@ -11,10 +12,12 @@ namespace ProyectoCaritas.Controllers
     public class RequestsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly OrderLineService _orderLineService;
 
-        public RequestsController(ApplicationDbContext context)
+        public RequestsController(ApplicationDbContext context, OrderLineService orderLineService)
         {
             _context = context;
+            _orderLineService = orderLineService;
         }
 
         // GET: api/Requests
@@ -74,22 +77,63 @@ namespace ProyectoCaritas.Controllers
                     Message = "Requesting center not found."
                 });
             }
+            if (requestDTO.OrderLines.IsNullOrEmpty())
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "Request have not orderline."
+                });
+            }
 
             var request = new Request
             {
                 RequestingCenterId = requestDTO.RequestingCenterId,
                 UrgencyLevel = requestDTO.UrgencyLevel,
                 RequestDate = requestDTO.RequestDate,
-                RequestingCenter = requestingCenter
+                RequestingCenter = requestingCenter,
             };
 
-            _context.Requests.Add(request);
-            await _context.SaveChangesAsync();
+            using var transaction = await _context.Database.BeginTransactionAsync();
 
-            return CreatedAtAction(
-                nameof(GetRequestById),
-                new { id = request.Id },
-                RequestToDTO(request));
+            try
+            {
+
+                _context.Requests.Add(request);
+                await _context.SaveChangesAsync();
+
+                // Agregar líneas de pedido
+                foreach (var line in requestDTO.OrderLines)
+                {
+                    var orderLine = new OrderLineDTO
+                    {
+                        RequestId = request.Id,
+                        ProductId = line.ProductId,
+                        Quantity = line.Quantity,
+                        Description = line.Description
+                    };
+
+                    await _orderLineService.AddOrderLineAsync(orderLine, request.Id);
+                }
+
+                await transaction.CommitAsync();
+
+                return CreatedAtAction(
+                    nameof(GetRequestById),
+                    new { id = request.Id },
+                    RequestToDTO(request));
+            }
+            catch (ArgumentException ex)
+            {
+                await transaction.RollbackAsync();
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return StatusCode(500, $"Error al agregar la solicitud: {ex.Message}");
+            }
         }
 
         // PUT: api/Requests/5

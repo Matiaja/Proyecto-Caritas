@@ -33,7 +33,7 @@ export class RequestComponent implements OnInit{
         this.requests = reqs.map(req => ({
           ...req, // Copia el resto de las propiedades
           requestDate: new Date(req.requestDate).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }),
-          centerName: req.requestingCenter.name
+          centerName: req.requestingCenter?.name
         }));
         console.log(this.requests);
       },
@@ -44,7 +44,7 @@ export class RequestComponent implements OnInit{
   } 
   
   onAddRequest() {
-    console.log('crear request');
+    this.router.navigate(['/requests/add']);
   }
   onEditRequest(req: RequestModel) {
     console.log('Edit request', req);
