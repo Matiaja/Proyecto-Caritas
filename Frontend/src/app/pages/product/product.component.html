@@ -1,0 +1,13 @@
+<ui-table
+    [title]="title"
+    [displayedColumns]="displayedColumns"
+    [dataSource]="products"
+    [columnHeaders]="columnHeaders"
+    [showAddButton]="true"
+    [showEditButton]="true"
+    [showDeleteButton]="true"
+    [showSelectButton]="true"
+    (addElement)="onAddProduct()"
+    (editElement)="onEditProduct($event)"
+    (deleteElement)="onDeleteProduct($event)">
+</ui-table>

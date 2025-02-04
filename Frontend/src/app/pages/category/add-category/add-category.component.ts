@@ -9,7 +9,7 @@ import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/brea
 @Component({
   selector: 'app-add-category',
   standalone: true,
-  imports: [CommonModule, GenericFormComponent, BreadcrumbComponent],
+  imports: [ GenericFormComponent, BreadcrumbComponent],
   templateUrl: './add-category.component.html',
   styleUrl: './add-category.component.css'
 })

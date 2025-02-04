@@ -1,16 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { RequestService } from '../../../services/request.service';
+import { RequestService } from '../../../services/request/request.service';
 import { RequestModel } from '../../../models/request.model';
 import { ProductService } from '../../../services/product/product.service';
 import { UiTableComponent } from "../../../shared/components/ui-table/ui-table.component";
 import { CommonModule, Location } from '@angular/common';
-
+import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
 
 @Component({
   selector: 'app-request-detail',
   standalone: true,
-  imports: [UiTableComponent, CommonModule],
+  imports: [UiTableComponent, CommonModule, BreadcrumbComponent],
   templateUrl: './request-detail.component.html',
   styleUrl: './request-detail.component.css',
   

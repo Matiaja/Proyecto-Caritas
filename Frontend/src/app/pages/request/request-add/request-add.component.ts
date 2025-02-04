@@ -15,7 +15,7 @@ import { UiTableComponent } from '../../../shared/components/ui-table/ui-table.c
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { Product } from '../../../models/product.model';
 import { HttpClient } from '@angular/common/http';
-import { RequestService } from '../../../services/request.service';
+import { RequestService } from '../../../services/request/request.service';
 
 @Component({
   selector: 'app-request-add',

@@ -7,6 +7,7 @@
       <div class="form-group mb-3" *ngFor="let field of data.fields">
         <label [for]="field.name" class="form-label">{{ field.label }}</label>
         <ng-container [ngSwitch]="field.type">
+          <!-- Campo de texto -->
           <input
             *ngSwitchCase="'text'"
             [id]="field.name"
@@ -15,6 +16,8 @@
             [type]="field.type"
             [placeholder]="field.placeholder || ''"
           />
+          
+          <!-- Campo de selección -->
           <select
             *ngSwitchCase="'select'"
             [id]="field.name"
@@ -25,7 +28,28 @@
               {{ option.label }}
             </option>
           </select>
+        
+          <!-- Campo numérico -->
+          <input
+            *ngSwitchCase="'number'"
+            [id]="field.name"
+            [formControlName]="field.name"
+            class="form-control"
+            type="number"
+            [placeholder]="field.placeholder || ''"
+          />
+        
+          <!-- Campo de correo electrónico -->
+          <input
+            *ngSwitchCase="'email'"
+            [id]="field.name"
+            [formControlName]="field.name"
+            class="form-control"
+            type="email"
+            [placeholder]="field.placeholder || ''"
+          />
         </ng-container>
+        
         <div
           *ngIf="form.get(field.name)?.invalid && form.get(field.name)?.touched"
           class="text-danger"

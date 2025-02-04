@@ -12,6 +12,11 @@ import { EditCategoryComponent } from './pages/category/edit-category/edit-categ
 import { RequestDetailComponent } from './pages/request/request-detail/request-detail.component';
 import { RequestAssignComponent } from './pages/request/request-assign/request-assign.component';
 import { RequestAddComponent } from './pages/request/request-add/request-add.component';
+import { ProductComponent } from './pages/product/product.component';
+import { ProductAddComponent } from './pages/product/product-add/product-add.component';
+import { CenterAddComponent } from './pages/center/center-add/center-add.component';
+import { CenterEditComponent } from './pages/center/center-edit/center-edit.component';
+import { CenterDetailComponent } from './pages/center/center-detail/center-detail.component';
 
 export const routes: Routes = [
     {
@@ -43,8 +48,17 @@ export const routes: Routes = [
             { path: ':id/assign', component: RequestAssignComponent }
         ]
     },
+    {path: 'center/:id', component: CenterDetailComponent, data: { breadcrumb: 'Detalle de Centro' }} ,
     { 
-        path: 'centers', component: CenterComponent, canActivate: [authGuard] 
+        path: 'centers',
+        data: { breadcrumb: 'Centros' },  
+        canActivate: [authGuard],
+         children: [
+            {path: '', component: CenterComponent},
+            {path: 'add', component: CenterAddComponent, data: { breadcrumb: 'Agregar Centro' } },
+            {path: 'edit/:id', component: CenterEditComponent, data: { breadcrumb: 'Editar Centro' } },
+            //{path: 'center/:id', component: CenterDetailComponent, data: { breadcrumb: 'Detalle de Centro' }} 
+        ]
     },
     {
         path: 'categories',
@@ -55,5 +69,14 @@ export const routes: Routes = [
           { path: 'add', component: AddCategoryComponent, data: { breadcrumb: 'Agregar Categoría' } },
           { path: 'edit/:id', component: EditCategoryComponent, data: { breadcrumb: 'Editar Categoría' } }
         ]
-      }
+    },
+    {
+        path: 'products',
+        data: { breadcrumb: 'Productos' },
+        canActivate: [authGuard],
+        children: [
+            { path: '', component: ProductComponent },
+            { path: 'add', component: ProductAddComponent, data: { breadcrumb: 'Agregar Producto' } },
+        ]
+    }
 ];

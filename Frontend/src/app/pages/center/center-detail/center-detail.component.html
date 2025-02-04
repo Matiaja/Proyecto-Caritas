@@ -1,0 +1,38 @@
+<app-breadcrumbs></app-breadcrumbs>
+
+<div class="mb-md-3">
+  <div class="d-flex justify-content-center mt-5">
+    <div class="card container w-100 w-md-75 mx-auto p-md-3 shadow-sm">
+      <div class="card-header d-md-flex justify-content-md-between align-items-center ">
+        <h5 class="mb-md-0">Detalles del centro Nro. {{ center.id }}</h5>
+        <button class="btn btn-outline-secondary btn-sm" (click)="goBack()">Volver</button>
+      </div>
+      <div class="row align-items-center py-4 g-4 px-3">
+        <div class="col-sm-6">
+          <label class="fw-medium">Nombre:</label>
+          <span class="ps-2">{{ center.name }}</span>
+        </div>
+        <div class="col-sm-6">
+          <label class="fw-medium">Ubicación:</label>
+          <span class="ps-2">{{ center.location }}</span>
+        </div>
+        <div class="col-sm-6">
+          <label class="fw-medium">Encargado:</label>
+          <span class="ps-2">{{ center.manager }}</span>
+        </div>
+        <div class="col-sm-6">
+          <label class="fw-medium">Capacidad máxima:</label>
+          <span class="ps-2">{{ center.capacityLimit }}</span>
+        </div>
+        <div class="col-sm-6">
+          <label class="fw-medium">Teléfono:</label>
+          <span class="ps-2">{{ center.phone }}</span>
+        </div>
+        <div class="col-sm-6">
+          <label class="fw-medium">Email:</label>
+          <span class="ps-2">{{ center.email }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

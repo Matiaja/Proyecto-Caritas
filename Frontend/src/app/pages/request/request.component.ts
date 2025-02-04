@@ -1,14 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { RequestModel } from '../../models/request.model';
-import { RequestService } from '../../services/request.service';
+import { RequestService } from '../../services/request/request.service';
 import { CommonModule } from '@angular/common';
 import { UiTableComponent } from "../../shared/components/ui-table/ui-table.component";
 import { Router } from '@angular/router';
+import { BreadcrumbComponent } from '../../shared/components/breadcrumbs/breadcrumbs.component';
 
 @Component({
   selector: 'app-request',
   standalone: true,
-  imports: [CommonModule, UiTableComponent],
+  imports: [CommonModule, UiTableComponent, BreadcrumbComponent],
   templateUrl: './request.component.html',
   styleUrl: './request.component.css'
 })

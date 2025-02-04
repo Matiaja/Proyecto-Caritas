@@ -1,0 +1,30 @@
+.button-add{
+    background-color: #36337f;
+    border-color: #36337f;
+}
+
+.button-add:hover{
+    background-color: #27246f;
+    border-color: #27246f;
+}
+
+.btn-group .btn-outline-primary {
+    border-color: #36337f;
+    color: #36337f;
+}
+
+.btn-group .btn-outline-primary:hover {
+    background-color: #36337f;
+    color: #ffffff;
+    border-color: #36337f;
+}
+
+.btn-group .btn-outline-primary svg {
+    fill: #36337f;
+}
+
+.btn-group .btn-outline-primary:hover svg {
+    fill: #ffffff;
+}
+
+
