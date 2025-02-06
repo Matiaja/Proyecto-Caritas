@@ -15,6 +15,31 @@
         class="form-control"
         [type]="field.type"
         [placeholder]="field.placeholder || ''"
+        [readonly]="field.name === 'type'"
+      />
+      <input
+        *ngif="field.type === 'date'"
+        [id]="field.name"
+        [formControlName]="field.name"
+        class="form-control"
+        [type]="field.type"
+        [placeholder]="field.placeholder || ''"
+      />
+      <input
+        *ngIf="field.type === 'number'"
+        [id]="field.name"
+        [formControlName]="field.name"
+        class="form-control"
+        [type]="field.type"
+        [placeholder]="field.placeholder || ''"
+      />
+      <input 
+        *ngif="field.type === 'textarea'"
+        [id]="field.name"
+        [formControlName]="field.name"
+        class="form-control"
+        [type]="field.type"
+        [placeholder]="field.placeholder || ''"
       />
       <select
         *ngIf="field.type === 'select'"

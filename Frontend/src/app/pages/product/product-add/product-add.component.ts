@@ -28,6 +28,15 @@ export class ProductAddComponent implements OnInit{
         errorMessage: 'El nombre es requerido',
       },
       {
+        name: 'code',
+        label: 'Código',
+        type: 'text',
+        value: '',
+        placeholder: 'Ingrese el código del producto',
+        validators: [Validators.required],
+        errorMessage: 'El código es requerido',
+      },
+      {
         name: 'category',
         label: 'Categoría',
         type: 'select',

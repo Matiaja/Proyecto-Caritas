@@ -17,6 +17,11 @@ import { ProductAddComponent } from './pages/product/product-add/product-add.com
 import { CenterAddComponent } from './pages/center/center-add/center-add.component';
 import { CenterEditComponent } from './pages/center/center-edit/center-edit.component';
 import { CenterDetailComponent } from './pages/center/center-detail/center-detail.component';
+import { CategoryDetailComponent } from './pages/category/category-detail/category-detail.component';
+import { ProductDetailComponent } from './pages/product/product-detail/product-detail.component';
+import { StorageComponent } from './pages/storage/storage.component';
+import { StorageAddComponent } from './pages/storage/storage-add/storage-add.component';
+import { StorageDetailComponent } from './pages/storage/storage-detail/storage-detail.component';
 
 export const routes: Routes = [
     {
@@ -67,7 +72,8 @@ export const routes: Routes = [
         children: [
           { path: '', component: CategoryComponent },
           { path: 'add', component: AddCategoryComponent, data: { breadcrumb: 'Agregar Categoría' } },
-          { path: 'edit/:id', component: EditCategoryComponent, data: { breadcrumb: 'Editar Categoría' } }
+          { path: 'edit/:id', component: EditCategoryComponent, data: { breadcrumb: 'Editar Categoría' } },
+          { path: 'detail/:id', component: CategoryDetailComponent, data: { breadcrumb: 'Detalle de Categoría' } }
         ]
     },
     {
@@ -77,6 +83,17 @@ export const routes: Routes = [
         children: [
             { path: '', component: ProductComponent },
             { path: 'add', component: ProductAddComponent, data: { breadcrumb: 'Agregar Producto' } },
+            { path: 'detail/:id', component: ProductDetailComponent, data: { breadcrumb: 'Detalle de Producto' } }
+        ]
+    },
+    {
+        path: 'storage',
+        data: { breadcrumb: 'Almacén' },
+        canActivate: [authGuard],
+        children: [
+            {path: '', component: StorageComponent},
+            {path: 'add', component: StorageAddComponent, data: { breadcrumb: 'Agregar Stock' }},
+            {path: 'detail/:id', component: StorageDetailComponent, data: { breadcrumb: 'Detalle de Stock' }}
         ]
     }
 ];

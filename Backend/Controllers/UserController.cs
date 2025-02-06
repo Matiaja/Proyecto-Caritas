@@ -162,6 +162,8 @@ namespace ProyectoCaritas.Controllers
                 return Unauthorized(new { message = "Invalid login attempt" });
             }
 
+            var centerId = await GetUserCenterId(user.Id);
+
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes("SuperSecureKey1234!·$%&/()=asdfasdf"); // Use a secure key
 
@@ -179,7 +181,7 @@ namespace ProyectoCaritas.Controllers
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
 
-            return Ok(new { token = tokenString });
+            return Ok(new { token = tokenString, centerId = centerId });
         }
 
         // PUT: api/User/{id}
@@ -281,6 +283,14 @@ namespace ProyectoCaritas.Controllers
             }
 
             return Ok(new { message = "User deleted successfully" });
+        }
+
+        private async Task<int?> GetUserCenterId(string id)
+        {
+            return await _context.Users
+                .Where(u => u.Id == id)
+                .Select(u => u.CenterId)
+                .FirstOrDefaultAsync();
         }
     }
 }

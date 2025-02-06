@@ -5,6 +5,7 @@
         public int Id { get; set; }
         public required int CategoryId { get; set; } // Un Producto pertenece solo a una Categoría. 
         public required string Name { get; set; }
+        public string? Code { get; set; }
 
         public required Category Category { get; set; } // Un Producto pertenece solo a una Categoría. 
         public ICollection<OrderLine>? OrderLines { get; set; } // Un Producto esta en cero o mas Lineas de pedidos.

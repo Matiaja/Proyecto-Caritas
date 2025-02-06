@@ -1,0 +1,53 @@
+<div *ngIf="stock && stock.length">
+    <div class="mb-md-3">
+        <div class="d-flex justify-content-center mt-5">
+        <div class="card container w-100 w-md-75 mx-auto p-md-3 shadow-sm">
+            <div class="card-header d-md-flex justify-content-md-between align-items-center ">
+            <h5 class="mb-md-0">Detalles del stock del producto: {{ stock[0].productId }}</h5>
+            <button class="btn btn-outline-secondary btn-sm" (click)="goBack()">Volver</button>
+            </div>
+            <div class="row align-items-center py-4 g-4 px-3">
+                <div class="col-sm-6">
+                    <label class="fw-medium">Producto:</label>
+                    <span class="ps-2">{{ stock[0].product.name }}</span>
+                </div>
+                <div class="col-sm-6">
+                    <label class="fw-medium">Código:</label>
+                    <span class="ps-2">{{ stock[0].product.code }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mb-md-3" *ngFor="let item of stock">
+        <div class="d-flex justify-content-center mt-5">
+        <div class="card container w-100 w-md-75 mx-auto p-md-3 shadow-sm">
+            <div class="card-header d-md-flex justify-content-md-between align-items-center" 
+            [ngClass]="{'bg-light-green': item.type === 'Ingreso', 'bg-light-red': item.type === 'Egreso'}">
+                <h5 class="mb-md-0">{{ item.type }}</h5>
+            </div>
+            <div class="row align-items-center py-4 g-4 px-3">
+            <div class="col-sm-6">
+                <label class="fw-medium">Cantidad:</label>
+                <span class="ps-2">{{ item.quantity }}</span>
+            </div>
+            <div class="col-sm-6">
+                <label class="fw-medium">Descripción:</label>
+                <span class="ps-2">{{ item.description }}</span>
+            </div>
+            <div class="col-sm-6">
+                <label class="fw-medium">Fecha de llegada:</label>
+                <span class="ps-2">{{ item.date }}</span>
+            </div>
+            <div class="col-sm-6">
+                <label class="fw-medium">Fecha de expiración:</label>
+                <span class="ps-2">{{ item.expirationDate }}</span>
+            </div>
+            <div class="col-sm-6">
+                <label class="fw-medium">Peso:</label>
+                <span class="ps-2">{{ item.weight }}</span>
+            </div>
+
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,10 @@
+<ui-table
+    [title]="title"
+    [displayedColumns]="displayedColumns"
+    [dataSource]="stocks"
+    [columnHeaders]="columnHeaders"
+    [showAddButton]="true"
+    [showSelectButton]="true"
+    (addElement)="onAddStock()"
+    (selectElement)="onSelectStock($event)">
+</ui-table>

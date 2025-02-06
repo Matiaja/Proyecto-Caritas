@@ -9,6 +9,22 @@
         <ng-container [ngSwitch]="field.type">
           <!-- Campo de texto -->
           <input
+            *ngSwitchCase="'date'"
+            [id]="field.name"
+            [formControlName]="field.name"
+            class="form-control"
+            [type]="field.type"
+            [placeholder]="field.placeholder || ''"
+          />
+          <input
+            *ngSwitchCase="'number'"
+            [id]="field.name"
+            [formControlName]="field.name"
+            class="form-control"
+            [type]="field.type"
+            [placeholder]="field.placeholder || ''"
+          />
+          <input 
             *ngSwitchCase="'text'"
             [id]="field.name"
             [formControlName]="field.name"
@@ -17,6 +33,14 @@
             [placeholder]="field.placeholder || ''"
           />
           
+          <input
+            *ngSwitchCase="'textarea'"
+            [id]="field.name"
+            [formControlName]="field.name"
+            class="form-control"
+            [type]="field.type"
+            [placeholder]="field.placeholder || ''"
+          />
           <!-- Campo de selección -->
           <select
             *ngSwitchCase="'select'"

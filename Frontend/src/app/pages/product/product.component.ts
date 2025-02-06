@@ -18,12 +18,11 @@ import { ProductService } from '../../services/product/product.service';
 
 export class ProductComponent implements OnInit {
   title = 'Productos';
-  displayedColumns = ['name', 'description', 'price', 'stock'];
+  displayedColumns = ['name', 'code'];
   products: any[] = [];
   columnHeaders: { [key: string]: string } = {
     name: 'Nombre',
-    description: 'Descripción',
-    price: 'Precio',
+    code: 'Code',
   };
 
   constructor(
@@ -35,6 +34,7 @@ export class ProductComponent implements OnInit {
       this.products = products;
     });
     this.productService.getProducts();
+
   }
 
   onAddProduct(): void {
@@ -42,6 +42,10 @@ export class ProductComponent implements OnInit {
   }
 
   onEditProduct(product: any) {
+  }
+
+  onSelectProduct(product: any) {
+    this.router.navigate(['/products/detail', product.id]);
   }
 
   async onDeleteProduct(product: any) {

@@ -25,6 +25,8 @@ export class AuthService {
     }).pipe(
       tap((res: any) => {
         localStorage.setItem('authUser', JSON.stringify(res));
+        localStorage.setItem('currentCenterId', res.centerId);
+        console.log(res)
       })
     );
   }
