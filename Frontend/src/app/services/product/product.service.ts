@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Product } from '../../models/product.model';
-import { Observable, BehaviorSubject, tap, map} from 'rxjs';
+import { Observable, BehaviorSubject, tap, map, catchError, of} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -16,8 +16,12 @@ export class ProductService {
   constructor(private http: HttpClient) { }
 
   getProducts(): Observable<Product[]> {
-    return this.http.get<Product[]>(this.baseUrl);
-  }
+    return this.http.get<Product[]>(this.baseUrl).pipe(
+      tap((products) => {
+        this.productsSubject.next(products);
+      })
+    );
+  }  
 
   getProductById(productId: number): Observable<Product> {
     return this.http.get<Product>(this.baseUrl + '/' + productId);
@@ -38,6 +42,16 @@ export class ProductService {
         const currentProducts = this.productsSubject.getValue();
         const updatedProducts = currentProducts.filter((p) => p.id !== productId);
         this.productsSubject.next(updatedProducts);
+      })
+    );
+  }
+
+  searchProducts(searchTerm: string): Observable<Product[]> {
+    console.log('Searching:', searchTerm);
+    return this.http.get<Product[]>(`${this.baseUrl}/search?query=${searchTerm}`).pipe(
+      catchError((error) => {
+        console.error('Error searching products:', error);
+        return of([]);
       })
     );
   }

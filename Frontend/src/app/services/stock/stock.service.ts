@@ -32,7 +32,11 @@ export class StockService {
       tap((newStock) => {
         const currentStocks = this.stockSubject.getValue();
         this.stockSubject.next([...currentStocks, newStock]);
-      })
+      }),
+      catchError((error) => {
+      console.error('Error al crear stock:', error);
+      return throwError(() => new Error('No se pudo crear el stock'));
+    })
     );
   }
 
@@ -60,7 +64,7 @@ export class StockService {
 
   getProductWithStock(centerId: number): Observable<any[]> {
     const headers = { 'centerId': centerId.toString() };
-    return this.http.get<any[]>(`${this.baseUrl}/product-with-stock`, { headers });
+    return this.http.get<any[]>(`${this.baseUrl}/product-with-stock`, { headers })
   }
 
   getProductWithStockById(productId: number, centerId: number): Observable<any> {

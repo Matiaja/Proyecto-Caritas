@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, OnChange
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-
+import { ProductService } from '../../../services/product/product.service';
 @Component({
   selector: 'generic-form',
   standalone: true,
@@ -32,8 +32,9 @@ export class GenericFormComponent implements OnChanges {
   @Output() formChange = new EventEmitter<FormGroup>();
 
   form!: FormGroup;
+  suggestions: { [key: string]: any[] } = {};
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private productService: ProductService) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['data'] && this.data) {
@@ -51,6 +52,36 @@ export class GenericFormComponent implements OnChanges {
       ];
     });
     this.form = this.fb.group(controls);
+  }
+
+  onSearchChange(event: Event, value: string) {
+    const searchTerm = (event.target as HTMLInputElement).value;
+    console.log('Searching:', searchTerm);
+    if (!searchTerm) {
+      this.suggestions[value] = [];
+      return;
+    }
+    this.productService.searchProducts(searchTerm).subscribe((products) => {
+      this.suggestions[value] = products.map((product: any) => ({
+        value: product.id,
+        label: product.name,
+        }));
+    },
+    (error) => {
+      console.error('Error searching products:', error);
+      this.suggestions[value] = [];
+    });
+  }
+
+  selectSearchResult(field: string, value: any) {
+    console.log('Selected:', value);
+    this.form.get(field)?.setValue({ id: value.value, name: value.label });
+    this.suggestions[field] = [];
+  }
+
+  getProductLabel(fieldName: string): string {
+    const fieldValue = this.form.get(fieldName)?.value;
+    return fieldValue && fieldValue.name ? fieldValue.name : '';
   }
 
   onSubmit(): void {

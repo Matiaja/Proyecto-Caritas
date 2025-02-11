@@ -20,14 +20,12 @@ export class StorageAddComponent implements OnInit{
     title: 'Agregar Stock',
     fields: [
       {
-        name: 'product',
+        name: 'productSearch',
         label: 'Producto',
-        type: 'select',
+        type: 'searchProducts',
         value: '',
-        placeholder: 'Seleccione un producto',
+        placeholder: 'Escriba para buscar un producto...',
         validators: [Validators.required],
-        errorMessage: 'El producto es requerido',
-        options: [] as { value: any; label: string }[],
       },
       {
         name: 'type',
@@ -87,7 +85,7 @@ export class StorageAddComponent implements OnInit{
         value: '',
         placeholder: 'Ingrese el peso',
         validators: [Validators.min(0)],
-        errorMessage: 'El peso es requerido y debe ser mayor o igual a 0',
+        errorMessage: 'El peso debe ser mayor o igual a 0',
       },
     ],
   };
@@ -99,28 +97,19 @@ export class StorageAddComponent implements OnInit{
   ) {}
   
   ngOnInit(): void {
-      this.loadProducts();
-  }
-
-  loadProducts() {
-    this.productService.products$.subscribe(products => {
-      this.formConfig.fields[0].options = products.map((product) => {
-        return { value: product.id, label: product.name };
-      });
-    });
-    this.productService.getProducts();
+      // this.loadProducts();
   }
 
   onSubmit(data: any): void {
     const centerId = localStorage.getItem('currentCenterId');
     const payload = {
-      productId: data.product,
+      productId: data.productSearch?.id,
       type: data.type,
       date: data.date,
       expirationDate: data.expirationDate,
-      description: data.description,
+      description: data.description? data.description : '',
       quantity: data.quantity,
-      weight: data.weight,
+      weight: data.weight? data.weight : 0,
       centerId: centerId,
     };
 

@@ -89,24 +89,42 @@ namespace ProyectoCaritas.Controllers
                     });
                 }
             }
-            var stock = new Stock
+
+            var result = await ValidateQuantity(StockDTO.CenterId, (int)StockDTO.ProductId, StockDTO.Quantity);
+
+            if (result is BadRequestObjectResult badRequest)
             {
-                CenterId = StockDTO.CenterId,
-                ProductId = StockDTO.ProductId,
-                Date = StockDTO.Date,
-                ExpirationDate = StockDTO.ExpirationDate,
-                Description = StockDTO.Description,
-                Quantity = StockDTO.Quantity,
-                Weight = StockDTO.Weight,
-                Type = StockDTO.Type,
-                //Status = StockDTO.Status,
-                Center = center
-            };
+                return BadRequest(badRequest.Value);
+            }
 
-            _context.Stocks.Add(stock);
-            await _context.SaveChangesAsync();
+            if (result is OkObjectResult okResult)
+            {
+                var totalQuantity = (int)((dynamic)okResult.Value).totalStock;
 
-            return CreatedAtAction(nameof(GetStockById), new { id = stock.Id }, StockToDto(stock));
+                if (totalQuantity >= 0)
+                {
+
+                    var stock = new Stock
+                    {
+                        CenterId = StockDTO.CenterId,
+                        ProductId = StockDTO.ProductId,
+                        Date = StockDTO.Date,
+                        ExpirationDate = StockDTO.ExpirationDate,
+                        Description = StockDTO.Description,
+                        Quantity = StockDTO.Quantity,
+                        Weight = StockDTO.Weight,
+                        Type = StockDTO.Type,
+                        Center = center
+                    };
+
+                    _context.Stocks.Add(stock);
+                    await _context.SaveChangesAsync();
+
+                    return CreatedAtAction(nameof(GetStockById), new { id = stock.Id }, StockToDto(stock));
+                }
+            }
+
+            return BadRequest(new { message = "Invalid Quantity" });
         }
 
         // PUT: api/Stocks/{id}

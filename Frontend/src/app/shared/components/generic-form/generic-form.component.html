@@ -16,14 +16,6 @@
             [type]="field.type"
             [placeholder]="field.placeholder || ''"
           />
-          <input
-            *ngSwitchCase="'number'"
-            [id]="field.name"
-            [formControlName]="field.name"
-            class="form-control"
-            [type]="field.type"
-            [placeholder]="field.placeholder || ''"
-          />
           <input 
             *ngSwitchCase="'text'"
             [id]="field.name"
@@ -63,6 +55,27 @@
             [placeholder]="field.placeholder || ''"
           />
         
+          <div class="position-relative" *ngSwitchCase="'searchProducts'">
+            <input
+              [id]="field.name"
+              [formControlName]="field.name"
+              class="form-control"
+              type="text"
+              [placeholder]="field.placeholder || ''"
+              (input)="onSearchChange($event, field.name)"
+              [value]="getProductLabel(field.name)"
+              />
+            <ul *ngIf="suggestions[field.name]?.length" 
+                class="list-group position-absolute w-100 bg-white shadow mt-1"
+                style="z-index: 1050; max-height: 200px; overflow-y: auto;">
+              <li *ngFor="let option of suggestions[field.name]" 
+                  class="list-group-item list-group-item-action"
+                  (click)="selectSearchResult(field.name, option)">
+                {{ option.label }}
+              </li>
+            </ul>
+          </div>
+
           <!-- Campo de correo electrónico -->
           <input
             *ngSwitchCase="'email'"

@@ -54,6 +54,27 @@ namespace ProyectoCaritas.Controllers
             return ProductToDTO(prod);
         }
 
+        [HttpGet("search")]
+        public async Task<ActionResult> Search([FromQuery] string query)
+        {
+            if (string.IsNullOrEmpty(query))
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "La consulta no puede estar vacía."
+                });
+            }
+            var products = await context.Products
+                .Include(x => x.Stocks)
+                .Where(x => x.Name.Contains(query))
+                .Select(x => ProductToDTO(x))
+                .ToListAsync();
+            return Ok(products);
+        }
+
+
         // POST: api/Products
         [HttpPost]
         public async Task<ActionResult<ProductDTO>> AddProduct(AddProductDTO prod)
