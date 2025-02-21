@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Product } from '../../models/product.model';
@@ -65,6 +65,11 @@ export class StockService {
   getProductWithStock(centerId: number): Observable<any[]> {
     const headers = { 'centerId': centerId.toString() };
     return this.http.get<any[]>(`${this.baseUrl}/product-with-stock`, { headers })
+  }
+
+  getProductInStocks(productId: number): Observable<any[]> {
+    const headers = new HttpHeaders().set('productId', productId.toString());
+    return this.http.get<any[]>(`${this.baseUrl}/product-with-all-stocks`, { headers });
   }
 
   getProductWithStockById(productId: number, centerId: number): Observable<any> {

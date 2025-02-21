@@ -87,12 +87,12 @@ export class RequestAssignComponent implements OnInit {
         this.orderLineId = queryParams['orderLineId'] ? Number(queryParams['orderLineId']) : null;
   
         if (this.productId && this.orderLineId) {
-          this.searchProduct(this.productId);
+          this.searchProductInStock(this.productId);
         }
       });
   }
 
-  searchProduct(productId: number | null) {
+  searchProductInStock(productId: number | null) {
     if(productId) {
       this.productService.getProductById(productId).subscribe({
         next: (product) => {
