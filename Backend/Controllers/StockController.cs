@@ -90,7 +90,7 @@ namespace ProyectoCaritas.Controllers
                 }
             }
 
-            var result = await ValidateQuantity(StockDTO.CenterId, (int)StockDTO.ProductId, StockDTO.Quantity);
+            var result = await ValidateQuantity(StockDTO.CenterId, (int)StockDTO.ProductId, StockDTO.Quantity, StockDTO.Type);
 
             if (result is BadRequestObjectResult badRequest)
             {
@@ -235,7 +235,7 @@ namespace ProyectoCaritas.Controllers
 
         // GET: api/Stocks/validate-quantity
         [HttpGet("validate-quantity")]
-        public async Task<IActionResult> ValidateQuantity(int centerId, int productId, int newQuantity)
+        public async Task<IActionResult> ValidateQuantity(int centerId, int productId, int newQuantity, string type)
         {
             var stocks = await _context.Stocks
                 .Where(s => s.CenterId == centerId && s.ProductId == productId)
@@ -244,12 +244,17 @@ namespace ProyectoCaritas.Controllers
             int totalStock = stocks
                 .Sum(s => s.Type == "Ingreso" ? s.Quantity : -s.Quantity);
 
-            if (totalStock < newQuantity)
+            if (type == "Egreso")
             {
-                return BadRequest(new { message = "La cantidad ingresada excede al stock disponible del producto" });
+                if (totalStock < newQuantity)
+                {
+                    return BadRequest(new { message = "El stock no puede ser negativo." });
+                }
+                return Ok(new { totalStock = totalStock - newQuantity });
             }
 
-            return Ok(new { totalStock = totalStock - newQuantity });
+            return Ok(new { totalStock = totalStock + newQuantity });
+
 
         }
 
@@ -275,6 +280,34 @@ namespace ProyectoCaritas.Controllers
                 return Ok(productWithStock);
             }
             return BadRequest(new { message = "Invalid centerId" });
+
+        }
+
+        // GET: api/Stocks/product-with-all-stock
+        [HttpGet("product-with-all-stocks")]
+        public async Task<ActionResult<List<ProductStockDTO>>> GetProductWithAllStocks([FromHeader] string productId)
+        {
+            if (int.TryParse(productId, out int productIdInt))
+            {
+                var productWithStock = await _context.Stocks
+                    .Where(s => s.ProductId == productIdInt)
+                    .Include(s => s.Center)
+                    .GroupBy(s => new { s.ProductId, s.Product.Name, s.Product.Code, s.CenterId, CenterName = s.Center.Name })
+                    .Select(s => new ProductStockDTO
+                    {
+                        ProductId = (int)s.Key.ProductId,
+                        ProductName = s.Key.Name,
+                        ProductCode = s.Key.Code,
+                        CenterId = s.Key.CenterId,
+                        CenterName = s.Key.CenterName,
+                        StockQuantity = s.Sum(s => s.Type == "Ingreso" ? s.Quantity : -s.Quantity)
+                    })
+                    .Where(p => p.StockQuantity > 0)
+                    .ToListAsync();
+
+                return Ok(productWithStock);
+            }
+            return BadRequest(new { message = "Invalid productId" });
 
         }
 
