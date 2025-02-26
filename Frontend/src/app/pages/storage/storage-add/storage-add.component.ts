@@ -2,11 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { GenericFormComponent } from '../../../shared/components/generic-form/generic-form.component';
 import { Router } from '@angular/router';
-import { Validators } from '@angular/forms';
+import { AbstractControl, AsyncValidatorFn, Validators } from '@angular/forms';
 import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
 import { ProductService } from '../../../services/product/product.service';
 import { StockService } from '../../../services/stock/stock.service';
 import { expirationDateValidator } from '../../../shared/validators/date-compare.validator';
+import { catchError, debounceTime, distinctUntilChanged, map, switchMap, of } from 'rxjs';
+
 
 @Component({
   selector: 'app-storage-add',
@@ -95,9 +97,9 @@ export class StorageAddComponent implements OnInit{
     private stockService: StockService,
     private router: Router
   ) {}
+
   
   ngOnInit(): void {
-      // this.loadProducts();
   }
 
   onSubmit(data: any): void {

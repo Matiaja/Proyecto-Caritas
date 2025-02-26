@@ -52,11 +52,60 @@ namespace ProyectoCaritas.Controllers
             return Ok(userDTOs);
         }
 
+
+        //Creo que habria que eliminar este endpoint
+        [HttpGet("user-with-center")]
+        public async Task<ActionResult<IEnumerable<UserCenterDTO>>> GetAllUserWithCenter()
+        {
+            var users = await _userManager.Users.ToListAsync();
+            if (!users.Any())
+            {
+                return NotFound(new { message = "No users found." });
+            }
+            var userDTOs = users
+            .Select(u => new UserCenterDTO
+            {
+                Username = u.UserName ?? string.Empty,
+                Email = u.Email ?? string.Empty,
+                CenterName = u.Center?.Name ?? string.Empty
+            }).ToList();
+            return Ok(userDTOs);
+        }
+
+        [HttpGet("all-user-no-admin")]
+        public async Task<ActionResult<IEnumerable<UserDTO>>> GetAllUserNoAdmin()
+        {
+            var users = await _userManager.Users.Where(u => u.Role != "Admin")
+                .Include(u => u.Center)
+                .ToListAsync();
+            if (!users.Any())
+            {
+                return NotFound(new { message = "No users found." });
+            }
+            var userDTOs = users.Select(u => new UserDTO
+            {
+                Id = u.Id,
+                UserName = u.UserName ?? string.Empty,
+                Email = u.Email ?? string.Empty,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                Role = u.Role,
+                PhoneNumber = u.PhoneNumber ?? string.Empty,
+                CenterId = u.CenterId,
+                CenterName = u.Center?.Name ?? string.Empty
+            }).ToList();
+            return Ok(userDTOs);
+        }
+
         // GET: api/User/{id}
-        [HttpGet("id/{id}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<UserDTO>> GetUserById(string id)
         {
-            var user = await _userManager.FindByIdAsync(id);
+            var user = await _userManager.Users
+                .Where(u => u.Id == id)
+                .Include(u => u.Center)
+                .FirstOrDefaultAsync();
+
             if (user == null)
             {
                 return NotFound(new { message = "User not found" });
@@ -71,7 +120,8 @@ namespace ProyectoCaritas.Controllers
                 LastName = user.LastName,
                 Role = user.Role,
                 PhoneNumber = user.PhoneNumber ?? string.Empty,
-                CenterId = user.CenterId
+                CenterId = user.CenterId,
+                CenterName = user.Center?.Name ?? string.Empty
             };
 
             return Ok(userDTO);

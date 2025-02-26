@@ -246,7 +246,7 @@ namespace ProyectoCaritas.Controllers
 
             if (totalStock < newQuantity)
             {
-                return BadRequest(new { message = "El stock no puede ser negativo." });
+                return BadRequest(new { message = "La cantidad ingresada excede al stock disponible del producto" });
             }
 
             return Ok(new { totalStock = totalStock - newQuantity });

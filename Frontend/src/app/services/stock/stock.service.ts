@@ -50,16 +50,10 @@ export class StockService {
     );
   }
 
-  validateQuantity(productId: number, centerId: number, newQuantity: number): Observable<number> {
-    return this.http.post<{ totalStock: number }>(`${this.baseUrl}/validate-quantity`, 
-      { productId, centerId, newQuantity }
-    ).pipe(
-      map(response => response.totalStock),
-      catchError(error => {
-        console.error("Error validando stock:", error);
-        return throwError(() => new Error(error.error.message || "Error en la validación del stock"));
-      })
-    );
+  validateQuantity(centerId: string, productId: number, newQuantity: number) {
+    return this.http.get(`${this.baseUrl}/validate-quantity`, {
+      params: { centerId, productId, newQuantity }
+    });
   }
 
   getProductWithStock(centerId: number): Observable<any[]> {

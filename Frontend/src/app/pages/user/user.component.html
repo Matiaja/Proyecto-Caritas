@@ -1,0 +1,14 @@
+<ui-table
+    [title]="title"
+    [displayedColumns]="displayedColumns"
+    [dataSource]="users"
+    [columnHeaders]="columnHeaders"
+    [showAddButton]="true"
+    [showEditButton]="true"
+    [showDeleteButton]="true"
+    [showSelectButton]="true"
+    (addElement)="onAddUser()"
+    (editElement)="onEditUser($event)"
+    (deleteElement)="onDeleteUser($event)"
+    (selectElement)="onSelectUser($event)">
+</ui-table>
