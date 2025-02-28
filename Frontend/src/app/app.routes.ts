@@ -25,6 +25,7 @@ import { StorageDetailComponent } from './pages/storage/storage-detail/storage-d
 import { UserComponent } from './pages/user/user.component';
 import { UserAddComponent } from './pages/user/user-add/user-add.component';
 import { UserDetailComponent } from './pages/user/user-detail/user-detail.component';
+import { UserEditComponent } from './pages/user/user-edit/user-edit.component';
 
 export const routes: Routes = [
     {
@@ -107,6 +108,7 @@ export const routes: Routes = [
             {path: '', component: UserComponent},
             {path: 'add', component: UserAddComponent, data: { breadcrumb: 'Agregar Usuario' }},
             {path: 'detail/:id', component: UserDetailComponent, data: { breadcrumb: 'Detalle de Usuario' }},
+            {path: 'edit', component: UserEditComponent, data: { breadcrumb: 'Editar Usuario' }}
             ]
     }
 ];

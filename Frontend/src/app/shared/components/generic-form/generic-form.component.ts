@@ -6,6 +6,7 @@ import { ProductService } from '../../../services/product/product.service';
 import { StockService } from '../../../services/stock/stock.service';
 import { catchError, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { GlobalStateService } from '../../../services/global/global-state.service';
 
 @Component({
   selector: 'generic-form',
@@ -41,7 +42,8 @@ export class GenericFormComponent implements OnChanges {
   constructor(
     private fb: FormBuilder, 
     private productService: ProductService,
-    private stockService: StockService
+    private stockService: StockService,
+    private globalStateService: GlobalStateService
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -84,7 +86,7 @@ export class GenericFormComponent implements OnChanges {
   private validateStockQuantity() {
     return (control: any) => {
       const productId = this.form.get('productSearch')?.value?.id;
-      const centerId = localStorage.getItem('currentCenterId');
+      const centerId = this.globalStateService.getCurrentCenterId();
       const newQuantity = control.value;
 
       return this.stockService

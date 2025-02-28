@@ -50,7 +50,7 @@ export class StockService {
     );
   }
 
-  validateQuantity(centerId: string, productId: number, newQuantity: number) {
+  validateQuantity(centerId: number, productId: number, newQuantity: number) {
     return this.http.get(`${this.baseUrl}/validate-quantity`, {
       params: { centerId, productId, newQuantity }
     });

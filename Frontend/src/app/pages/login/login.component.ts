@@ -4,6 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { GlobalStateService } from '../../services/global/global-state.service';
 
 @Component({
   selector: 'app-login',
@@ -12,7 +13,9 @@ import { CommonModule } from '@angular/common';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent {
+export class LoginComponent{
+
+  constructor(private globalStateService: GlobalStateService) {}
 
   authService = inject(AuthService);
   router = inject(Router);
@@ -28,6 +31,10 @@ export class LoginComponent {
     this.authService.login(this.loginForm.value).subscribe({
       next: (data: any) => {
         if (data && data.token) {
+          this.globalStateService.setCenterId(data.centerId);
+          this.globalStateService.setUserId(data.userId);
+          console.log(this.globalStateService.getCurrentCenterId());
+          console.log(this.globalStateService.getCurrentUserId());
           localStorage.setItem('authUser', JSON.stringify(data)); // Almacena el token
           this.router.navigate(['/home']);
           this.errorMessage = null; // Reset error message on successful login

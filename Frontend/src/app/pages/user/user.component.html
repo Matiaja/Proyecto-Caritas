@@ -4,11 +4,11 @@
     [dataSource]="users"
     [columnHeaders]="columnHeaders"
     [showAddButton]="true"
-    [showEditButton]="true"
     [showDeleteButton]="true"
     [showSelectButton]="true"
+    [showSearchBar]="showSearchBar"
+    [searchColumns]="searchColumns"
     (addElement)="onAddUser()"
-    (editElement)="onEditUser($event)"
     (deleteElement)="onDeleteUser($event)"
     (selectElement)="onSelectUser($event)">
 </ui-table>

@@ -39,11 +39,11 @@ export class UserService {
     ).subscribe();
   }
 
-  getUserById(userId: number): Observable<any> {
+  getUserById(userId: string): Observable<any> {
     return this.http.get<any>(this.baseUrl + '/' + userId);
   }
 
-  deleteUser(userId: number){
+  deleteUser(userId: string){
     return this.http.delete(this.baseUrl + '/' + userId).pipe(
       tap(() => {
         const currentUsers = this.usersSubject.getValue();
@@ -51,6 +51,10 @@ export class UserService {
         this.usersSubject.next(updatedUsers);
       })
     );
+  }
+
+  updateUser(user: any, userId: string): Observable<any> {
+    return this.http.put(this.baseUrl + '/' + userId, user);
   }
 
   registerUser(user: any): Observable<any> {

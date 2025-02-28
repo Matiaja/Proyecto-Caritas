@@ -2,12 +2,21 @@
 <div class="card container w-100 w-md-75 mx-auto p-md-3 shadow-sm">
   <div class="card-header d-flex justify-content-between align-items-center">
     <h5 class="mb-0">{{ title }}</h5>
+    @if(showSearchBar) {
+      <input
+        type="text"
+        class="form-control w-50"
+        [(ngModel)]="searchTerm"
+        (input)="filterData()"
+        placeholder="Buscar..."
+      />
+    }
     @if(showAddButton) {
       <button class="btn btn-primary btn-sm button-add" (click)="onAddElement()">Agregar Nuevo</button>
     }
   </div>
   <div class="table-responsive overflow-x-auto">
-    <table mat-table [dataSource]="dataSource" class="table table-hover table-borderless">
+    <table mat-table [dataSource]="filteredDataSource" class="table table-hover table-borderless">
       <ng-container *ngFor="let column of displayedColumns" [matColumnDef]="column">
         <th mat-header-cell *matHeaderCellDef class="border-bottom">
           {{ columnHeaders[column] || column | titlecase }}

@@ -25,6 +25,9 @@ export class UserComponent implements OnInit{
     centerName: 'Centro',
   };
 
+  showSearchBar = true;
+  searchColumns = ['userName', 'email', 'centerName'];
+
   constructor(private userService: UserService, private router: Router, private modalService: ConfirmModalService) { }
 
   ngOnInit() {
@@ -40,10 +43,6 @@ export class UserComponent implements OnInit{
 
   onAddUser(): void {
     this.router.navigate(['/users/add']);
-  }
-
-  onEditUser(user: any) {
-    this.router.navigate(['/users/edit', user.id]);
   }
 
   onSelectUser(user: any) {
@@ -62,6 +61,7 @@ export class UserComponent implements OnInit{
     }
 
   }
-  
+
+   
 
 }

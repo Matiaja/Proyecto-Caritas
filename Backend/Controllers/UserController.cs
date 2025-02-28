@@ -231,13 +231,16 @@ namespace ProyectoCaritas.Controllers
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
 
-            return Ok(new { token = tokenString, centerId = centerId });
+            return Ok(new { token = tokenString, centerId = centerId, userId = user.Id });
         }
 
+
+
+        // Creo que la actualizacion de la contraseña conviene hacerla por otra ruta por el tema del hasheo de la contraseña
         // PUT: api/User/{id}
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateUser(string id, UserRegisterDTO userDTO)
+        //[Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateUser(string id, UserDTO userDTO)
         {
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
@@ -263,6 +266,7 @@ namespace ProyectoCaritas.Controllers
             userDTO.Role = char.ToUpper(userDTO.Role[0]) + userDTO.Role.Substring(1).ToLower(); // Normalize role name
 
             // Update user properties
+            user.Id = userDTO.Id;
             user.UserName = userDTO.UserName;
             user.Email = userDTO.Email;
             user.FirstName = userDTO.FirstName;
@@ -272,20 +276,20 @@ namespace ProyectoCaritas.Controllers
             user.CenterId = userDTO.CenterId;
 
             // Actualizar la contraseña si se proporciona
-            if (!string.IsNullOrWhiteSpace(userDTO.Password))
-            {
-                var removePasswordResult = await _userManager.RemovePasswordAsync(user);
-                if (!removePasswordResult.Succeeded)
-                {
-                    return BadRequest(removePasswordResult.Errors);
-                }
+            //if (!string.IsNullOrWhiteSpace(userDTO.Password))
+            //{
+            //    var removePasswordResult = await _userManager.RemovePasswordAsync(user);
+            //    if (!removePasswordResult.Succeeded)
+            //    {
+            //        return BadRequest(removePasswordResult.Errors);
+            //    }
 
-                var addPasswordResult = await _userManager.AddPasswordAsync(user, userDTO.Password);
-                if (!addPasswordResult.Succeeded)
-                {
-                    return BadRequest(addPasswordResult.Errors);
-                }
-            }
+            //    var addPasswordResult = await _userManager.AddPasswordAsync(user, userDTO.Password);
+            //    if (!addPasswordResult.Succeeded)
+            //    {
+            //        return BadRequest(addPasswordResult.Errors);
+            //    }
+            //}
 
             // Update user in the database
             var result = await _userManager.UpdateAsync(user);

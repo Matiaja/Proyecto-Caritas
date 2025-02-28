@@ -8,6 +8,7 @@ import { ProductService } from '../../../services/product/product.service';
 import { StockService } from '../../../services/stock/stock.service';
 import { expirationDateValidator } from '../../../shared/validators/date-compare.validator';
 import { catchError, debounceTime, distinctUntilChanged, map, switchMap, of } from 'rxjs';
+import { GlobalStateService } from '../../../services/global/global-state.service';
 
 
 @Component({
@@ -95,7 +96,8 @@ export class StorageAddComponent implements OnInit{
   constructor(
     private productService: ProductService,
     private stockService: StockService,
-    private router: Router
+    private router: Router,
+    private globalStateService: GlobalStateService
   ) {}
 
   
@@ -103,7 +105,7 @@ export class StorageAddComponent implements OnInit{
   }
 
   onSubmit(data: any): void {
-    const centerId = localStorage.getItem('currentCenterId');
+    const centerId = this.globalStateService.getCurrentCenterId();
     const payload = {
       productId: data.productSearch?.id,
       type: data.type,
