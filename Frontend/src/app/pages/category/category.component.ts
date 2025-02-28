@@ -7,6 +7,8 @@ import { Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BreadcrumbComponent } from '../../shared/components/breadcrumbs/breadcrumbs.component';
 import { ConfirmModalService } from '../../services/confirmModal/confirm-modal.service';
+import { ToastrService } from 'ngx-toastr';
+
 @Component({
   selector: 'app-category',
   standalone: true,
@@ -23,7 +25,13 @@ export class CategoryComponent implements OnInit {
     description: 'Descripción',
   };
 
-  constructor(private categoryService: CategoryService, private router: Router,private dialog: MatDialog,private modalService: ConfirmModalService) {}
+  constructor(
+    private categoryService: CategoryService, 
+    private router: Router,
+    private dialog: MatDialog,
+    private modalService: ConfirmModalService,
+    private toastr: ToastrService
+    ) {}
   ngOnInit() {
     this.categoryService.categories$.subscribe(categories => {
       this.categories = categories;
@@ -52,6 +60,7 @@ export class CategoryComponent implements OnInit {
       this.categoryService.deleteCategory(category.id).subscribe(() => {
         this.categories = this.categories.filter((c) => c.id !== category.id);
       });
+      this.toastr.success('Categoría eliminada con éxito', 'Exito');
     }
 
   }
