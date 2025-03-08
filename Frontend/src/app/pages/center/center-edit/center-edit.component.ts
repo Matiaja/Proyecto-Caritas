@@ -5,6 +5,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { CenterService } from '../../../services/center/center.service';
 import { FormGroup } from '@angular/forms';
 import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-edit-center',
@@ -82,7 +83,8 @@ export class CenterEditComponent implements OnInit {
     private centerService: CenterService,
     private router: Router,
     private route: ActivatedRoute,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -159,6 +161,7 @@ export class CenterEditComponent implements OnInit {
 
   onSubmit(formData: any): void {
     this.centerService.updateCenter(this.centerId, formData).subscribe(() => {
+      this.toastr.success('Centro actualizado correctamente', 'Exito');
       this.router.navigate(['/centers']);
     });
   }

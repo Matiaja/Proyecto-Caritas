@@ -16,6 +16,9 @@ export class UiTableComponent<T extends Record<string, any>>{
   @Input() displayedColumns: string[] = []; 
   @Input() dataSource: T[] = [];
   @Input() columnHeaders: { [key: string]: string } = {};
+  @Input() showFilters: boolean = false;
+  @Input() categories: { id: number; name: string }[] = [];
+  @Input() sortOptions: { key: string; label: string }[] = [];
 
   @Input() customActions?: TemplateRef<any>;
 
@@ -26,29 +29,29 @@ export class UiTableComponent<T extends Record<string, any>>{
   @Input() showSearchBar = false;
   @Input() searchColumns: string[] = [];
 
+  @Output() filterChange = new EventEmitter<{ categoryId?: number; sortBy?: string; order?: string }>();
   @Output() addElement = new EventEmitter<void>();
   @Output() editElement = new EventEmitter<T>();
   @Output() deleteElement = new EventEmitter<T>();
   @Output() selectElement = new EventEmitter<T>();
 
   searchTerm: string = '';
+  selectedCategory: number | null = null;
+  selectedSortBy: string | null = null;
+  selectedOrder: string = 'asc';
   filteredDataSource: T[] = [];
 
   ngOnChanges() {
     this.filteredDataSource = [...this.dataSource];
+    this.filterData();
   }
 
   filterData() {
-    const searchTermLower = this.searchTerm.toLowerCase().trim();
-    if (!searchTermLower) {
-      this.filteredDataSource = [...this.dataSource];
-    } else {
-      this.filteredDataSource = this.dataSource.filter(item =>
-        this.searchColumns.some(col =>
-          String(item[col] || '').toLowerCase().includes(searchTermLower)
-        )
-      );
-    }
+    this.filterChange.emit({
+      categoryId: this.selectedCategory || undefined,
+      sortBy: this.selectedSortBy || undefined,
+      order: this.selectedOrder
+    });
   }
 
   get columnsToDisplay(): string[] {

@@ -6,6 +6,7 @@ import { FormGroup } from '@angular/forms';
 import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
 import { UserService } from '../../../services/user/user.service';
 import { GlobalStateService } from '../../../services/global/global-state.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-user-edit',
@@ -63,7 +64,10 @@ export class UserEditComponent implements OnInit{
     private globalStateService: GlobalStateService,
     private router: Router, 
     private route: ActivatedRoute, 
-    private fb: FormBuilder) {
+    private fb: FormBuilder,
+    private toastr: ToastrService
+    ) 
+    {
       this.userId = '';
     }
 
@@ -133,10 +137,12 @@ export class UserEditComponent implements OnInit{
     console.log('User data:', user);
     this.userService.updateUser(user, this.userId).subscribe(
       (response) => {
+        this.toastr.success('Usuario actualizado exitosamente', 'Exito');
         console.log('User updated successfully:', response);
         this.router.navigate(['/users/edit']);
       },
       (error) => {
+        this.toastr.error('Error al actualizar el usuario', 'Error');
         console.error('Error updating user:', error);
       }
     );

@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { BreadcrumbComponent } from '../../shared/components/breadcrumbs/breadcrumbs.component';
 import { ConfirmModalService } from '../../services/confirmModal/confirm-modal.service';
 import { UserService } from '../../services/user/user.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-user',
@@ -28,7 +29,11 @@ export class UserComponent implements OnInit{
   showSearchBar = true;
   searchColumns = ['userName', 'email', 'centerName'];
 
-  constructor(private userService: UserService, private router: Router, private modalService: ConfirmModalService) { }
+  constructor(private userService: UserService, 
+    private router: Router, 
+    private modalService: ConfirmModalService,
+    private toastr: ToastrService
+  ) { }
 
   ngOnInit() {
     this.userService.users$.subscribe(users => {
@@ -58,6 +63,7 @@ export class UserComponent implements OnInit{
       this.userService.deleteUser(user.id).subscribe(() => {
         this.users = this.users.filter((u) => u.id !== user.id);
       });
+      this.toastr.success('Usuario eliminado correctamente');
     }
 
   }
