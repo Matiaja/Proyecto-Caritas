@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProyectoCaritas.Data;
+using ProyectoCaritas.Models;
 using ProyectoCaritas.Models.DTOs;
 using ProyectoCaritas.Models.Entities;
 
@@ -107,12 +108,11 @@ namespace ProyectoCaritas.Controllers
         }
 
         [HttpGet("filter")]
-        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProductsByFilter(
+        public async Task<ActionResult<List<ProductDTO>>> GetProductsByFilter(
             [FromQuery] int? categoryId = null,
             [FromQuery] string? sortBy = null,
             [FromQuery] string? order = "asc")
         {
-
             var query = context.Products
                 .Include(x => x.Stocks)
                 .Include(c => c.Category)
@@ -123,44 +123,50 @@ namespace ProyectoCaritas.Controllers
                 query = query.Where(x => x.CategoryId == categoryId.Value);
             }
 
+            var productQuery = query.Select(x => new
+            {
+                Product = x,
+                Quantity = x.Stocks
+                    .Where(s => s.Type == "Ingreso" || s.Type == "Egreso")
+                    .Sum(s => s.Type == "Ingreso" ? s.Quantity : -s.Quantity)
+            });
+
             if (!string.IsNullOrEmpty(sortBy))
             {
                 switch (sortBy.ToLower())
                 {
                     case "name":
-                        query = (order == "desc") ? query.OrderByDescending(x => x.Name) : query.OrderBy(x => x.Name);
+                        productQuery = (order == "desc")
+                            ? productQuery.OrderByDescending(x => x.Product.Name)
+                            : productQuery.OrderBy(x => x.Product.Name);
                         break;
                     case "quantity":
-                        query = (order == "desc")
-                            ? query.OrderByDescending(x => x.Stocks
-                                .Where(s => s.Type == "Ingreso" || s.Type == "Egreso")
-                                .Sum(s => s.Type == "Ingreso" ? s.Quantity : -s.Quantity))
-                            : query.OrderBy(x => x.Stocks
-                                .Where(s => s.Type == "Ingreso" || s.Type == "Egreso")
-                                .Sum(s => s.Type == "Ingreso" ? s.Quantity : -s.Quantity));
+                        productQuery = (order == "desc")
+                            ? productQuery.OrderByDescending(x => x.Quantity)
+                            : productQuery.OrderBy(x => x.Quantity);
                         break;
                 }
             }
 
-            var products = await query
-        .Select(x => new ProductDTO
-        {
-            Id = x.Id,
-            CategoryId = x.CategoryId,
-            Name = x.Name,
-            Code = x.Code,
-            CategoryName = x.Category.Name,
-            Quantity = x.Stocks.Sum(s => s.Type == "Ingreso" ? s.Quantity : -s.Quantity),
-            Stocks = x.Stocks.Select(s => new GetStockDTO
-            {
-                Id = s.Id,
-                Quantity = s.Quantity,
-                Type = s.Type
-            }).ToList()
-        })
-        .ToListAsync();
+            var products = await productQuery
+                .Select(x => new ProductDTO
+                {
+                    Id = x.Product.Id,
+                    CategoryId = x.Product.CategoryId,
+                    Name = x.Product.Name,
+                    Code = x.Product.Code,
+                    CategoryName = x.Product.Category.Name,
+                    Quantity = x.Quantity,
+                    Stocks = x.Product.Stocks.Select(s => new GetStockDTO
+                    {
+                        Id = s.Id,
+                        Quantity = s.Quantity,
+                        Type = s.Type
+                    }).ToList()
+                })
+                .ToListAsync();
 
-            return Ok(products);
+            return Ok(products); // Devuelve todos los elementos
         }
 
 

@@ -9,15 +9,18 @@ import { ConfirmModalService } from '../../services/confirmModal/confirm-modal.s
 import { ProductService } from '../../services/product/product.service';
 import { ToastrService } from 'ngx-toastr';
 import { CategoryService } from '../../services/category/category.service';
+import { NgxPaginationModule } from 'ngx-pagination';
+
 @Component({
   selector: 'app-product',
   standalone: true,
-  imports: [UiTableComponent, BreadcrumbComponent],
+  imports: [NgxPaginationModule, UiTableComponent, BreadcrumbComponent],
   templateUrl: './product.component.html',
   styleUrl: './product.component.css'
 })
 
 export class ProductComponent implements OnInit {
+  paginationId = 'productPagination';
   title = 'Productos';
   displayedColumns = ['name', 'code', 'categoryName', 'quantity'];
   products: any[] = [];
@@ -36,6 +39,10 @@ export class ProductComponent implements OnInit {
     { key: 'quantity', label: 'Cantidad' }
   ];
 
+  page = 1;
+  itemsPerPage: number = 2;
+  totalItems: number = 0;
+
   constructor(
     private productService: ProductService, 
     private router: Router, 
@@ -46,9 +53,9 @@ export class ProductComponent implements OnInit {
   ngOnInit() {
     this.loadCategories();
 
-    this.productService.products$.subscribe(products => {
-      this.products = products;
-    });
+    // this.productService.products$.subscribe(products => {
+    //   this.products = products;
+    // });
     this.loadProducts();
   }
 
@@ -60,7 +67,17 @@ export class ProductComponent implements OnInit {
   }
 
   loadProducts() {
-    this.productService.getFilteredProducts(this.selectedCategory ?? undefined, this.sortBy, this.order);
+    this.productService.getFilteredProducts(
+      this.selectedCategory ?? undefined,
+      this.sortBy,
+      this.order
+    );
+
+    this.productService.products$.subscribe(products => {
+      this.products = products;
+    });
+
+    this.totalItems = this.productService.totalItems;
   }
 
   onFilterChange(filters: { categoryId?: number; sortBy?: string; order?: string }) {
@@ -84,6 +101,11 @@ export class ProductComponent implements OnInit {
   //   this.order = order;
   //   this.loadProducts();
   // }
+
+  onPageChange(newPage: number) {
+    this.page = newPage;
+    this.loadProducts();
+  }
 
   onAddProduct(): void {
     this.router.navigate(['/products/add']);
