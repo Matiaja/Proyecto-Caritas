@@ -7,7 +7,7 @@
       </button>
     </div>
     <!-- Filtros -->
-    <div class="filters-container" [class.visible]="filtersVisible">
+    <div *ngIf="showProductsFilters" class="filters-container" [class.visible]="filtersVisible">
       <div class="card-body d-flex flex-wrap gap-2 align-items-center">
         <label>Categoría:</label>
         <select class="form-select w-auto" [(ngModel)]="selectedCategory" (change)="filterData()">
@@ -15,6 +15,30 @@
           <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
         </select>
 
+        <label>Ordenar por:</label>
+        <select class="form-select w-auto" [(ngModel)]="selectedSortBy" (change)="filterData()">
+          <option [ngValue]="null">Sin orden</option>
+          <option *ngFor="let option of sortOptions" [value]="option.key">{{ option.label }}</option>
+        </select>
+
+        <label>Dirección:</label>
+        <select class="form-select w-auto" [(ngModel)]="selectedOrder" (change)="filterData()">
+          <option value="asc">Asc</option>
+          <option value="desc">Desc</option>
+        </select>
+
+        <input
+          type="text"
+          class="form-control w-auto ms-auto"
+          [(ngModel)]="searchTerm"
+          (input)="filterData()"
+          placeholder="Buscar..."
+        />
+      </div>
+    </div>
+
+    <div *ngIf="showCommonFilters" class="filters-container" [class.visible]="filtersVisible">
+      <div class="card-body d-flex flex-wrap gap-2 align-items-center">
         <label>Ordenar por:</label>
         <select class="form-select w-auto" [(ngModel)]="selectedSortBy" (change)="filterData()">
           <option [ngValue]="null">Sin orden</option>

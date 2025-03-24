@@ -17,9 +17,10 @@ export class UiTableComponent<T extends Record<string, any>>{
   @Input() displayedColumns: string[] = []; 
   @Input() dataSource: T[] = [];
   @Input() columnHeaders: { [key: string]: string } = {};
-  @Input() showFilters: boolean = false;
+  @Input() showProductsFilters: boolean = false;
   @Input() categories: { id: number; name: string }[] = [];
   @Input() sortOptions: { key: string; label: string }[] = [];
+  @Input() showCommonFilters: boolean = false;
 
   @Input() customActions?: TemplateRef<any>;
 
@@ -46,7 +47,7 @@ export class UiTableComponent<T extends Record<string, any>>{
   filteredDataSource: T[] = [];
 
   p: number = 1;
-  itemsPerPage: number = 2;
+  itemsPerPage: number = 10;
   totalItems: number = 0
 
   ngOnChanges() {
@@ -61,6 +62,8 @@ export class UiTableComponent<T extends Record<string, any>>{
   }
 
   filterData() {
+    this.applySearchFilter();
+
     this.filterChange.emit({
       categoryId: this.selectedCategory || undefined,
       sortBy: this.selectedSortBy || undefined,
@@ -68,6 +71,28 @@ export class UiTableComponent<T extends Record<string, any>>{
     });
 
     this.updatePagedData();
+  }
+
+  applySearchFilter() {
+    if (!this.searchTerm || this.searchTerm.trim() === '') {
+      this.filteredDataSource = [...this.dataSource];
+      return;
+    }
+
+    const searchTermLower = this.searchTerm.toLowerCase();
+  
+    this.filteredDataSource = this.dataSource.filter(item => {
+      const columnsToSearch = this.searchColumns.length > 0 
+        ? this.searchColumns 
+        : this.displayedColumns;
+      
+      return columnsToSearch.some(column => {
+        const value = item[column];
+        if (value === undefined || value === null) return false;
+        
+        return value.toString().toLowerCase().includes(searchTermLower);
+      });
+    });
   }
 
   get columnsToDisplay(): string[] {

@@ -23,6 +23,7 @@ export class ProductComponent implements OnInit {
   paginationId = 'productPagination';
   title = 'Productos';
   displayedColumns = ['name', 'code', 'categoryName', 'quantity'];
+  searchColumns = ['name', 'code'];
   products: any[] = [];
   selectedCategory: number | null = null;
   sortBy: string = '';
@@ -40,7 +41,7 @@ export class ProductComponent implements OnInit {
   ];
 
   page = 1;
-  itemsPerPage: number = 2;
+  itemsPerPage: number = 10;
   totalItems: number = 0;
 
   constructor(

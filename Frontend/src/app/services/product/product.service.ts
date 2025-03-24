@@ -69,7 +69,7 @@ export class ProductService {
     }
   
     this.http.get<any[]>(`${this.baseUrl}/filter`, { params }).subscribe(products => {
-      this.productsSubject.next(products); // Envía todos los elementos al componente
+      this.productsSubject.next(products); 
     });
   }
 

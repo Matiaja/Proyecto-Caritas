@@ -18,12 +18,17 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class CategoryComponent implements OnInit {
   title = 'Categorías';
+  sortBy: string = '';
+  order: string = 'asc';
   displayedColumns = ['name', 'description'];
   categories: any[] = [];
   columnHeaders: { [key: string]: string } = {
     name: 'Nombre',
     description: 'Descripción',
   };
+  sortOptions = [
+    { key: 'name', label: 'Nombre' }
+  ];
 
   constructor(
     private categoryService: CategoryService, 
@@ -33,10 +38,7 @@ export class CategoryComponent implements OnInit {
     private toastr: ToastrService
     ) {}
   ngOnInit() {
-    this.categoryService.categories$.subscribe(categories => {
-      this.categories = categories;
-    });
-    this.categoryService.getCategories();
+    this.loadCategories();
   }
 
   onAddCategory(): void {
@@ -49,6 +51,23 @@ export class CategoryComponent implements OnInit {
 
   onSelectCategory(category: any) {
     this.router.navigate(['/categories/detail', category.id]);
+  }
+
+  loadCategories() {
+    this.categoryService.getFilteredCategories(
+      this.sortBy,
+      this.order
+    );
+
+    this.categoryService.categories$.subscribe(categories => {
+      this.categories = categories;
+    });
+  }
+
+  onFilterChange(filters: { sortBy?: string; order?: string }) {
+    this.sortBy = filters.sortBy || '';
+    this.order = filters.order || 'asc';
+    this.loadCategories();
   }
 
   async onDeleteCategory(category: any) {
