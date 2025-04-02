@@ -29,6 +29,10 @@ export class CategoryComponent implements OnInit {
   sortOptions = [
     { key: 'name', label: 'Nombre' }
   ];
+  mobileHeaders: { [key: string]: string } = {
+    name: 'Nombre'
+  };
+  mobileColumns = ['name'];
 
   constructor(
     private categoryService: CategoryService, 
@@ -59,7 +63,8 @@ export class CategoryComponent implements OnInit {
       this.order
     );
 
-    this.categoryService.categories$.subscribe(categories => {
+    this.categoryService.categories$
+    .subscribe(categories => {
       this.categories = categories;
     });
   }

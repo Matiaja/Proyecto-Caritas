@@ -54,7 +54,30 @@
   }
   
   .filters-container.visible {
-    max-height: 200px;
+    max-height: 270px;
     visibility: visible;
     opacity: 1;
+  }
+
+  
+  @media (max-width: 575.98px) {
+    .mobile-table {
+      font-size: 0.85rem;
+    }
+    
+    .mobile-header {
+        padding: 0.5rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 0;
+        font-weight: 600 !important; 
+        background-color: #f8f9fa;
+        position: sticky;
+        top: 0;
+      }
+
+    .mobile-header, .mobile-cell {
+      padding: 0.3rem;
+    }
   }

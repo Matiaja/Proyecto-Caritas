@@ -118,14 +118,15 @@ namespace ProyectoCaritas.Controllers
         }
 
         [HttpGet("filter")]
-        public async Task<ActionResult<List<CategoryDTO>>> GetCategoriesByFilter(
+        public async Task<ActionResult<List<GetCategoryDTO>>> GetCategoriesByFilter(
             [FromQuery] string? sortBy = null,
             [FromQuery] string? order = "asc")
 
         {
             var categories = await _context.Categories
-                .Select(c => new CategoryDTO
+                .Select(c => new GetCategoryDTO
                 {
+                    Id = c.Id,
                     Name = c.Name,
                     Description = c.Description
                 })

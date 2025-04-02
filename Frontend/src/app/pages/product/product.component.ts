@@ -39,6 +39,11 @@ export class ProductComponent implements OnInit {
     { key: 'name', label: 'Nombre' },
     { key: 'quantity', label: 'Cantidad' }
   ];
+  mobileHeaders: { [key: string]: string } = {
+    name: 'Nombre',
+    quantity: 'Stock',
+  };
+  mobileColumns = ['name', 'quantity'];
 
   page = 1;
   itemsPerPage: number = 10;

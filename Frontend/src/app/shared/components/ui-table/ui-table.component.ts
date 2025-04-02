@@ -3,6 +3,7 @@ import { MatTableModule } from '@angular/material/table';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { ResponsiveService } from '../../../services/responsive/responsive.service';
 
 @Component({
   selector: 'ui-table',
@@ -17,12 +18,15 @@ export class UiTableComponent<T extends Record<string, any>>{
   @Input() displayedColumns: string[] = []; 
   @Input() dataSource: T[] = [];
   @Input() columnHeaders: { [key: string]: string } = {};
+  @Input() mobileHeaders: { [key: string]: string } = {};
   @Input() showProductsFilters: boolean = false;
   @Input() categories: { id: number; name: string }[] = [];
   @Input() sortOptions: { key: string; label: string }[] = [];
   @Input() showCommonFilters: boolean = false;
 
   @Input() customActions?: TemplateRef<any>;
+
+  @Input() mobileColumns: string[] = [];
 
   @Input() showAddButton = false;
   @Input() showEditButton = false;
@@ -38,8 +42,15 @@ export class UiTableComponent<T extends Record<string, any>>{
   @Output() selectElement = new EventEmitter<T>();
 
   @Output() pageChange = new EventEmitter<number>();
-  filtersVisible: boolean = false;
   
+  constructor(private responsiveService: ResponsiveService) {
+    this.responsiveService.isMobile$.subscribe(isMobile => {
+      this.isMobileView = isMobile;
+    });
+  }
+  
+  filtersVisible: boolean = false;
+  isMobileView = false;
   searchTerm: string = '';
   selectedCategory: number | null = null;
   selectedSortBy: string | null = null;
@@ -50,26 +61,30 @@ export class UiTableComponent<T extends Record<string, any>>{
   itemsPerPage: number = 10;
   totalItems: number = 0
 
+
+  
   ngOnChanges() {
     this.filteredDataSource = [...this.dataSource];
     this.totalItems = this.dataSource.length;
     this.updatePagedData();
-    this.filterData();
+    this.applySearchFilter();
   }
 
   updatePagedData() {
     this.totalItems = this.filteredDataSource.length;
   }
 
-  filterData() {
+  filterData(emitRemoteFilter: boolean = true) {
     this.applySearchFilter();
-
-    this.filterChange.emit({
-      categoryId: this.selectedCategory || undefined,
-      sortBy: this.selectedSortBy || undefined,
-      order: this.selectedOrder
-    });
-
+    
+    if (emitRemoteFilter) {
+      this.filterChange.emit({
+        categoryId: this.selectedCategory || undefined,
+        sortBy: this.selectedSortBy || undefined,
+        order: this.selectedOrder
+      });
+    }
+  
     this.updatePagedData();
   }
 
@@ -96,7 +111,19 @@ export class UiTableComponent<T extends Record<string, any>>{
   }
 
   get columnsToDisplay(): string[] {
-    return [...this.displayedColumns, 'actions'];
+    const baseColumns = this.isMobileView && this.mobileColumns.length > 0 
+      ? this.mobileColumns 
+      : this.displayedColumns;
+    
+    return [...baseColumns, 'actions'];
+  }
+
+  get headersToDisplay(): string[] {
+    const baseHeaders = this.isMobileView
+      ? this.mobileHeaders 
+      : this.columnHeaders;
+    
+    return Object.keys(baseHeaders).concat('Acciones');
   }
 
   onPageChange(newPage: number) {
