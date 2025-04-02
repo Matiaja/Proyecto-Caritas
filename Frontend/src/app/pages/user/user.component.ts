@@ -8,7 +8,6 @@ import { BreadcrumbComponent } from '../../shared/components/breadcrumbs/breadcr
 import { ConfirmModalService } from '../../services/confirmModal/confirm-modal.service';
 import { UserService } from '../../services/user/user.service';
 import { ToastrService } from 'ngx-toastr';
-
 @Component({
   selector: 'app-user',
   standalone: true,
@@ -20,14 +19,24 @@ export class UserComponent implements OnInit{
   title = 'Usuarios';
   displayedColumns = ['userName', 'email', 'centerName'];
   users: any[] = [];
+  selectedCenter: number | null = null;
+  sortBy: string = '';
+  order: string = 'asc';
   columnHeaders: { [key: string]: string } = {
     userName: 'Nombre de usuario',
     email: 'Correo electrónico',
     centerName: 'Centro',
   };
-
+  centers : any[] = [];
   showSearchBar = true;
   searchColumns = ['userName', 'email', 'centerName'];
+  sortOptions = [
+    { key: 'userName', label: 'Nombre de usuario' }
+  ];
+  mobileHeaders: { [key: string]: string } = {
+    userName: 'Nombre de usuario',
+  };
+  mobileColumns = ['userName'];
 
   constructor(private userService: UserService, 
     private router: Router, 
@@ -36,14 +45,35 @@ export class UserComponent implements OnInit{
   ) { }
 
   ngOnInit() {
-    this.userService.users$.subscribe(users => {
-      this.users = users.map(user => ({
-        ...user,
-        centerName: user.centerName ? user.centerName : "Usuario sin centro"
-      }));
-    });
-    this.userService.getUsersNoAdmin();
-    console.log(this.users);
+    // this.userService.users$.subscribe(users => {
+    //   this.users = users.map(user => ({
+    //     ...user,
+    //     centerName: user.centerName ? user.centerName : "Usuario sin centro"
+    //   }));
+    // });
+    // this.userService.getUsersNoAdmin();
+    // console.log(this.users);
+    this.loadUsers();
+  }
+
+  loadUsers() {
+    this.userService.getFilteredUsers(
+      this.selectedCenter ?? undefined, 
+      this.sortBy, 
+      this.order);
+      this.userService.users$.subscribe(users => {
+        this.users = users.map(user => ({
+          ...user,
+          centerName: user.centerName ? user.centerName : "Usuario sin centro"
+        }));
+      });
+  }
+
+  onFilterChange(filter: { centerId?: number; sortBy?: string; order?: string }) {
+    this.selectedCenter = filter.centerId ?? null;
+    this.sortBy = filter.sortBy ?? '';
+    this.order = filter.order ?? 'asc';
+    this.loadUsers();
   }
 
   onAddUser(): void {

@@ -65,7 +65,7 @@ export class UiTableComponent<T extends Record<string, any>>{
   
   ngOnChanges() {
     this.filteredDataSource = [...this.dataSource];
-    this.totalItems = this.dataSource.length;
+    this.totalItems = this.filteredDataSource.length;
     this.updatePagedData();
     this.applySearchFilter();
   }

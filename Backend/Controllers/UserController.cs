@@ -52,6 +52,55 @@ namespace ProyectoCaritas.Controllers
             return Ok(userDTOs);
         }
 
+        [HttpGet("filter")]
+        public async Task<ActionResult<List<UserDTO>>> GetUsersByFilter(
+            [FromQuery] int? centerId = null,
+            [FromQuery] string? sortBy = null,
+            [FromQuery] string? order = "asc")
+
+        {
+            var users = await _context.Users
+                .Select(u => new UserDTO
+                {
+                    Id = u.Id,
+                    UserName = u.UserName ?? string.Empty,
+                    Email = u.Email ?? string.Empty,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    Role = u.Role,
+                    PhoneNumber = u.PhoneNumber ?? string.Empty,
+                    CenterId = u.CenterId
+                })
+                .ToListAsync();
+
+            if (centerId.HasValue)
+            {
+                users = users.Where(u => u.CenterId == centerId).ToList();
+            }
+
+            if (sortBy == null)
+            {
+                return users;
+            }
+            if (sortBy == "userName")
+            {
+                if (order == "asc")
+                {
+                    return users.OrderBy(u => u.UserName).ToList();
+                }
+                else if (order == "desc")
+                {
+                    return users.OrderByDescending(u => u.UserName).ToList();
+                }
+            }
+            return BadRequest(new
+            {
+                Status = "400",
+                Error = "Bad Request",
+                Message = "Invalid sortBy parameter."
+            });
+        }
+
 
         //Creo que habria que eliminar este endpoint
         [HttpGet("user-with-center")]
