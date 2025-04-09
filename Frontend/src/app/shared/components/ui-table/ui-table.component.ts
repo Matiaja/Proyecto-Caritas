@@ -21,6 +21,7 @@ export class UiTableComponent<T extends Record<string, any>>{
   @Input() mobileHeaders: { [key: string]: string } = {};
   @Input() showProductsFilters: boolean = false;
   @Input() categories: { id: number; name: string }[] = [];
+  @Input() centers: { id: number; name: string }[] = [];
   @Input() sortOptions: { key: string; label: string }[] = [];
   @Input() showCommonFilters: boolean = false;
 
@@ -33,9 +34,10 @@ export class UiTableComponent<T extends Record<string, any>>{
   @Input() showDeleteButton = false;
   @Input() showSelectButton = true;
   @Input() showSearchBar = false;
+  @Input() showCenterSelect = false;
   @Input() searchColumns: string[] = [];
 
-  @Output() filterChange = new EventEmitter<{ categoryId?: number; sortBy?: string; order?: string }>();
+  @Output() filterChange = new EventEmitter<{ categoryId?: number; sortBy?: string; order?: string; centerId?: number }>();
   @Output() addElement = new EventEmitter<void>();
   @Output() editElement = new EventEmitter<T>();
   @Output() deleteElement = new EventEmitter<T>();
@@ -53,6 +55,7 @@ export class UiTableComponent<T extends Record<string, any>>{
   isMobileView = false;
   searchTerm: string = '';
   selectedCategory: number | null = null;
+  selectedCenter: number | null = null;
   selectedSortBy: string | null = null;
   selectedOrder: string = 'asc';
   filteredDataSource: T[] = [];
@@ -80,6 +83,7 @@ export class UiTableComponent<T extends Record<string, any>>{
     if (emitRemoteFilter) {
       this.filterChange.emit({
         categoryId: this.selectedCategory || undefined,
+        centerId: this.selectedCenter || undefined,
         sortBy: this.selectedSortBy || undefined,
         order: this.selectedOrder
       });

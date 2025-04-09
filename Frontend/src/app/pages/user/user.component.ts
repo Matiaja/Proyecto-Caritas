@@ -8,6 +8,8 @@ import { BreadcrumbComponent } from '../../shared/components/breadcrumbs/breadcr
 import { ConfirmModalService } from '../../services/confirmModal/confirm-modal.service';
 import { UserService } from '../../services/user/user.service';
 import { ToastrService } from 'ngx-toastr';
+import { CenterService } from '../../services/center/center.service';
+
 @Component({
   selector: 'app-user',
   standalone: true,
@@ -41,10 +43,12 @@ export class UserComponent implements OnInit{
   constructor(private userService: UserService, 
     private router: Router, 
     private modalService: ConfirmModalService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private centerService : CenterService,
   ) { }
 
   ngOnInit() {
+    this.loadCenters();
     // this.userService.users$.subscribe(users => {
     //   this.users = users.map(user => ({
     //     ...user,
@@ -56,6 +60,15 @@ export class UserComponent implements OnInit{
     this.loadUsers();
   }
 
+  loadCenters() {
+    this.centerService.getCenters().subscribe(centers => {
+      this.centers = centers.map(center => ({
+        ...center,
+        name: center.name
+      }));
+    });
+  }
+
   loadUsers() {
     this.userService.getFilteredUsers(
       this.selectedCenter ?? undefined, 
@@ -64,7 +77,9 @@ export class UserComponent implements OnInit{
       this.userService.users$.subscribe(users => {
         this.users = users.map(user => ({
           ...user,
-          centerName: user.centerName ? user.centerName : "Usuario sin centro"
+          centerName: user.centerId 
+        ? (user.centerName ? user.centerName : "Centro número " + user.centerId)
+        : (user.centerName ? user.centerName : "Usuario sin centro")
         }));
       });
   }
