@@ -7,6 +7,8 @@ import { Router } from '@angular/router';
 import { BreadcrumbComponent } from '../../shared/components/breadcrumbs/breadcrumbs.component';
 import { ConfirmModalService } from '../../services/confirmModal/confirm-modal.service';
 import { UserService } from '../../services/user/user.service';
+import { ToastrService } from 'ngx-toastr';
+import { CenterService } from '../../services/center/center.service';
 
 @Component({
   selector: 'app-user',
@@ -19,26 +21,74 @@ export class UserComponent implements OnInit{
   title = 'Usuarios';
   displayedColumns = ['userName', 'email', 'centerName'];
   users: any[] = [];
+  selectedCenter: number | null = null;
+  sortBy: string = '';
+  order: string = 'asc';
   columnHeaders: { [key: string]: string } = {
     userName: 'Nombre de usuario',
     email: 'Correo electrónico',
     centerName: 'Centro',
   };
-
+  centers : any[] = [];
   showSearchBar = true;
   searchColumns = ['userName', 'email', 'centerName'];
+  sortOptions = [
+    { key: 'userName', label: 'Nombre de usuario' }
+  ];
+  mobileHeaders: { [key: string]: string } = {
+    userName: 'Nombre de usuario',
+  };
+  mobileColumns = ['userName'];
 
-  constructor(private userService: UserService, private router: Router, private modalService: ConfirmModalService) { }
+  constructor(private userService: UserService, 
+    private router: Router, 
+    private modalService: ConfirmModalService,
+    private toastr: ToastrService,
+    private centerService : CenterService,
+  ) { }
 
   ngOnInit() {
-    this.userService.users$.subscribe(users => {
-      this.users = users.map(user => ({
-        ...user,
-        centerName: user.centerName ? user.centerName : "Usuario sin centro"
+    this.loadCenters();
+    // this.userService.users$.subscribe(users => {
+    //   this.users = users.map(user => ({
+    //     ...user,
+    //     centerName: user.centerName ? user.centerName : "Usuario sin centro"
+    //   }));
+    // });
+    // this.userService.getUsersNoAdmin();
+    // console.log(this.users);
+    this.loadUsers();
+  }
+
+  loadCenters() {
+    this.centerService.getCenters().subscribe(centers => {
+      this.centers = centers.map(center => ({
+        ...center,
+        name: center.name
       }));
     });
-    this.userService.getUsersNoAdmin();
-    console.log(this.users);
+  }
+
+  loadUsers() {
+    this.userService.getFilteredUsers(
+      this.selectedCenter ?? undefined, 
+      this.sortBy, 
+      this.order);
+      this.userService.users$.subscribe(users => {
+        this.users = users.map(user => ({
+          ...user,
+          centerName: user.centerId 
+        ? (user.centerName ? user.centerName : "Centro número " + user.centerId)
+        : (user.centerName ? user.centerName : "Usuario sin centro")
+        }));
+      });
+  }
+
+  onFilterChange(filter: { centerId?: number; sortBy?: string; order?: string }) {
+    this.selectedCenter = filter.centerId ?? null;
+    this.sortBy = filter.sortBy ?? '';
+    this.order = filter.order ?? 'asc';
+    this.loadUsers();
   }
 
   onAddUser(): void {
@@ -58,6 +108,7 @@ export class UserComponent implements OnInit{
       this.userService.deleteUser(user.id).subscribe(() => {
         this.users = this.users.filter((u) => u.id !== user.id);
       });
+      this.toastr.success('Usuario eliminado correctamente');
     }
 
   }

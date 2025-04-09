@@ -25,7 +25,7 @@ export class RequestComponent implements OnInit{
 
   constructor(
     private reqService: RequestService, 
-    private router: Router
+    private router: Router,
   ) { }
   
   ngOnInit() {

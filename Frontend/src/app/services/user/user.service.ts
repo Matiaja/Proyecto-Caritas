@@ -4,6 +4,7 @@ import { environment } from '../../../environments/environment';
 import { Product } from '../../models/product.model';
 import { Observable, BehaviorSubject, tap, map, catchError, of} from 'rxjs';
 import { Router } from '@angular/router';
+import { HttpParams } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -51,6 +52,20 @@ export class UserService {
         this.usersSubject.next(updatedUsers);
       })
     );
+  }
+
+  getFilteredUsers(centerId?: number, sortBy?: string, order: string= 'asc'): void {
+    let params = new HttpParams();
+    if (centerId) {
+      params = params.set('centerId', centerId);
+    }
+    if (sortBy) {
+      params = params.set('sortBy', sortBy);
+      params = params.set('order', order);
+    }
+    this.http.get<any[]>(`${this.baseUrl}/filter`, { params }).subscribe(users => {
+      this.usersSubject.next(users);
+    });
   }
 
   updateUser(user: any, userId: string): Observable<any> {

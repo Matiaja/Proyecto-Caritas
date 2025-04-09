@@ -9,7 +9,7 @@ import { StockService } from '../../../services/stock/stock.service';
 import { expirationDateValidator } from '../../../shared/validators/date-compare.validator';
 import { catchError, debounceTime, distinctUntilChanged, map, switchMap, of } from 'rxjs';
 import { GlobalStateService } from '../../../services/global/global-state.service';
-
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-storage-add',
@@ -97,7 +97,8 @@ export class StorageAddComponent implements OnInit{
     private productService: ProductService,
     private stockService: StockService,
     private router: Router,
-    private globalStateService: GlobalStateService
+    private globalStateService: GlobalStateService,
+    private toastr: ToastrService
   ) {}
 
   
@@ -118,6 +119,7 @@ export class StorageAddComponent implements OnInit{
     };
 
     this.stockService.createStock(payload).subscribe(() => {
+      this.toastr.success('Stock creado con éxito', 'Exito');
       this.router.navigate(['/storage']);
     });
   }

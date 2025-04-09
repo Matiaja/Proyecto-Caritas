@@ -6,6 +6,7 @@ import { Validators } from '@angular/forms';
 import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
 import { ProductService } from '../../../services/product/product.service';
 import { CategoryService } from '../../../services/category/category.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-product-add',
@@ -52,7 +53,8 @@ export class ProductAddComponent implements OnInit{
   constructor(
     private categoryService: CategoryService,
     private productService: ProductService,
-    private router: Router
+    private router: Router,
+    private toastr: ToastrService
   ) {}
   
   ngOnInit(): void {
@@ -80,6 +82,7 @@ export class ProductAddComponent implements OnInit{
       categoryId: formData.category,
     };
     this.productService.createProduct(payload).subscribe(() => {
+      this.toastr.success('Producto creado con éxito', 'Exito');
       this.router.navigate(['/products']);
     });
   }

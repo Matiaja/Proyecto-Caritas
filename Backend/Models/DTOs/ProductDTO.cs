@@ -8,6 +8,8 @@ namespace ProyectoCaritas.Models.DTOs
         public required int CategoryId { get; set; }  
         public required string Name { get; set; }
         public string? Code { get; set; }
+        public int? Quantity { get; set; }
+        public string? CategoryName { get; set; }
 
         public ICollection<GetStockDTO>? Stocks { get; set; }
         public ICollection<OrderLineDTO>? OrderLines { get; set; }

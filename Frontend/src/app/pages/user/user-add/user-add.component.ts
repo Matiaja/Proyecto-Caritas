@@ -6,6 +6,7 @@ import { Validators } from '@angular/forms';
 import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
 import { UserService } from '../../../services/user/user.service';
 import { CenterService } from '../../../services/center/center.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-user-add',
@@ -97,7 +98,8 @@ formConfig = {
 
   constructor(private userService: UserService, 
     private router: Router,
-    private centerService: CenterService
+    private centerService: CenterService,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -128,6 +130,7 @@ formConfig = {
       centerId: formData.center,
     };
     this.userService.registerUser(payload).subscribe(() => {
+      this.toastr.success('Usuario creado correctamente', 'Exito');
       this.router.navigate(['/users']);
     });
   }
