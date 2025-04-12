@@ -22,6 +22,10 @@ import { ProductDetailComponent } from './pages/product/product-detail/product-d
 import { StorageComponent } from './pages/storage/storage.component';
 import { StorageAddComponent } from './pages/storage/storage-add/storage-add.component';
 import { StorageDetailComponent } from './pages/storage/storage-detail/storage-detail.component';
+import { UserComponent } from './pages/user/user.component';
+import { UserAddComponent } from './pages/user/user-add/user-add.component';
+import { UserDetailComponent } from './pages/user/user-detail/user-detail.component';
+import { UserEditComponent } from './pages/user/user-edit/user-edit.component';
 
 export const routes: Routes = [
     {
@@ -95,5 +99,16 @@ export const routes: Routes = [
             {path: 'add', component: StorageAddComponent, data: { breadcrumb: 'Agregar Stock' }},
             {path: 'detail/:id', component: StorageDetailComponent, data: { breadcrumb: 'Detalle de Stock' }}
         ]
+    },
+    {
+        path: 'users',
+        data: { breadcrumb: 'Usuarios' },
+        canActivate: [authGuard],
+        children: [
+            {path: '', component: UserComponent},
+            {path: 'add', component: UserAddComponent, data: { breadcrumb: 'Agregar Usuario' }},
+            {path: 'detail/:id', component: UserDetailComponent, data: { breadcrumb: 'Detalle de Usuario' }},
+            {path: 'edit', component: UserEditComponent, data: { breadcrumb: 'Editar Usuario' }}
+            ]
     }
 ];

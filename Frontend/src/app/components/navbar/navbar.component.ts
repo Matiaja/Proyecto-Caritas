@@ -40,4 +40,12 @@ export class NavbarComponent {
     this.router.navigate(['/login']); // Redirigir al login
   }
 
+  editUser() {
+    this.router.navigate(['/users/edit']);
+  }
+
+  onUpdateProfile() {
+    this.router.navigate(['/profile']);
+  }
+
 }

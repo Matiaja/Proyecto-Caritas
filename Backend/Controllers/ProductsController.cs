@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProyectoCaritas.Data;
+using ProyectoCaritas.Models;
 using ProyectoCaritas.Models.DTOs;
 using ProyectoCaritas.Models.Entities;
 
@@ -29,7 +30,22 @@ namespace ProyectoCaritas.Controllers
         {
             return await context.Products
                 .Include(x => x.Stocks)
-                .Select(x => ProductToDTO(x))
+                .Include(c => c.Category)
+                .Select(x => new ProductDTO
+                {
+                    Id = x.Id,
+                    CategoryId = x.CategoryId,
+                    Name = x.Name,
+                    Code = x.Code,
+                    CategoryName = x.Category.Name,
+                    Quantity = x.Stocks.Sum(s => s.Type == "Ingreso" ? s.Quantity : -s.Quantity),
+                    Stocks = x.Stocks.Select(s => new GetStockDTO
+                    {
+                        Id = s.Id,
+                        Quantity = s.Quantity,
+                        Type = s.Type
+                    }).ToList()
+                })
                 .ToListAsync();
         }
 
@@ -39,6 +55,7 @@ namespace ProyectoCaritas.Controllers
         {
             var prod = await context.Products
                 .Include(x => x.Stocks)
+                .Include(c => c.Category)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
             if (prod == null)
@@ -51,7 +68,23 @@ namespace ProyectoCaritas.Controllers
                 });
             }
 
-            return ProductToDTO(prod);
+            var productDto = new ProductDTO
+            {
+                Id = prod.Id,
+                CategoryId = prod.CategoryId,
+                Name = prod.Name,
+                Code = prod.Code,
+                CategoryName = prod.Category.Name,
+                Quantity = prod.Stocks.Sum(s => s.Type == "Ingreso" ? s.Quantity : -s.Quantity),
+                Stocks = prod.Stocks.Select(s => new GetStockDTO
+                {
+                    Id = s.Id,
+                    Quantity = s.Quantity,
+                    Type = s.Type
+                }).ToList()
+            };
+
+            return Ok(productDto);
         }
 
         [HttpGet("search")]
@@ -72,6 +105,68 @@ namespace ProyectoCaritas.Controllers
                 .Select(x => ProductToDTO(x))
                 .ToListAsync();
             return Ok(products);
+        }
+
+        [HttpGet("filter")]
+        public async Task<ActionResult<List<ProductDTO>>> GetProductsByFilter(
+            [FromQuery] int? categoryId = null,
+            [FromQuery] string? sortBy = null,
+            [FromQuery] string? order = "asc")
+        {
+            var query = context.Products
+                .Include(x => x.Stocks)
+                .Include(c => c.Category)
+                .AsQueryable();
+
+            if (categoryId.HasValue && categoryId > 0)
+            {
+                query = query.Where(x => x.CategoryId == categoryId.Value);
+            }
+
+            var productQuery = query.Select(x => new
+            {
+                Product = x,
+                Quantity = x.Stocks
+                    .Where(s => s.Type == "Ingreso" || s.Type == "Egreso")
+                    .Sum(s => s.Type == "Ingreso" ? s.Quantity : -s.Quantity)
+            });
+
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                switch (sortBy.ToLower())
+                {
+                    case "name":
+                        productQuery = (order == "desc")
+                            ? productQuery.OrderByDescending(x => x.Product.Name)
+                            : productQuery.OrderBy(x => x.Product.Name);
+                        break;
+                    case "quantity":
+                        productQuery = (order == "desc")
+                            ? productQuery.OrderByDescending(x => x.Quantity)
+                            : productQuery.OrderBy(x => x.Quantity);
+                        break;
+                }
+            }
+
+            var products = await productQuery
+                .Select(x => new ProductDTO
+                {
+                    Id = x.Product.Id,
+                    CategoryId = x.Product.CategoryId,
+                    Name = x.Product.Name,
+                    Code = x.Product.Code,
+                    CategoryName = x.Product.Category.Name,
+                    Quantity = x.Quantity,
+                    Stocks = x.Product.Stocks.Select(s => new GetStockDTO
+                    {
+                        Id = s.Id,
+                        Quantity = s.Quantity,
+                        Type = s.Type
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            return Ok(products); // Devuelve todos los elementos
         }
 
 

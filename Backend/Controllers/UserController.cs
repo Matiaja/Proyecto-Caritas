@@ -52,11 +52,109 @@ namespace ProyectoCaritas.Controllers
             return Ok(userDTOs);
         }
 
+        [HttpGet("filter")]
+        public async Task<ActionResult<List<UserDTO>>> GetUsersByFilter(
+            [FromQuery] int? centerId = null,
+            [FromQuery] string? sortBy = null,
+            [FromQuery] string? order = "asc")
+
+        {
+            var users = await _context.Users
+                .Select(u => new UserDTO
+                {
+                    Id = u.Id,
+                    UserName = u.UserName ?? string.Empty,
+                    Email = u.Email ?? string.Empty,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    Role = u.Role,
+                    PhoneNumber = u.PhoneNumber ?? string.Empty,
+                    CenterId = u.CenterId
+                })
+                .ToListAsync();
+
+            if (centerId.HasValue)
+            {
+                users = users.Where(u => u.CenterId == centerId).ToList();
+            }
+
+            if (sortBy == null)
+            {
+                return users;
+            }
+            if (sortBy == "userName")
+            {
+                if (order == "asc")
+                {
+                    return users.OrderBy(u => u.UserName).ToList();
+                }
+                else if (order == "desc")
+                {
+                    return users.OrderByDescending(u => u.UserName).ToList();
+                }
+            }
+            return BadRequest(new
+            {
+                Status = "400",
+                Error = "Bad Request",
+                Message = "Invalid sortBy parameter."
+            });
+        }
+
+
+        //Creo que habria que eliminar este endpoint
+        [HttpGet("user-with-center")]
+        public async Task<ActionResult<IEnumerable<UserCenterDTO>>> GetAllUserWithCenter()
+        {
+            var users = await _userManager.Users.ToListAsync();
+            if (!users.Any())
+            {
+                return NotFound(new { message = "No users found." });
+            }
+            var userDTOs = users
+            .Select(u => new UserCenterDTO
+            {
+                Username = u.UserName ?? string.Empty,
+                Email = u.Email ?? string.Empty,
+                CenterName = u.Center?.Name ?? string.Empty
+            }).ToList();
+            return Ok(userDTOs);
+        }
+
+        [HttpGet("all-user-no-admin")]
+        public async Task<ActionResult<IEnumerable<UserDTO>>> GetAllUserNoAdmin()
+        {
+            var users = await _userManager.Users.Where(u => u.Role != "Admin")
+                .Include(u => u.Center)
+                .ToListAsync();
+            if (!users.Any())
+            {
+                return NotFound(new { message = "No users found." });
+            }
+            var userDTOs = users.Select(u => new UserDTO
+            {
+                Id = u.Id,
+                UserName = u.UserName ?? string.Empty,
+                Email = u.Email ?? string.Empty,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                Role = u.Role,
+                PhoneNumber = u.PhoneNumber ?? string.Empty,
+                CenterId = u.CenterId,
+                CenterName = u.Center?.Name ?? string.Empty
+            }).ToList();
+            return Ok(userDTOs);
+        }
+
         // GET: api/User/{id}
-        [HttpGet("id/{id}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<UserDTO>> GetUserById(string id)
         {
-            var user = await _userManager.FindByIdAsync(id);
+            var user = await _userManager.Users
+                .Where(u => u.Id == id)
+                .Include(u => u.Center)
+                .FirstOrDefaultAsync();
+
             if (user == null)
             {
                 return NotFound(new { message = "User not found" });
@@ -71,7 +169,8 @@ namespace ProyectoCaritas.Controllers
                 LastName = user.LastName,
                 Role = user.Role,
                 PhoneNumber = user.PhoneNumber ?? string.Empty,
-                CenterId = user.CenterId
+                CenterId = user.CenterId,
+                CenterName = user.Center?.Name ?? string.Empty
             };
 
             return Ok(userDTO);
@@ -181,13 +280,16 @@ namespace ProyectoCaritas.Controllers
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
 
-            return Ok(new { token = tokenString, centerId = centerId });
+            return Ok(new { token = tokenString, centerId = centerId, userId = user.Id });
         }
 
+
+
+        // Creo que la actualizacion de la contraseña conviene hacerla por otra ruta por el tema del hasheo de la contraseña
         // PUT: api/User/{id}
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateUser(string id, UserRegisterDTO userDTO)
+        //[Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateUser(string id, UserDTO userDTO)
         {
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
@@ -213,6 +315,7 @@ namespace ProyectoCaritas.Controllers
             userDTO.Role = char.ToUpper(userDTO.Role[0]) + userDTO.Role.Substring(1).ToLower(); // Normalize role name
 
             // Update user properties
+            user.Id = userDTO.Id;
             user.UserName = userDTO.UserName;
             user.Email = userDTO.Email;
             user.FirstName = userDTO.FirstName;
@@ -222,20 +325,20 @@ namespace ProyectoCaritas.Controllers
             user.CenterId = userDTO.CenterId;
 
             // Actualizar la contraseña si se proporciona
-            if (!string.IsNullOrWhiteSpace(userDTO.Password))
-            {
-                var removePasswordResult = await _userManager.RemovePasswordAsync(user);
-                if (!removePasswordResult.Succeeded)
-                {
-                    return BadRequest(removePasswordResult.Errors);
-                }
+            //if (!string.IsNullOrWhiteSpace(userDTO.Password))
+            //{
+            //    var removePasswordResult = await _userManager.RemovePasswordAsync(user);
+            //    if (!removePasswordResult.Succeeded)
+            //    {
+            //        return BadRequest(removePasswordResult.Errors);
+            //    }
 
-                var addPasswordResult = await _userManager.AddPasswordAsync(user, userDTO.Password);
-                if (!addPasswordResult.Succeeded)
-                {
-                    return BadRequest(addPasswordResult.Errors);
-                }
-            }
+            //    var addPasswordResult = await _userManager.AddPasswordAsync(user, userDTO.Password);
+            //    if (!addPasswordResult.Succeeded)
+            //    {
+            //        return BadRequest(addPasswordResult.Errors);
+            //    }
+            //}
 
             // Update user in the database
             var result = await _userManager.UpdateAsync(user);

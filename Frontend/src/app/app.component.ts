@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, computed } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { NavbarComponent } from "./components/navbar/navbar.component";
 import { BreadcrumbComponent } from "./shared/components/breadcrumbs/breadcrumbs.component";
@@ -19,6 +19,7 @@ export class AppComponent {
     this.router.events.subscribe(() => {
       this.updateNavbarVisibility();
     });
+
   }
 
   private updateNavbarVisibility() {

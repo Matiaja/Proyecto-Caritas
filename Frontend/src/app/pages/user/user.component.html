@@ -1,0 +1,21 @@
+<ui-table
+    [title]="title"
+    [displayedColumns]="displayedColumns"
+    [dataSource]="users"
+    [columnHeaders]="columnHeaders"
+    [mobileColumns]="mobileColumns"
+    [mobileHeaders]="mobileHeaders"
+    [showAddButton]="true"
+    [showDeleteButton]="true"
+    [showSelectButton]="true"
+    [showSearchBar]="showSearchBar"
+    [showCommonFilters]="true"
+    [showCenterSelect]="true"
+    [centers]="centers"
+    [sortOptions]="sortOptions"
+    [searchColumns]="searchColumns"
+    (addElement)="onAddUser()"
+    (filterChange)="onFilterChange($event)"
+    (deleteElement)="onDeleteUser($event)"
+    (selectElement)="onSelectUser($event)">
+</ui-table>

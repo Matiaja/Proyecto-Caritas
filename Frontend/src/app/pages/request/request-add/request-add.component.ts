@@ -16,6 +16,7 @@ import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { Product } from '../../../models/product.model';
 import { HttpClient } from '@angular/common/http';
 import { RequestService } from '../../../services/request/request.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-request-add',
@@ -114,7 +115,8 @@ export class RequestAddComponent implements OnInit {
     private fb: FormBuilder,
     private productService: ProductService,
     private requestService: RequestService,
-    private location: Location
+    private location: Location,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -240,11 +242,13 @@ export class RequestAddComponent implements OnInit {
     // console.log(this.request);
     this.requestService.addRequest(requestDTO).subscribe({
       next: (response) => {
+        this.toastr.success('Solicitud creada con éxito', 'Éxito');
         console.log('Solicitud creada con éxito', response);
         this.router.navigate(['requests/']);
       },
       error: (err) => {
         console.error('Error al crear la solicitud', err);
+        this.toastr.error('Hubo un error al crear la solicitud. Inténtalo nuevamente.', 'Error');
         alert('Hubo un error al crear la solicitud. Inténtalo nuevamente.');
       },
     });

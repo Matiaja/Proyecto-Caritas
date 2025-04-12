@@ -8,6 +8,7 @@ import { BreadcrumbComponent } from '../../shared/components/breadcrumbs/breadcr
 import { ConfirmModalService } from '../../services/confirmModal/confirm-modal.service';
 import { StockService } from '../../services/stock/stock.service';
 import { ProductService } from '../../services/product/product.service';
+import { GlobalStateService } from '../../services/global/global-state.service';
 
 @Component({
   selector: 'app-storage',
@@ -27,13 +28,23 @@ export class StorageComponent implements OnInit{
     stockQuantity: 'Cantidad',
   };
 
-  centerId = Number(localStorage.getItem('currentCenterId'));
+  centerId: number | null = null;
 
-  constructor(private stockService: StockService, private router: Router, private modalService: ConfirmModalService) { }
+  constructor(
+    private stockService: StockService,
+    private router: Router,
+    private modalService: ConfirmModalService,
+    private globalStateService: GlobalStateService
+  ) {
+    this.centerId = this.globalStateService.getCurrentCenterId();
+  }
+
   ngOnInit() {
-    this.stockService.getProductWithStock(this.centerId).subscribe((stocks) => {
-      this.stocks = stocks;
-    });
+    if (this.centerId) {
+      this.stockService.getProductWithStock(this.centerId).subscribe((stocks) => {
+        this.stocks = stocks;
+      });
+    }
   }
 
   onAddStock(): void {

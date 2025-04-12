@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { GenericFormComponent } from '../../../shared/components/generic-form/generic-form.component';
 import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
 import { CenterService } from '../../../services/center/center.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-center-add',
@@ -73,7 +74,10 @@ export class CenterAddComponent implements OnInit {
     ],
   };
 
-  constructor(private centerService: CenterService, private router: Router) {}
+  constructor(private centerService: CenterService, 
+    private router: Router,
+    private toastr: ToastrService
+  ) {}
 
   ngOnInit(): void {}
 
@@ -89,6 +93,7 @@ export class CenterAddComponent implements OnInit {
     };
 
     this.centerService.createCenter(payload).subscribe(() => {
+      this.toastr.success('Centro creado correctamente', 'Exito');
       this.router.navigate(['/centers']);
     });
   }

@@ -2,11 +2,14 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { GenericFormComponent } from '../../../shared/components/generic-form/generic-form.component';
 import { Router } from '@angular/router';
-import { Validators } from '@angular/forms';
+import { AbstractControl, AsyncValidatorFn, Validators } from '@angular/forms';
 import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
 import { ProductService } from '../../../services/product/product.service';
 import { StockService } from '../../../services/stock/stock.service';
 import { expirationDateValidator } from '../../../shared/validators/date-compare.validator';
+import { catchError, debounceTime, distinctUntilChanged, map, switchMap, of } from 'rxjs';
+import { GlobalStateService } from '../../../services/global/global-state.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-storage-add',
@@ -93,15 +96,17 @@ export class StorageAddComponent implements OnInit{
   constructor(
     private productService: ProductService,
     private stockService: StockService,
-    private router: Router
+    private router: Router,
+    private globalStateService: GlobalStateService,
+    private toastr: ToastrService
   ) {}
+
   
   ngOnInit(): void {
-      // this.loadProducts();
   }
 
   onSubmit(data: any): void {
-    const centerId = localStorage.getItem('currentCenterId');
+    const centerId = this.globalStateService.getCurrentCenterId();
     const payload = {
       productId: data.productSearch?.id,
       type: data.type,
@@ -114,6 +119,7 @@ export class StorageAddComponent implements OnInit{
     };
 
     this.stockService.createStock(payload).subscribe(() => {
+      this.toastr.success('Stock creado con éxito', 'Exito');
       this.router.navigate(['/storage']);
     });
   }

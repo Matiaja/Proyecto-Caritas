@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using ProyectoCaritas.Data;
 using ProyectoCaritas.Models.DTOs;
 using ProyectoCaritas.Models.Entities;
+using System.Globalization;
 
 namespace ProyectoCaritas.Controllers
 {
@@ -114,6 +115,43 @@ namespace ProyectoCaritas.Controllers
             _context.Categories.Remove(category);
             await _context.SaveChangesAsync();
             return NoContent();
+        }
+
+        [HttpGet("filter")]
+        public async Task<ActionResult<List<GetCategoryDTO>>> GetCategoriesByFilter(
+            [FromQuery] string? sortBy = null,
+            [FromQuery] string? order = "asc")
+
+        {
+            var categories = await _context.Categories
+                .Select(c => new GetCategoryDTO
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Description = c.Description
+                })
+                .ToListAsync();
+            if (sortBy == null)
+            {
+                return categories;
+            }
+            if (sortBy == "name")
+            {
+                if (order == "asc")
+                {
+                    return categories.OrderBy(c => c.Name).ToList();
+                }
+                else if (order == "desc")
+                {
+                    return categories.OrderByDescending(c => c.Name).ToList();
+                }
+            }
+            return BadRequest(new
+            {
+                Status = "400",
+                Error = "Bad Request",
+                Message = "Invalid sortBy parameter."
+            });
         }
 
 

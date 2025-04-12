@@ -12,5 +12,6 @@ namespace ProyectoCaritas.Models.DTOs
         public required string Role { get; set; }
         public required string PhoneNumber { get; set; }
         public int? CenterId { get; set; }
+        public string? CenterName { get; set; }
     }
 }

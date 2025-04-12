@@ -6,6 +6,7 @@ import { UiTableComponent } from '../../shared/components/ui-table/ui-table.comp
 import { Router } from '@angular/router';
 import { BreadcrumbComponent } from '../../shared/components/breadcrumbs/breadcrumbs.component';
 import { ConfirmModalService } from '../../services/confirmModal/confirm-modal.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-center',
@@ -30,7 +31,8 @@ export class CenterComponent implements OnInit {
   constructor(
     private centerService: CenterService,
     private router: Router,
-    private modalService: ConfirmModalService
+    private modalService: ConfirmModalService,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit() {
@@ -62,6 +64,7 @@ export class CenterComponent implements OnInit {
       this.centerService.deleteCenter(center.id).subscribe(() => {
         this.centers = this.centers.filter((p) => p.id !== center.id);
       });
+      this.toastr.success('Centro eliminado correctamente');
     }
   }
 
