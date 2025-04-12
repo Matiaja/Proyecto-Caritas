@@ -53,6 +53,7 @@ namespace ProyectoCaritas.Controllers
         [HttpPost]
         public async Task<ActionResult<DonationRequestDTO>> CreateDonationRequest(DonationRequestDTO addDonationRequestDto)
         {
+            // validate if the DonationRequest was sended
             if (addDonationRequestDto == null)
             {
                 return BadRequest(new
@@ -63,28 +64,85 @@ namespace ProyectoCaritas.Controllers
                 });
             }
 
-            if (addDonationRequestDto.AssignedCenterId.HasValue)
+            // validate if the Center was sended
+            if (addDonationRequestDto.AssignedCenterId.ToString() == null || addDonationRequestDto.AssignedCenterId.ToString() == "0")
             {
-                var centerExists = await _context.Centers
-                .AnyAsync(c => c.Id == addDonationRequestDto.AssignedCenterId.Value);
-
-                if (!centerExists)
+                return BadRequest(new
                 {
-                    return BadRequest(new
-                    {
-                        Status = "400",
-                        Error = "Bad Request",
-                        Message = $"The Assigned Center with ID {addDonationRequestDto.AssignedCenterId} does not exist."
-                    });
-                }
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "Assigned Center ID is required."
+                });
+            }
+            // validate if the Center exists
+            var centerExists = await _context.Centers
+            .AnyAsync(c => c.Id == addDonationRequestDto.AssignedCenterId);
+
+            if (!centerExists)
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = $"Assigned Center with ID {addDonationRequestDto.AssignedCenterId} not found."
+                });
             }
 
+            // validate if the OrderLine exists
+            var orderLine = await _context.OrderLines
+                .Include(ol => ol.Product)
+                .Include(ol => ol.DonationRequests)
+                .FirstOrDefaultAsync(ol => ol.Id == addDonationRequestDto.OrderLineId);
+
+            if (orderLine == null)
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = $"Order Line with ID {addDonationRequestDto.OrderLineId} not found."
+                });
+            }
+
+            var productId = orderLine.ProductId;
+
+            // validate stock available in center assigned
+            var stockAvailable = await _context.Stocks
+                .Where(s => s.CenterId == addDonationRequestDto.AssignedCenterId && s.ProductId == productId)
+                .SumAsync(s => s.Type == "Ingreso" ? s.Quantity : -s.Quantity);
+
+            if (stockAvailable < addDonationRequestDto.Quantity)
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "Center do not have enought stock available."
+                });
+            }
+
+            // validate quantity already assigned to the order line
+            var cantidadAsignada = orderLine.DonationRequests != null && orderLine.DonationRequests.Count != 0 ?
+                orderLine.DonationRequests.Sum(dr => dr.Quantity) : 0;
+            var cantidadPendiente = orderLine.Quantity - cantidadAsignada;
+
+            if (addDonationRequestDto.Quantity > cantidadPendiente)
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = $"The quantity exceeds the quantity of the Order Line. Remain {cantidadPendiente}."
+                });
+            }
+
+            // create DonationRequest
             var donationRequest = new DonationRequest
             {
+                OrderLineId = addDonationRequestDto.OrderLineId,
                 AssignedCenterId = addDonationRequestDto.AssignedCenterId,
-                ShipmentDate = addDonationRequestDto.ShipmentDate,
-                ReceptionDate = addDonationRequestDto.ReceptionDate,
-                Status = addDonationRequestDto.Status
+                Quantity = addDonationRequestDto.Quantity,
+                Status = "Pendiente"
             };
             _context.DonationRequests.Add(donationRequest);
             await _context.SaveChangesAsync();
@@ -106,20 +164,28 @@ namespace ProyectoCaritas.Controllers
                     Message = "Donation Request not found."
                 });
             }
-            if (updateDonationRequestDto.AssignedCenterId.HasValue)
+            if (updateDonationRequestDto.AssignedCenterId.ToString() == null || updateDonationRequestDto.AssignedCenterId.ToString() == "0")
             {
-                var centerExists = await _context.Centers
-                .AnyAsync(c => c.Id == updateDonationRequestDto.AssignedCenterId.Value);
-                if (!centerExists)
+                return BadRequest(new
                 {
-                    return BadRequest(new
-                    {
-                        Status = "400",
-                        Error = "Bad Request",
-                        Message = $"The Assigned Center with ID {updateDonationRequestDto.AssignedCenterId} does not exist."
-                    });
-                }
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "Assigned Center ID is required."
+                });
             }
+
+            var centerExists = await _context.Centers
+            .AnyAsync(c => c.Id == updateDonationRequestDto.AssignedCenterId);
+            if (!centerExists)
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = $"The Assigned Center with ID {updateDonationRequestDto.AssignedCenterId} does not exist."
+                });
+            }
+
 
             donationRequest.AssignedCenterId = updateDonationRequestDto.AssignedCenterId;
             donationRequest.ShipmentDate = updateDonationRequestDto.ShipmentDate;
@@ -170,8 +236,10 @@ namespace ProyectoCaritas.Controllers
             {
                 Id = donationRequest.Id,
                 AssignedCenterId = donationRequest.AssignedCenterId,
-                ShipmentDate = donationRequest.ShipmentDate,
-                ReceptionDate = donationRequest.ReceptionDate,
+                OrderLineId = donationRequest.OrderLineId,
+                Quantity = donationRequest.Quantity,
+                ShipmentDate = donationRequest.ShipmentDate ?? null,
+                ReceptionDate = donationRequest.ReceptionDate ?? null,
                 Status = donationRequest.Status,
                 OrderLine = donationRequest.OrderLine != null ? new OrderLineDTO
                 {

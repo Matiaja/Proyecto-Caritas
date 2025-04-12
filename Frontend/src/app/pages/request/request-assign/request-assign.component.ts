@@ -8,6 +8,7 @@ import { RequestService } from '../../../services/request/request.service';
 import { OrderLine } from '../../../models/orderLine.model';
 import { UiTableComponent } from '../../../shared/components/ui-table/ui-table.component';
 import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
+import { StockService } from '../../../services/stock/stock.service';
 
 @Component({
   selector: 'app-request-assign',
@@ -22,6 +23,7 @@ export class RequestAssignComponent implements OnInit {
     private route: ActivatedRoute,
     private productService: ProductService,
     private requestService: RequestService,
+    private stockService: StockService,
     private location: Location
   ) { }
 
@@ -46,13 +48,11 @@ export class RequestAssignComponent implements OnInit {
   // variables de tabla
   title = '';
   columnHeaders: { [key: string]: string } = {
-      id: 'Id', 
       productName: 'Producto',
       centerName: 'Centro',
-      quantity: 'Cantidad',
-      status: 'Estado'
+      stockQuantity: 'Cantidad'
     };
-  displayedColumns = ['id', 'productName', 'centerName', 'quantity','status'];
+  displayedColumns = ['productName', 'centerName', 'stockQuantity'];
   stocks: any[] = [];
 
   ngOnInit(): void {
@@ -111,11 +111,15 @@ export class RequestAssignComponent implements OnInit {
 
   loadStocks() {
     if (this.product && this.product.stocks && this.request && this.request.requestingCenter) {
-      this.stocks = this.product.stocks.map((stock) => ({
-        ...stock,
-        productName: this.product.name,
-        centerName: this.request.requestingCenter?.name
-      }));
+      this.stockService.getProductInStocks(this.product.id).subscribe({
+        next: (stocks) => {
+          this.stocks = stocks;
+          console.log(stocks);
+        },
+        error: (error) => {
+          console.error(error);
+        }
+      });
     }
   }
 
@@ -124,7 +128,7 @@ export class RequestAssignComponent implements OnInit {
   }
 
   assign(row: any): void {
-
+    console.log(row);
   }
 
   onAddElement = null;
@@ -132,5 +136,3 @@ export class RequestAssignComponent implements OnInit {
   onDeleteElement = null;
   onSelectElement = null;
 }
-
-
