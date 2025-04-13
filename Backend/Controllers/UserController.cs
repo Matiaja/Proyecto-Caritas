@@ -52,6 +52,7 @@ namespace ProyectoCaritas.Controllers
             return Ok(userDTOs);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("filter")]
         public async Task<ActionResult<List<UserDTO>>> GetUsersByFilter(
             [FromQuery] int? centerId = null,
@@ -70,7 +71,8 @@ namespace ProyectoCaritas.Controllers
                     Role = u.Role,
                     PhoneNumber = u.PhoneNumber ?? string.Empty,
                     CenterId = u.CenterId
-                })
+                }).
+                Where(u => u.Role != "Admin")
                 .ToListAsync();
 
             if (centerId.HasValue)
@@ -121,6 +123,7 @@ namespace ProyectoCaritas.Controllers
             return Ok(userDTOs);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("all-user-no-admin")]
         public async Task<ActionResult<IEnumerable<UserDTO>>> GetAllUserNoAdmin()
         {
@@ -241,8 +244,8 @@ namespace ProyectoCaritas.Controllers
             }
 
             // Normalizar el nombre del rol antes de asignarlo
-            var normalizedRole = _roleManager.NormalizeKey(userRegisterDTO.Role);
-            var rolassign = await _userManager.AddToRoleAsync(user, normalizedRole);
+            //var normalizedRole = _roleManager.NormalizeKey(userRegisterDTO.Role);
+            var rolassign = await _userManager.AddToRoleAsync(user, userRegisterDTO.Role);
             if (!rolassign.Succeeded)
             {
                 return BadRequest(rolassign.Errors);
@@ -263,16 +266,25 @@ namespace ProyectoCaritas.Controllers
 
             var centerId = await GetUserCenterId(user.Id);
 
+            var roles = await _userManager.GetRolesAsync(user);
+
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes("SuperSecureKey1234!·$%&/()=asdfasdf"); // Use a secure key
 
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Name, user.UserName ?? string.Empty)
+            };
+
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[]
-                {
-                new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
-                new Claim(ClaimTypes.Role, user.Role)
-                }),
+                Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };

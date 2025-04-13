@@ -47,8 +47,15 @@ export class AuthService {
     return localStorage.getItem('authUser') !== null;
   }
 
-  getAuthUser() {
-    return localStorage.getItem('authUser') || '';
+  getToken(): string {
+    const authUser = localStorage.getItem('authUser');
+    if (!authUser) return '';
+    try {
+      const parsed = JSON.parse(authUser);
+      return parsed.token || '';
+    } catch {
+      return '';
+    }
   }
 
   getUserRole(): string | null {
