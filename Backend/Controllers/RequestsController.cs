@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ProyectoCaritas.Data;
@@ -14,21 +17,57 @@ namespace ProyectoCaritas.Controllers
         private readonly ApplicationDbContext _context;
         private readonly OrderLineService _orderLineService;
 
-        public RequestsController(ApplicationDbContext context, OrderLineService orderLineService)
+        private readonly UserManager<User> _userManager;
+
+
+        public RequestsController(ApplicationDbContext context, UserManager<User> userManager, OrderLineService orderLineService)
         {
             _context = context;
+            _userManager = userManager;
             _orderLineService = orderLineService;
         }
 
         // GET: api/Requests
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<RequestDTO>>> GetAllRequests()
         {
-            return await _context.Requests
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+
+            // Si el token no tiene ID, devuelve un error 401
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(new { message = "Invalid token." });
+            }
+
+            // Si es admin, devuelve todas las requests
+            if (role == "Admin")
+            {
+                return await _context.Requests
+                    .Include(r => r.RequestingCenter)
+                    .Include(r => r.OrderLines)
+                    .Select(r => RequestToDTO(r))
+                    .ToListAsync();
+            }
+
+            // Si no es admin, buscar el centro del usuario
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found." });
+            }
+
+            // Filtrar las requests por centro del usuario
+            var userRequests = await _context.Requests
                 .Include(r => r.RequestingCenter)
                 .Include(r => r.OrderLines)
+                .Where(r => r.RequestingCenterId == user.CenterId)
                 .Select(r => RequestToDTO(r))
                 .ToListAsync();
+
+            return Ok(userRequests); ;
         }
 
         // GET: api/Requests/{id}
