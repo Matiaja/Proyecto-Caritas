@@ -1,7 +1,8 @@
 import { Component, computed } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { NavbarComponent } from "./components/navbar/navbar.component";
 import { BreadcrumbComponent } from "./shared/components/breadcrumbs/breadcrumbs.component";
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -14,16 +15,20 @@ export class AppComponent {
   title = 'Frontend';
   showNavbar = true;
 
-  constructor(private router: Router) {
-    // escuchar cambios de ruta
-    this.router.events.subscribe(() => {
-      this.updateNavbarVisibility();
+  constructor(private router: Router, private route: ActivatedRoute) {
+    this.router.events.pipe(
+        filter(event => event instanceof NavigationEnd)
+      ).subscribe(() => {
+        this.updateNavbarVisibility();
     });
-
   }
 
   private updateNavbarVisibility() {
-    const excludedRoutes = ['/login']; // rutas sin el navbar
-    this.showNavbar = !excludedRoutes.includes(this.router.url);
+    let currentRoute = this.route.root;
+    while (currentRoute.firstChild) {
+      currentRoute = currentRoute.firstChild;
+    }
+    const hideNavbar = currentRoute.snapshot.data['hideNavbar'];
+    this.showNavbar = !hideNavbar;
   }
 }

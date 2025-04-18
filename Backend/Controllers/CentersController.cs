@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProyectoCaritas.Data;
@@ -55,6 +56,7 @@ namespace ProyectoCaritas.Controllers
         }
 
         // POST: api/Centers
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<CenterDTO>> CreateCenter(CenterDTO addCenterDto)
         {
@@ -102,6 +104,7 @@ namespace ProyectoCaritas.Controllers
         }
 
         // DELETE: api/Centers/{id}
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCenter(int id)
         {
