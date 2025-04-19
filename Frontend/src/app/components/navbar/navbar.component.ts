@@ -8,10 +8,13 @@ import { AuthService } from '../../auth/auth.service';
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.css'
+  styleUrl: './navbar.component.css',
 })
 export class NavbarComponent {
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   isVisible: boolean = true; // Controla si el navbar es visible
   lastScrollPosition: number = 0; // Almacena la última posición del scroll
@@ -47,5 +50,4 @@ export class NavbarComponent {
   onUpdateProfile() {
     this.router.navigate(['/profile']);
   }
-
 }

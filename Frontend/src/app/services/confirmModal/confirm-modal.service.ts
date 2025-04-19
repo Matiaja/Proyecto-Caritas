@@ -3,10 +3,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../../shared/components/confirmation-dialog/confirmation-dialog.component';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ConfirmModalService {
-
   constructor(private dialog: MatDialog) {}
 
   confirm(title: string, message: string): Promise<boolean> {

@@ -15,9 +15,9 @@ import { GlobalStateService } from '../../services/global/global-state.service';
   standalone: true,
   imports: [UiTableComponent, BreadcrumbComponent],
   templateUrl: './storage.component.html',
-  styleUrl: './storage.component.css'
+  styleUrl: './storage.component.css',
 })
-export class StorageComponent implements OnInit{
+export class StorageComponent implements OnInit {
   product = '';
   title = 'Almacén';
   displayedColumns = ['productName', 'productCode', 'stockQuantity'];
@@ -54,5 +54,4 @@ export class StorageComponent implements OnInit{
   onSelectStock(stock: any) {
     this.router.navigate(['/storage/detail', stock.productId]);
   }
-
 }

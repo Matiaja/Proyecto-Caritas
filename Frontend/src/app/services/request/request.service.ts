@@ -5,12 +5,11 @@ import { Observable } from 'rxjs';
 import { RequestModel } from '../../models/request.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class RequestService {
-
   baseUrl = environment.baseUrl;
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getRequests(): Observable<RequestModel[]> {
     return this.http.get<RequestModel[]>(this.baseUrl + 'requests');

@@ -15,7 +15,7 @@ export const roleGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
-  if(!userRole || !requiredRoles.includes(userRole)) {
+  if (!userRole || !requiredRoles.includes(userRole)) {
     router.navigate(['/unauthorized']);
     return false;
   }

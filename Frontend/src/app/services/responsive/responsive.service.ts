@@ -1,14 +1,12 @@
 import { computed, inject, Injectable } from '@angular/core';
-import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { BehaviorSubject, debounceTime, fromEvent } from 'rxjs';
 
-
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ResponsiveService {
-
   private mobileBreakpoint = 600;
   isMobile$ = new BehaviorSubject<boolean>(false);
 
@@ -24,7 +22,6 @@ export class ResponsiveService {
     this.isMobile$.next(isMobile);
   }
 
-
   // private readonly breakpoints = {
   //   small: '(max-width: 599px)',
   //   medium: '(min-width: 600px) and (max-width: 959px)',
@@ -36,11 +33,11 @@ export class ResponsiveService {
   // isSmallScreen = toSignal(
   //   this.breakpointObserver.observe(this.breakpoints.small)
   // );
-  
+
   // isMediumScreen = toSignal(
   //   this.breakpointObserver.observe(this.breakpoints.medium)
   // );
-  
+
   // isLargeScreen = toSignal(
   //   this.breakpointObserver.observe(this.breakpoints.large)
   // );
@@ -50,6 +47,4 @@ export class ResponsiveService {
   //   if (this.isMediumScreen()) return 'medium';
   //   return 'large';
   // }
-
-
 }

@@ -16,9 +16,8 @@ import { NgxPaginationModule } from 'ngx-pagination';
   standalone: true,
   imports: [NgxPaginationModule, UiTableComponent, BreadcrumbComponent],
   templateUrl: './product.component.html',
-  styleUrl: './product.component.css'
+  styleUrl: './product.component.css',
 })
-
 export class ProductComponent implements OnInit {
   paginationId = 'productPagination';
   title = 'Productos';
@@ -37,7 +36,7 @@ export class ProductComponent implements OnInit {
   };
   sortOptions = [
     { key: 'name', label: 'Nombre' },
-    { key: 'quantity', label: 'Cantidad' }
+    { key: 'quantity', label: 'Cantidad' },
   ];
   mobileHeaders: { [key: string]: string } = {
     name: 'Nombre',
@@ -50,12 +49,12 @@ export class ProductComponent implements OnInit {
   totalItems: number = 0;
 
   constructor(
-    private productService: ProductService, 
-    private router: Router, 
+    private productService: ProductService,
+    private router: Router,
     private modalService: ConfirmModalService,
     private toastr: ToastrService,
     private categoryService: CategoryService
-  ) { }
+  ) {}
   ngOnInit() {
     this.loadCategories();
 
@@ -66,7 +65,7 @@ export class ProductComponent implements OnInit {
   }
 
   loadCategories() {
-    this.categoryService.categories$.subscribe(categories => {
+    this.categoryService.categories$.subscribe((categories) => {
       this.categories = categories;
     });
     this.categoryService.getCategories();
@@ -79,7 +78,7 @@ export class ProductComponent implements OnInit {
       this.order
     );
 
-    this.productService.products$.subscribe(products => {
+    this.productService.products$.subscribe((products) => {
       this.products = products;
     });
 
@@ -117,15 +116,15 @@ export class ProductComponent implements OnInit {
     this.router.navigate(['/products/add']);
   }
 
-  onEditProduct(product: any) {
-  }
+  onEditProduct(product: any) {}
 
   onSelectProduct(product: any) {
     this.router.navigate(['/products/detail', product.id]);
   }
 
   async onDeleteProduct(product: any) {
-    const confirmed = await this.modalService.confirm('Eliminar producto',
+    const confirmed = await this.modalService.confirm(
+      'Eliminar producto',
       '¿Estás seguro de que quieres eliminar este producto?'
     );
 

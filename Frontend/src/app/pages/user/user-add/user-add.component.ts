@@ -13,90 +13,91 @@ import { ToastrService } from 'ngx-toastr';
   standalone: true,
   imports: [GenericFormComponent, BreadcrumbComponent],
   templateUrl: './user-add.component.html',
-  styleUrl: './user-add.component.css'
+  styleUrl: './user-add.component.css',
 })
-export class UserAddComponent implements OnInit{
-formConfig = {
-  title: 'Agregar Usuario',
-  fields: [
-    {
-      name: 'userName',
-      label: 'Nombre de usuario',
-      type: 'text',
-      value: '',
-      placeholder: 'Ingrese el nombre de usuario',
-      validators: [Validators.required],
-      errorMessage: 'El nombre de usuario es requerido',
-    },
-    {
-      name: 'email',
-      label: 'Correo electrónico',
-      type: 'email',
-      value: '',
-      placeholder: 'Ingrese el correo electrónico',
-      validators: [Validators.required, Validators.email],
-    },
-    {
-      name: 'password',
-      label: 'Contraseña',
-      type: 'text',
-      value: '',
-      placeholder: 'Ingrese la contraseña',
-      validators: [Validators.required, Validators.minLength(8), Validators.pattern('.*\\d.*')],
-    },
-    {
-      name: 'FirstName',
-      label: 'Nombre',
-      type: 'text',
-      value: '',
-      placeholder: 'Ingrese el nombre',
-      validators: [Validators.required],
-      errorMessage: 'El nombre es requerido',
-    },
-    {
-      name: 'LastName',
-      label: 'Apellido',
-      type: 'text',
-      value: '',
-      placeholder: 'Ingrese el apellido',
-      validators: [Validators.required],
-      errorMessage: 'El apellido es requerido',
-    },
-    {
-      name: 'phoneNumber',
-      label: 'Teléfono',
-      type: 'tel',
-      value: '',
-      placeholder: 'Ingrese el teléfono',
-      validators: [Validators.required],
-    },
-    {
-      name: 'role',
-      label: 'Rol',
-      type: 'select',
-      value: '',
-      placeholder: 'Seleccione un rol',
-      validators: [Validators.required],
-      errorMessage: 'El rol es requerido',
-      options: [
-        { value: 'Admin', label: 'Administrador' },
-        { value: 'User', label: 'Usuario' },
-      ] as { value: any; label: string }[],
-    },
-    {
-      name: 'center',
-      label: 'Centro',
-      type: 'select',
-      value: '',
-      placeholder: 'Seleccione un centro',
-      validators: [Validators.required],
-      errorMessage: 'El centro es requerido',
-      options: [] as { value: any; label: string }[],
-    }
-  ],
-};
+export class UserAddComponent implements OnInit {
+  formConfig = {
+    title: 'Agregar Usuario',
+    fields: [
+      {
+        name: 'userName',
+        label: 'Nombre de usuario',
+        type: 'text',
+        value: '',
+        placeholder: 'Ingrese el nombre de usuario',
+        validators: [Validators.required],
+        errorMessage: 'El nombre de usuario es requerido',
+      },
+      {
+        name: 'email',
+        label: 'Correo electrónico',
+        type: 'email',
+        value: '',
+        placeholder: 'Ingrese el correo electrónico',
+        validators: [Validators.required, Validators.email],
+      },
+      {
+        name: 'password',
+        label: 'Contraseña',
+        type: 'text',
+        value: '',
+        placeholder: 'Ingrese la contraseña',
+        validators: [Validators.required, Validators.minLength(8), Validators.pattern('.*\\d.*')],
+      },
+      {
+        name: 'FirstName',
+        label: 'Nombre',
+        type: 'text',
+        value: '',
+        placeholder: 'Ingrese el nombre',
+        validators: [Validators.required],
+        errorMessage: 'El nombre es requerido',
+      },
+      {
+        name: 'LastName',
+        label: 'Apellido',
+        type: 'text',
+        value: '',
+        placeholder: 'Ingrese el apellido',
+        validators: [Validators.required],
+        errorMessage: 'El apellido es requerido',
+      },
+      {
+        name: 'phoneNumber',
+        label: 'Teléfono',
+        type: 'tel',
+        value: '',
+        placeholder: 'Ingrese el teléfono',
+        validators: [Validators.required],
+      },
+      {
+        name: 'role',
+        label: 'Rol',
+        type: 'select',
+        value: '',
+        placeholder: 'Seleccione un rol',
+        validators: [Validators.required],
+        errorMessage: 'El rol es requerido',
+        options: [
+          { value: 'Admin', label: 'Administrador' },
+          { value: 'User', label: 'Usuario' },
+        ] as { value: any; label: string }[],
+      },
+      {
+        name: 'center',
+        label: 'Centro',
+        type: 'select',
+        value: '',
+        placeholder: 'Seleccione un centro',
+        validators: [Validators.required],
+        errorMessage: 'El centro es requerido',
+        options: [] as { value: any; label: string }[],
+      },
+    ],
+  };
 
-  constructor(private userService: UserService, 
+  constructor(
+    private userService: UserService,
     private router: Router,
     private centerService: CenterService,
     private toastr: ToastrService
@@ -116,7 +117,7 @@ formConfig = {
         }));
       }
     });
- }
+  }
 
   onSubmit(formData: any): void {
     const payload = {
@@ -138,6 +139,4 @@ formConfig = {
   onCancel(): void {
     this.router.navigate(['/users']);
   }
-
 }
-

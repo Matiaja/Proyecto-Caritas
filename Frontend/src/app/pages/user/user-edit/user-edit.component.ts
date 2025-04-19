@@ -13,15 +13,15 @@ import { ToastrService } from 'ngx-toastr';
   standalone: true,
   imports: [GenericFormComponent],
   templateUrl: './user-edit.component.html',
-  styleUrl: './user-edit.component.css'
+  styleUrl: './user-edit.component.css',
 })
-export class UserEditComponent implements OnInit{
+export class UserEditComponent implements OnInit {
   userData: any;
   userId: string;
   form!: FormGroup;
 
   formConfig = {
-    title : 'Editar Usuario',
+    title: 'Editar Usuario',
     fields: [
       {
         name: 'email',
@@ -55,21 +55,20 @@ export class UserEditComponent implements OnInit{
         value: '',
         placeholder: 'Ingrese el teléfono',
         validators: [Validators.required],
-      }
+      },
     ],
   };
 
   constructor(
-    private userService: UserService, 
+    private userService: UserService,
     private globalStateService: GlobalStateService,
-    private router: Router, 
-    private route: ActivatedRoute, 
+    private router: Router,
+    private route: ActivatedRoute,
     private fb: FormBuilder,
     private toastr: ToastrService
-    ) 
-    {
-      this.userId = '';
-    }
+  ) {
+    this.userId = '';
+  }
 
   ngOnInit(): void {
     const userId = this.globalStateService.getCurrentUserId();
@@ -117,7 +116,7 @@ export class UserEditComponent implements OnInit{
             value: this.userData.phoneNumber,
             placeholder: 'Ingrese el teléfono',
             validators: [Validators.required],
-          }
+          },
         ],
       };
     });
@@ -125,7 +124,7 @@ export class UserEditComponent implements OnInit{
 
   onSubmit(formData: any): void {
     const user = {
-      Id : this.userId,
+      Id: this.userId,
       UserName: this.userData.userName,
       Email: formData.email,
       FirstName: formData.FirstName,
@@ -151,5 +150,4 @@ export class UserEditComponent implements OnInit{
   onCancel(): void {
     this.router.navigate(['/home']);
   }
-
 }

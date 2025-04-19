@@ -10,13 +10,13 @@ import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-add-category',
   standalone: true,
-  imports: [ GenericFormComponent, BreadcrumbComponent],
+  imports: [GenericFormComponent, BreadcrumbComponent],
   templateUrl: './add-category.component.html',
-  styleUrl: './add-category.component.css'
+  styleUrl: './add-category.component.css',
 })
 export class AddCategoryComponent {
   formConfig = {
-    title : 'Agregar Categoría',
+    title: 'Agregar Categoría',
     fields: [
       {
         name: 'name',
@@ -38,11 +38,11 @@ export class AddCategoryComponent {
   };
 
   constructor(
-    private categoryService: CategoryService, 
+    private categoryService: CategoryService,
     private router: Router,
     private toastr: ToastrService
-    ) {}
-  
+  ) {}
+
   onSubmit(formData: any): void {
     console.log(formData);
     this.categoryService.createCategory(formData).subscribe(() => {
@@ -54,5 +54,4 @@ export class AddCategoryComponent {
   onCancel(): void {
     this.router.navigate(['/categories']);
   }
-
 }

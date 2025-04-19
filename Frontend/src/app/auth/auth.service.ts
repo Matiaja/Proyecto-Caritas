@@ -6,11 +6,10 @@ import { environment } from '../../environments/environment';
 import { jwtDecode } from 'jwt-decode';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
-
-  constructor() { }
+  constructor() {}
 
   httpClient = inject(HttpClient);
   baseUrl = environment.baseUrl + 'user';
@@ -20,15 +19,17 @@ export class AuthService {
   }
 
   login(data: any) {
-    return this.httpClient.post(`${this.baseUrl}/login`, data, {
-      headers: { 'Content-Type': 'application/json' }
-    }).pipe(
-      tap((res: any) => {
-        localStorage.setItem('authUser', JSON.stringify(res));
-        localStorage.setItem('currentCenterId', res.centerId);
-        console.log(res)
+    return this.httpClient
+      .post(`${this.baseUrl}/login`, data, {
+        headers: { 'Content-Type': 'application/json' },
       })
-    );
+      .pipe(
+        tap((res: any) => {
+          localStorage.setItem('authUser', JSON.stringify(res));
+          localStorage.setItem('currentCenterId', res.centerId);
+          console.log(res);
+        })
+      );
   }
 
   // login(data: any) {
@@ -67,5 +68,4 @@ export class AuthService {
     }
     return null;
   }
-
 }

@@ -16,9 +16,9 @@ import { ToastrService } from 'ngx-toastr';
   standalone: true,
   imports: [GenericFormComponent, BreadcrumbComponent],
   templateUrl: './storage-add.component.html',
-  styleUrl: './storage-add.component.css'
+  styleUrl: './storage-add.component.css',
 })
-export class StorageAddComponent implements OnInit{
+export class StorageAddComponent implements OnInit {
   formConfig = {
     title: 'Agregar Stock',
     fields: [
@@ -58,9 +58,7 @@ export class StorageAddComponent implements OnInit{
         type: 'date',
         value: '',
         placeholder: 'Seleccione la fecha de expiración',
-        validators: [
-          expirationDateValidator('date'),
-        ],
+        validators: [expirationDateValidator('date')],
         errorMessage: 'La fecha de expiracion no puede ser menor a hoy ni a la fecha de creación',
       },
       {
@@ -101,9 +99,7 @@ export class StorageAddComponent implements OnInit{
     private toastr: ToastrService
   ) {}
 
-  
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   onSubmit(data: any): void {
     const centerId = this.globalStateService.getCurrentCenterId();
@@ -112,9 +108,9 @@ export class StorageAddComponent implements OnInit{
       type: data.type,
       date: data.date,
       expirationDate: data.expirationDate,
-      description: data.description? data.description : '',
+      description: data.description ? data.description : '',
       quantity: data.quantity,
-      weight: data.weight? data.weight : 0,
+      weight: data.weight ? data.weight : 0,
       centerId: centerId,
     };
 
@@ -127,5 +123,4 @@ export class StorageAddComponent implements OnInit{
   onCancel(): void {
     this.router.navigate(['/storage']);
   }
-
 }

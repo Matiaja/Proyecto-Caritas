@@ -8,9 +8,8 @@ describe('UnauthorizedComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [UnauthorizedComponent]
-    })
-    .compileComponents();
+      imports: [UnauthorizedComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(UnauthorizedComponent);
     component = fixture.componentInstance;

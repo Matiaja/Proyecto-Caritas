@@ -13,11 +13,11 @@ import { CenterService } from '../../services/center/center.service';
 @Component({
   selector: 'app-user',
   standalone: true,
-  imports: [ UiTableComponent, BreadcrumbComponent ],
+  imports: [UiTableComponent, BreadcrumbComponent],
   templateUrl: './user.component.html',
-  styleUrl: './user.component.css'
+  styleUrl: './user.component.css',
 })
-export class UserComponent implements OnInit{
+export class UserComponent implements OnInit {
   title = 'Usuarios';
   displayedColumns = ['userName', 'email', 'centerName'];
   users: any[] = [];
@@ -29,23 +29,22 @@ export class UserComponent implements OnInit{
     email: 'Correo electrónico',
     centerName: 'Centro',
   };
-  centers : any[] = [];
+  centers: any[] = [];
   showSearchBar = true;
   searchColumns = ['userName', 'email', 'centerName'];
-  sortOptions = [
-    { key: 'userName', label: 'Nombre de usuario' }
-  ];
+  sortOptions = [{ key: 'userName', label: 'Nombre de usuario' }];
   mobileHeaders: { [key: string]: string } = {
     userName: 'Nombre de usuario',
   };
   mobileColumns = ['userName'];
 
-  constructor(private userService: UserService, 
-    private router: Router, 
+  constructor(
+    private userService: UserService,
+    private router: Router,
     private modalService: ConfirmModalService,
     private toastr: ToastrService,
-    private centerService : CenterService,
-  ) { }
+    private centerService: CenterService
+  ) {}
 
   ngOnInit() {
     this.loadCenters();
@@ -61,27 +60,28 @@ export class UserComponent implements OnInit{
   }
 
   loadCenters() {
-    this.centerService.getCenters().subscribe(centers => {
-      this.centers = centers.map(center => ({
+    this.centerService.getCenters().subscribe((centers) => {
+      this.centers = centers.map((center) => ({
         ...center,
-        name: center.name
+        name: center.name,
       }));
     });
   }
 
   loadUsers() {
-    this.userService.getFilteredUsers(
-      this.selectedCenter ?? undefined, 
-      this.sortBy, 
-      this.order);
-      this.userService.users$.subscribe(users => {
-        this.users = users.map(user => ({
-          ...user,
-          centerName: user.centerId 
-        ? (user.centerName ? user.centerName : "Centro número " + user.centerId)
-        : (user.centerName ? user.centerName : "Usuario sin centro")
-        }));
-      });
+    this.userService.getFilteredUsers(this.selectedCenter ?? undefined, this.sortBy, this.order);
+    this.userService.users$.subscribe((users) => {
+      this.users = users.map((user) => ({
+        ...user,
+        centerName: user.centerId
+          ? user.centerName
+            ? user.centerName
+            : 'Centro número ' + user.centerId
+          : user.centerName
+            ? user.centerName
+            : 'Usuario sin centro',
+      }));
+    });
   }
 
   onFilterChange(filter: { centerId?: number; sortBy?: string; order?: string }) {
@@ -100,7 +100,8 @@ export class UserComponent implements OnInit{
   }
 
   async onDeleteUser(user: any) {
-    const confirmed = await this.modalService.confirm('Eliminar usuario', 
+    const confirmed = await this.modalService.confirm(
+      'Eliminar usuario',
       '¿Estás seguro de que quieres eliminar este usuario?'
     );
 
@@ -110,9 +111,5 @@ export class UserComponent implements OnInit{
       });
       this.toastr.success('Usuario eliminado correctamente');
     }
-
   }
-
-   
-
 }

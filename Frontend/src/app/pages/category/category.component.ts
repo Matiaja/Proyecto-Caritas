@@ -12,9 +12,9 @@ import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-category',
   standalone: true,
-  imports: [ UiTableComponent, BreadcrumbComponent ],
+  imports: [UiTableComponent, BreadcrumbComponent],
   templateUrl: './category.component.html',
-  styleUrl: './category.component.css'
+  styleUrl: './category.component.css',
 })
 export class CategoryComponent implements OnInit {
   title = 'Categorías';
@@ -26,21 +26,19 @@ export class CategoryComponent implements OnInit {
     name: 'Nombre',
     description: 'Descripción',
   };
-  sortOptions = [
-    { key: 'name', label: 'Nombre' }
-  ];
+  sortOptions = [{ key: 'name', label: 'Nombre' }];
   mobileHeaders: { [key: string]: string } = {
-    name: 'Nombre'
+    name: 'Nombre',
   };
   mobileColumns = ['name'];
 
   constructor(
-    private categoryService: CategoryService, 
+    private categoryService: CategoryService,
     private router: Router,
     private dialog: MatDialog,
     private modalService: ConfirmModalService,
     private toastr: ToastrService
-    ) {}
+  ) {}
   ngOnInit() {
     this.loadCategories();
   }
@@ -58,13 +56,9 @@ export class CategoryComponent implements OnInit {
   }
 
   loadCategories() {
-    this.categoryService.getFilteredCategories(
-      this.sortBy,
-      this.order
-    );
+    this.categoryService.getFilteredCategories(this.sortBy, this.order);
 
-    this.categoryService.categories$
-    .subscribe(categories => {
+    this.categoryService.categories$.subscribe((categories) => {
       this.categories = categories;
     });
   }
@@ -76,7 +70,8 @@ export class CategoryComponent implements OnInit {
   }
 
   async onDeleteCategory(category: any) {
-    const confirmed = await this.modalService.confirm('Eliminar categoría', 
+    const confirmed = await this.modalService.confirm(
+      'Eliminar categoría',
       '¿Estás seguro de que quieres eliminar esta categoría?'
     );
 
@@ -86,6 +81,5 @@ export class CategoryComponent implements OnInit {
       });
       this.toastr.success('Categoría eliminada con éxito', 'Exito');
     }
-
   }
 }

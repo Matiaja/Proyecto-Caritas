@@ -2,22 +2,19 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Product } from '../../models/product.model';
-import { Observable, BehaviorSubject, tap, map, catchError, of} from 'rxjs';
+import { Observable, BehaviorSubject, tap, map, catchError, of } from 'rxjs';
 import { Router } from '@angular/router';
 import { HttpParams } from '@angular/common/http';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UserService {
-
   baseUrl = environment.baseUrl + 'user';
   private usersSubject = new BehaviorSubject<any[]>([]);
   users$ = this.usersSubject.asObservable();
 
-  constructor(
-    private http: HttpClient,
-  ) { }
+  constructor(private http: HttpClient) {}
 
   getUsers(): Observable<any[]> {
     return this.http.get<any[]>(this.baseUrl).pipe(
@@ -28,23 +25,26 @@ export class UserService {
   }
 
   getUsersNoAdmin(): void {
-    this.http.get<any[]>(this.baseUrl + '/all-user-no-admin').pipe(
-      tap(users => {
-        console.log("Usuarios recibidos:", users);
-        this.usersSubject.next(users);
-      }),
-      catchError(error => {
-        console.error("Error obteniendo usuarios:", error);
-        return of([]); 
-      })
-    ).subscribe();
+    this.http
+      .get<any[]>(this.baseUrl + '/all-user-no-admin')
+      .pipe(
+        tap((users) => {
+          console.log('Usuarios recibidos:', users);
+          this.usersSubject.next(users);
+        }),
+        catchError((error) => {
+          console.error('Error obteniendo usuarios:', error);
+          return of([]);
+        })
+      )
+      .subscribe();
   }
 
   getUserById(userId: string): Observable<any> {
     return this.http.get<any>(this.baseUrl + '/' + userId);
   }
 
-  deleteUser(userId: string){
+  deleteUser(userId: string) {
     return this.http.delete(this.baseUrl + '/' + userId).pipe(
       tap(() => {
         const currentUsers = this.usersSubject.getValue();
@@ -54,7 +54,7 @@ export class UserService {
     );
   }
 
-  getFilteredUsers(centerId?: number, sortBy?: string, order: string= 'asc'): void {
+  getFilteredUsers(centerId?: number, sortBy?: string, order: string = 'asc'): void {
     let params = new HttpParams();
     if (centerId) {
       params = params.set('centerId', centerId);
@@ -63,7 +63,7 @@ export class UserService {
       params = params.set('sortBy', sortBy);
       params = params.set('order', order);
     }
-    this.http.get<any[]>(`${this.baseUrl}/filter`, { params }).subscribe(users => {
+    this.http.get<any[]>(`${this.baseUrl}/filter`, { params }).subscribe((users) => {
       this.usersSubject.next(users);
     });
   }
@@ -75,5 +75,4 @@ export class UserService {
   registerUser(user: any): Observable<any> {
     return this.http.post(this.baseUrl + '/register', user);
   }
-
 }

@@ -10,7 +10,7 @@ export function expirationDateValidator(creationDateControlName: string) {
     const creationDate = creationDateControl ? new Date(creationDateControl.value) : null;
 
     if (!control.value) {
-      return null; 
+      return null;
     }
 
     if (expirationDate < today) {
@@ -18,7 +18,9 @@ export function expirationDateValidator(creationDateControlName: string) {
     }
 
     if (creationDate && expirationDate < creationDate) {
-      return { expirationDateInvalid: 'La fecha de expiración no puede ser menor a la fecha de creación.' };
+      return {
+        expirationDateInvalid: 'La fecha de expiración no puede ser menor a la fecha de creación.',
+      };
     }
 
     return null;

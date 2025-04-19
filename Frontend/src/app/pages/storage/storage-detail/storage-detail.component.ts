@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Category } from '../../../models/category.model';
-import { UiTableComponent } from "../../../shared/components/ui-table/ui-table.component";
+import { UiTableComponent } from '../../../shared/components/ui-table/ui-table.component';
 import { CommonModule, Location } from '@angular/common';
 import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
 import { StockService } from '../../../services/stock/stock.service';
@@ -13,21 +13,23 @@ import { GlobalStateService } from '../../../services/global/global-state.servic
   standalone: true,
   imports: [UiTableComponent, CommonModule, BreadcrumbComponent],
   templateUrl: './storage-detail.component.html',
-  styleUrl: './storage-detail.component.css'
+  styleUrl: './storage-detail.component.css',
 })
-export class StorageDetailComponent implements OnInit{
-  stock: any[] = [{
-    id: 0,
-    product: {
-      name: '',
-      code: '',
+export class StorageDetailComponent implements OnInit {
+  stock: any[] = [
+    {
+      id: 0,
+      product: {
+        name: '',
+        code: '',
+      },
+      quantity: 0,
+      date: '',
+      expirationDate: '',
+      description: '',
+      weight: 0,
     },
-    quantity: 0,
-    date: '',
-    expirationDate: '',
-    description: '',
-    weight: 0,
-  }];
+  ];
 
   centerId: number | null = null;
 
@@ -40,7 +42,7 @@ export class StorageDetailComponent implements OnInit{
     private globalStateService: GlobalStateService
   ) {
     this.centerId = this.globalStateService.getCurrentCenterId();
-   }
+  }
 
   ngOnInit(): void {
     this.route.params.subscribe((params) => {

@@ -1,116 +1,115 @@
-.button-add{
-    background-color: #36337f;
-    border-color: #36337f;
+.button-add {
+  background-color: #36337f;
+  border-color: #36337f;
 }
 
-.button-add:hover{
-    background-color: #27246f;
-    border-color: #27246f;
+.button-add:hover {
+  background-color: #27246f;
+  border-color: #27246f;
 }
 
 .btn-group .btn-outline-primary {
-    border-color: #36337f;
-    color: #36337f;
+  border-color: #36337f;
+  color: #36337f;
 }
 
 .btn-group .btn-outline-primary:hover {
-    background-color: #36337f;
-    color: #ffffff;
-    border-color: #36337f;
+  background-color: #36337f;
+  color: #ffffff;
+  border-color: #36337f;
 }
 
 .btn-group .btn-outline-primary svg {
-    fill: #36337f;
+  fill: #36337f;
 }
 
 .btn-group .btn-outline-primary:hover svg {
-    fill: #ffffff;
+  fill: #ffffff;
 }
 
 .fixed-width-column {
-    min-width: 150px; 
-    max-width: 150px;
-    white-space: nowrap; 
-    overflow: hidden;
-    text-overflow: ellipsis;
-
+  min-width: 150px;
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .transition-icon {
-    transition: transform 0.3s ease;
+  transition: transform 0.3s ease;
 }
 
 .rotate-icon {
-    transform: rotate(180deg);
+  transform: rotate(180deg);
 }
 
-
 .filters-container {
-    opacity: 0;
-    visibility: hidden;
-    max-height: 0;
-    overflow: hidden;
-    transition: opacity 0.5s ease, visibility 0.5s ease, max-height 0.5s ease;
-  }
-  
-  .filters-container.visible {
-    max-height: 270px;
-    visibility: visible;
-    opacity: 1;
+  opacity: 0;
+  visibility: hidden;
+  max-height: 0;
+  overflow: hidden;
+  transition:
+    opacity 0.5s ease,
+    visibility 0.5s ease,
+    max-height 0.5s ease;
+}
+
+.filters-container.visible {
+  max-height: 270px;
+  visibility: visible;
+  opacity: 1;
+}
+
+.mobile-btn-group {
+  display: flex;
+  justify-content: end;
+}
+
+.mobile-action-btn {
+  padding: 0.25rem 0.4rem !important;
+  min-width: auto !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.mobile-btn-icon {
+  width: 16px !important;
+  height: 16px !important;
+  margin: 0 !important;
+}
+
+.mobile-btn-text {
+  font-size: 0.65rem;
+  margin-top: 2px;
+  display: block;
+}
+
+@media (max-width: 575.98px) {
+  .mobile-table {
+    font-size: 0.85rem;
   }
 
-
-  .mobile-btn-group {
-    display: flex;
-    justify-content: end;
-  }
-  
-  .mobile-action-btn {
-    padding: 0.25rem 0.4rem !important;
-    min-width: auto !important;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-  }
-  
-  .mobile-btn-icon {
-    width: 16px !important;
-    height: 16px !important;
-    margin: 0 !important;
-  }
-  
-  .mobile-btn-text {
-    font-size: 0.65rem;
-    margin-top: 2px;
-    display: block;
+  .mobile-header {
+    font-size: 0.85rem;
+    padding: 0.5rem;
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
+    max-width: 0;
+    font-weight: 600 !important;
+    background-color: #f8f9fa;
+    position: sticky;
+    top: 0;
   }
 
-  
-  @media (max-width: 575.98px) {
-    .mobile-table {
-      font-size: 0.85rem;
-    }
-    
-    .mobile-header {
-        font-size: 0.85rem;
-        padding: 0.5rem;
-        white-space: nowrap;
-        overflow: visible;
-        text-overflow: clip;
-        max-width: 0;
-        font-weight: 600 !important; 
-        background-color: #f8f9fa;
-        position: sticky;
-        top: 0;
-      }
-
-    .mobile-header, .mobile-cell {
-      padding: 0.3rem;
-    }
-
-    .mobile-cell {
-      font-size: 0.7rem;
-    }
-    
+  .mobile-header,
+  .mobile-cell {
+    padding: 0.3rem;
   }
+
+  .mobile-cell {
+    font-size: 0.7rem;
+  }
+}

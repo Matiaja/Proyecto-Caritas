@@ -10,12 +10,12 @@ import { ResponsiveService } from '../../../services/responsive/responsive.servi
   standalone: true,
   imports: [NgxPaginationModule, MatTableModule, CommonModule, FormsModule],
   templateUrl: './ui-table.component.html',
-  styleUrl: './ui-table.component.css'
+  styleUrl: './ui-table.component.css',
 })
-export class UiTableComponent<T extends Record<string, any>>{
+export class UiTableComponent<T extends Record<string, any>> {
   paginationId = 'tablePagination';
   @Input() title: string = '';
-  @Input() displayedColumns: string[] = []; 
+  @Input() displayedColumns: string[] = [];
   @Input() dataSource: T[] = [];
   @Input() columnHeaders: { [key: string]: string } = {};
   @Input() mobileHeaders: { [key: string]: string } = {};
@@ -37,20 +37,25 @@ export class UiTableComponent<T extends Record<string, any>>{
   @Input() showCenterSelect = false;
   @Input() searchColumns: string[] = [];
 
-  @Output() filterChange = new EventEmitter<{ categoryId?: number; sortBy?: string; order?: string; centerId?: number }>();
+  @Output() filterChange = new EventEmitter<{
+    categoryId?: number;
+    sortBy?: string;
+    order?: string;
+    centerId?: number;
+  }>();
   @Output() addElement = new EventEmitter<void>();
   @Output() editElement = new EventEmitter<T>();
   @Output() deleteElement = new EventEmitter<T>();
   @Output() selectElement = new EventEmitter<T>();
 
   @Output() pageChange = new EventEmitter<number>();
-  
+
   constructor(private responsiveService: ResponsiveService) {
-    this.responsiveService.isMobile$.subscribe(isMobile => {
+    this.responsiveService.isMobile$.subscribe((isMobile) => {
       this.isMobileView = isMobile;
     });
   }
-  
+
   filtersVisible: boolean = false;
   isMobileView = false;
   searchTerm: string = '';
@@ -62,10 +67,8 @@ export class UiTableComponent<T extends Record<string, any>>{
 
   p: number = 1;
   itemsPerPage: number = 10;
-  totalItems: number = 0
+  totalItems: number = 0;
 
-
-  
   ngOnChanges() {
     this.filteredDataSource = [...this.dataSource];
     this.totalItems = this.filteredDataSource.length;
@@ -79,16 +82,16 @@ export class UiTableComponent<T extends Record<string, any>>{
 
   filterData(emitRemoteFilter: boolean = true) {
     this.applySearchFilter();
-    
+
     if (emitRemoteFilter) {
       this.filterChange.emit({
         categoryId: this.selectedCategory || undefined,
         centerId: this.selectedCenter || undefined,
         sortBy: this.selectedSortBy || undefined,
-        order: this.selectedOrder
+        order: this.selectedOrder,
       });
     }
-  
+
     this.updatePagedData();
   }
 
@@ -99,34 +102,32 @@ export class UiTableComponent<T extends Record<string, any>>{
     }
 
     const searchTermLower = this.searchTerm.toLowerCase();
-  
-    this.filteredDataSource = this.dataSource.filter(item => {
-      const columnsToSearch = this.searchColumns.length > 0 
-        ? this.searchColumns 
-        : this.displayedColumns;
-      
-      return columnsToSearch.some(column => {
+
+    this.filteredDataSource = this.dataSource.filter((item) => {
+      const columnsToSearch =
+        this.searchColumns.length > 0 ? this.searchColumns : this.displayedColumns;
+
+      return columnsToSearch.some((column) => {
         const value = item[column];
         if (value === undefined || value === null) return false;
-        
+
         return value.toString().toLowerCase().includes(searchTermLower);
       });
     });
   }
 
   get columnsToDisplay(): string[] {
-    const baseColumns = this.isMobileView && this.mobileColumns.length > 0 
-      ? this.mobileColumns 
-      : this.displayedColumns;
-    
+    const baseColumns =
+      this.isMobileView && this.mobileColumns.length > 0
+        ? this.mobileColumns
+        : this.displayedColumns;
+
     return [...baseColumns, 'actions'];
   }
 
   get headersToDisplay(): string[] {
-    const baseHeaders = this.isMobileView
-      ? this.mobileHeaders 
-      : this.columnHeaders;
-    
+    const baseHeaders = this.isMobileView ? this.mobileHeaders : this.columnHeaders;
+
     return Object.keys(baseHeaders).concat('Acciones');
   }
 

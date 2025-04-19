@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { UiTableComponent } from "../../../shared/components/ui-table/ui-table.component";
+import { UiTableComponent } from '../../../shared/components/ui-table/ui-table.component';
 import { CommonModule, Location } from '@angular/common';
 import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
 import { Product } from '../../../models/product.model';
@@ -13,10 +13,9 @@ import { CenterService } from '../../../services/center/center.service';
   standalone: true,
   imports: [UiTableComponent, CommonModule, BreadcrumbComponent],
   templateUrl: './user-detail.component.html',
-  styleUrl: './user-detail.component.css'
+  styleUrl: './user-detail.component.css',
 })
-export class UserDetailComponent implements OnInit{
-
+export class UserDetailComponent implements OnInit {
   user: any = {
     id: 0,
     userName: '',
@@ -50,22 +49,24 @@ export class UserDetailComponent implements OnInit{
     private route: ActivatedRoute,
     private router: Router,
     private location: Location
-  ) { }
+  ) {}
 
   ngOnInit(): void {
-    this.route.params.pipe(
-      switchMap((params) => {
-        const userId = params['id'];
-        return this.userService.getUserById(userId).pipe(
-          first()
-        );
-      })).subscribe({ next: (user: any) => {
-        this.user = user;
-      },
-      error: (error) => {
-        console.error("Error obteniendo usuario:", error);
-      }
-    });
+    this.route.params
+      .pipe(
+        switchMap((params) => {
+          const userId = params['id'];
+          return this.userService.getUserById(userId).pipe(first());
+        })
+      )
+      .subscribe({
+        next: (user: any) => {
+          this.user = user;
+        },
+        error: (error) => {
+          console.error('Error obteniendo usuario:', error);
+        },
+      });
   }
 
   goBack(): void {
@@ -75,5 +76,4 @@ export class UserDetailComponent implements OnInit{
   onAddElement = null;
   onEditElement = null;
   onDeleteElement = null;
-
 }

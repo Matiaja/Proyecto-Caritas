@@ -13,9 +13,9 @@ import { ToastrService } from 'ngx-toastr';
   standalone: true,
   imports: [GenericFormComponent, BreadcrumbComponent],
   templateUrl: './product-add.component.html',
-  styleUrl: './product-add.component.css'
+  styleUrl: './product-add.component.css',
 })
-export class ProductAddComponent implements OnInit{
+export class ProductAddComponent implements OnInit {
   formConfig = {
     title: 'Agregar Producto',
     fields: [
@@ -46,7 +46,7 @@ export class ProductAddComponent implements OnInit{
         validators: [Validators.required],
         errorMessage: 'La categoría es requerida',
         options: [] as { value: any; label: string }[],
-      }
+      },
     ],
   };
 
@@ -56,9 +56,9 @@ export class ProductAddComponent implements OnInit{
     private router: Router,
     private toastr: ToastrService
   ) {}
-  
+
   ngOnInit(): void {
-      this.loadCategories();
+    this.loadCategories();
   }
 
   loadCategories(): void {
@@ -90,5 +90,4 @@ export class ProductAddComponent implements OnInit{
   onCancel(): void {
     this.router.navigate(['/products']);
   }
-
 }

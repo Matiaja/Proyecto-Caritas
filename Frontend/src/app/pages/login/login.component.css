@@ -1,100 +1,96 @@
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 :host {
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #36337f;
-
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #36337f;
 }
 
 .login-card {
-    display: flex;
-    flex-direction: column;
-    margin: 10px 10px;
-    box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.3);
-    background-color: #ffffff;
-    padding: 10px;
-    border-radius: 10px;
-    width: 40%;
-
+  display: flex;
+  flex-direction: column;
+  margin: 10px 10px;
+  box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.3);
+  background-color: #ffffff;
+  padding: 10px;
+  border-radius: 10px;
+  width: 40%;
 }
 
 .login-card input {
-    margin: 5px 0;
-    width: 100%;
-    background-color: #e2e2e2;
-    border: none;
-    outline: none;
-    padding: 12px 20px;
-    border-radius: 4px;
+  margin: 5px 0;
+  width: 100%;
+  background-color: #e2e2e2;
+  border: none;
+  outline: none;
+  padding: 12px 20px;
+  border-radius: 4px;
 }
 
 .login-card button {
-    background-color: #AE3336;
-    color: #ffffff;
-    font-size: 16px;
-    outline: none;
-    border-radius: 5px;
-    border: none;
-    padding: 8px 15px;
-    width: 100%;
+  background-color: #ae3336;
+  color: #ffffff;
+  font-size: 16px;
+  outline: none;
+  border-radius: 5px;
+  border: none;
+  padding: 8px 15px;
+  width: 100%;
 }
 
-
 .card-title h1 {
-    font-size: 26px;
-    font-weight: bold;
+  font-size: 26px;
+  font-weight: bold;
 }
 /* login.component.css */
 
 .login-card {
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    background-color: #fff;
-  }
-  
-  .card-title {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  .form-group {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  input {
-    margin-bottom: 10px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-  }
-  
-  button {
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  }
-  
-  .error-message {
-    margin-top: 10px;
-    color: red;
-    font-weight: bold;
-    text-align: center;
-  }
-  
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+}
+
+.card-title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+input {
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+button {
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.error-message {
+  margin-top: 10px;
+  color: red;
+  font-weight: bold;
+  text-align: center;
+}

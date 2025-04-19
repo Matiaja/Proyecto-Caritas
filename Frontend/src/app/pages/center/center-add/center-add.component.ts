@@ -74,7 +74,8 @@ export class CenterAddComponent implements OnInit {
     ],
   };
 
-  constructor(private centerService: CenterService, 
+  constructor(
+    private centerService: CenterService,
     private router: Router,
     private toastr: ToastrService
   ) {}

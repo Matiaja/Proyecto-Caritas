@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { RequestModel } from '../../models/request.model';
 import { RequestService } from '../../services/request/request.service';
 import { CommonModule } from '@angular/common';
-import { UiTableComponent } from "../../shared/components/ui-table/ui-table.component";
+import { UiTableComponent } from '../../shared/components/ui-table/ui-table.component';
 import { Router } from '@angular/router';
 import { BreadcrumbComponent } from '../../shared/components/breadcrumbs/breadcrumbs.component';
 
@@ -11,39 +11,43 @@ import { BreadcrumbComponent } from '../../shared/components/breadcrumbs/breadcr
   standalone: true,
   imports: [CommonModule, UiTableComponent, BreadcrumbComponent],
   templateUrl: './request.component.html',
-  styleUrl: './request.component.css'
+  styleUrl: './request.component.css',
 })
-export class RequestComponent implements OnInit{
-    title = 'Solicitudes';
-    columnHeaders: { [key: string]: string } = {
-      centerName: 'Centro/Parroquia',
-      requestDate: 'Fecha de solicitud',
-      urgencyLevel: 'Urgencia',
-    };
+export class RequestComponent implements OnInit {
+  title = 'Solicitudes';
+  columnHeaders: { [key: string]: string } = {
+    centerName: 'Centro/Parroquia',
+    requestDate: 'Fecha de solicitud',
+    urgencyLevel: 'Urgencia',
+  };
   displayedColumns = ['centerName', 'requestDate', 'urgencyLevel'];
   requests: RequestModel[] = [];
 
   constructor(
-    private reqService: RequestService, 
-    private router: Router,
-  ) { }
-  
+    private reqService: RequestService,
+    private router: Router
+  ) {}
+
   ngOnInit() {
     this.reqService.getRequests().subscribe({
       next: (reqs: RequestModel[]) => {
-        this.requests = reqs.map(req => ({
+        this.requests = reqs.map((req) => ({
           ...req, // Copia el resto de las propiedades
-          requestDate: new Date(req.requestDate).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }),
-          centerName: req.requestingCenter?.name
+          requestDate: new Date(req.requestDate).toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+          }),
+          centerName: req.requestingCenter?.name,
         }));
         console.log(this.requests);
       },
       error: (err) => {
         console.log(err);
-      }
+      },
     });
-  } 
-  
+  }
+
   onAddRequest() {
     this.router.navigate(['/requests/add']);
   }
@@ -56,5 +60,4 @@ export class RequestComponent implements OnInit{
   onSelectRequest(req: RequestModel) {
     this.router.navigate(['/requests', req.id]);
   }
-
 }
