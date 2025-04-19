@@ -26,19 +26,25 @@ import { UserComponent } from './pages/user/user.component';
 import { UserAddComponent } from './pages/user/user-add/user-add.component';
 import { UserDetailComponent } from './pages/user/user-detail/user-detail.component';
 import { UserEditComponent } from './pages/user/user-edit/user-edit.component';
+import { roleGuard } from './guards/role.guard';
+import { UnauthorizedComponent } from './pages/unauthorized/unauthorized.component';
 
 export const routes: Routes = [
     {
-        path: '', redirectTo: '/login', pathMatch: 'full'
+        path: '', 
+        redirectTo: '/login', 
+        pathMatch: 'full'
     },
     {
-        path: 'login', component: LoginComponent
+        path: 'login', 
+        component: LoginComponent
     },
     {
-        path: 'signup', component: SignupComponent
+        path: 'signup', 
+        component: SignupComponent
     },
     {
-        path: 'admin', 
+        path: 'Admin', 
         component: AdminComponent, 
         canActivate: [authGuard],
         children: [
@@ -46,10 +52,13 @@ export const routes: Routes = [
         ]
     },
     { 
-        path: 'home', component: HomeComponent, canActivate: [authGuard]
+        path: 'home', 
+        component: HomeComponent, 
+        canActivate: [authGuard]
     },
     { 
-        path: 'requests', canActivate: [authGuard],
+        path: 'requests', 
+        canActivate: [authGuard],
         children: [
             { path: '', component: RequestComponent },
             { path: 'add', component: RequestAddComponent },
@@ -57,15 +66,29 @@ export const routes: Routes = [
             { path: ':id/assign', component: RequestAssignComponent }
         ]
     },
-    {path: 'center/:id', component: CenterDetailComponent, data: { breadcrumb: 'Detalle de Centro' }} ,
+    {
+        path: 'center/:id', 
+        component: CenterDetailComponent, 
+        data: { breadcrumb: 'Detalle de Centro' }
+    },
     { 
         path: 'centers',
-        data: { breadcrumb: 'Centros' },  
+        data: { breadcrumb: 'Centros', role: ['Admin'] },
         canActivate: [authGuard],
+        canActivateChild: [roleGuard],
          children: [
-            {path: '', component: CenterComponent},
-            {path: 'add', component: CenterAddComponent, data: { breadcrumb: 'Agregar Centro' } },
-            {path: 'edit/:id', component: CenterEditComponent, data: { breadcrumb: 'Editar Centro' } },
+            {
+                path: '', 
+                component: CenterComponent, 
+            },
+            {
+                path: 'add', 
+                component: CenterAddComponent, 
+                data: { breadcrumb: 'Agregar Centro'} },
+            {
+                path: 'edit/:id', 
+                component: CenterEditComponent, 
+                data: { breadcrumb: 'Editar Centro' } },
             //{path: 'center/:id', component: CenterDetailComponent, data: { breadcrumb: 'Detalle de Centro' }} 
         ]
     },
@@ -74,10 +97,29 @@ export const routes: Routes = [
         data: { breadcrumb: 'Categorías' },
         canActivate: [authGuard],
         children: [
-          { path: '', component: CategoryComponent },
-          { path: 'add', component: AddCategoryComponent, data: { breadcrumb: 'Agregar Categoría' } },
-          { path: 'edit/:id', component: EditCategoryComponent, data: { breadcrumb: 'Editar Categoría' } },
-          { path: 'detail/:id', component: CategoryDetailComponent, data: { breadcrumb: 'Detalle de Categoría' } }
+          { 
+            path: '', 
+            component: CategoryComponent,
+            canActivate: [roleGuard],
+            data: { role: ['Admin'] }
+          },
+          { 
+            path: 'add', 
+            component: AddCategoryComponent, 
+            canActivate: [roleGuard],
+            data: { breadcrumb: 'Agregar Categoría', role: ['Admin'] } 
+          },
+          { 
+            path: 'edit/:id', 
+            component: EditCategoryComponent, 
+            canActivate: [roleGuard],
+            data: { breadcrumb: 'Editar Categoría', role: ['Admin'] } 
+          },
+          { 
+            path: 'detail/:id', 
+            component: CategoryDetailComponent, 
+            data: { breadcrumb: 'Detalle de Categoría' } 
+          }
         ]
     },
     {
@@ -85,9 +127,22 @@ export const routes: Routes = [
         data: { breadcrumb: 'Productos' },
         canActivate: [authGuard],
         children: [
-            { path: '', component: ProductComponent },
-            { path: 'add', component: ProductAddComponent, data: { breadcrumb: 'Agregar Producto' } },
-            { path: 'detail/:id', component: ProductDetailComponent, data: { breadcrumb: 'Detalle de Producto' } }
+            { 
+                path: '', 
+                component: ProductComponent 
+            },
+            { 
+                path: 'add', 
+                component: ProductAddComponent, 
+                canActivate: [roleGuard],
+                data: { breadcrumb: 'Agregar Producto', role: ['Admin'] }
+
+            },
+            { 
+                path: 'detail/:id', 
+                component: ProductDetailComponent, 
+                data: { breadcrumb: 'Detalle de Producto' } 
+            }
         ]
     },
     {
@@ -110,5 +165,9 @@ export const routes: Routes = [
             {path: 'detail/:id', component: UserDetailComponent, data: { breadcrumb: 'Detalle de Usuario' }},
             {path: 'edit', component: UserEditComponent, data: { breadcrumb: 'Editar Usuario' }}
             ]
+    },
+    {
+        path: 'unauthorized',
+        component: UnauthorizedComponent,
     }
 ];
