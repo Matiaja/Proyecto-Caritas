@@ -3,7 +3,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { UiTableComponent } from '../../../shared/components/ui-table/ui-table.component';
 import { CommonModule, Location } from '@angular/common';
 import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
-import { Product } from '../../../models/product.model';
 import { first, switchMap } from 'rxjs';
 import { UserService } from '../../../services/user/user.service';
 import { CenterService } from '../../../services/center/center.service';
@@ -33,7 +32,7 @@ export class UserDetailComponent implements OnInit {
   // };
 
   title = 'Detalle de usuario';
-  columnHeaders: { [key: string]: string } = {
+  columnHeaders: Record<string, string> = {
     userName: 'Nombre de usuario',
     firstName: 'Nombre',
     lastName: 'Apellido',

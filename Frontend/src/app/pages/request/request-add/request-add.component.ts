@@ -20,7 +20,6 @@ import { ProductService } from '../../../services/product/product.service';
 import { UiTableComponent } from '../../../shared/components/ui-table/ui-table.component';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { Product } from '../../../models/product.model';
-import { HttpClient } from '@angular/common/http';
 import { RequestService } from '../../../services/request/request.service';
 import { ToastrService } from 'ngx-toastr';
 
@@ -44,7 +43,7 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class RequestAddComponent implements OnInit {
   @ViewChild('stepper') stepper!: MatStepper;
-  isLinear: boolean = true;
+  isLinear = true;
 
   // formularios
   formGroup1!: FormGroup;
@@ -65,7 +64,7 @@ export class RequestAddComponent implements OnInit {
   // variables de la tabla
   orderLines: OrderLine[] = [];
   title = 'Lista de pedidos';
-  columnHeaders: { [key: string]: string } = {
+  columnHeaders: Record<string, string> = {
     productName: 'Producto',
     quantity: 'Cantidad',
     description: 'Descripcion',

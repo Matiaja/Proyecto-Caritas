@@ -6,7 +6,7 @@ import { filter } from 'rxjs/operators';
   providedIn: 'root',
 })
 export class BreadcrumbService {
-  breadcrumbs: Array<{ label: string; url: string }> = [];
+  breadcrumbs: { label: string; url: string }[] = [];
 
   constructor(
     private router: Router,
@@ -19,9 +19,9 @@ export class BreadcrumbService {
 
   private createBreadcrumbs(
     route: ActivatedRoute,
-    url: string = '',
-    breadcrumbs: Array<{ label: string; url: string }> = []
-  ): Array<{ label: string; url: string }> {
+    url = '',
+    breadcrumbs: { label: string; url: string }[] = []
+  ): { label: string; url: string }[] {
     const children: ActivatedRoute[] = route.children;
 
     if (children.length === 0) {

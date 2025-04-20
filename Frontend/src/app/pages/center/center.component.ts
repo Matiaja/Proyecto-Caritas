@@ -17,7 +17,7 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class CenterComponent implements OnInit {
   title = 'Centros';
-  columnHeaders: { [key: string]: string } = {
+  columnHeaders: Record<string, string> = {
     name: 'Nombre',
     location: 'Ubicación',
     manager: 'Encargado',

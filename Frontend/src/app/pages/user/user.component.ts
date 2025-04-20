@@ -1,8 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { UiTableComponent } from '../../shared/components/ui-table/ui-table.component';
-import { MatDialog } from '@angular/material/dialog';
-import { GenericFormModalComponent } from '../../shared/components/generic-form-modal/generic-form-modal.component';
-import { Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BreadcrumbComponent } from '../../shared/components/breadcrumbs/breadcrumbs.component';
 import { ConfirmModalService } from '../../services/confirmModal/confirm-modal.service';
@@ -22,9 +19,9 @@ export class UserComponent implements OnInit {
   displayedColumns = ['userName', 'email', 'centerName'];
   users: any[] = [];
   selectedCenter: number | null = null;
-  sortBy: string = '';
-  order: string = 'asc';
-  columnHeaders: { [key: string]: string } = {
+  sortBy = '';
+  order = 'asc';
+  columnHeaders: Record<string, string> = {
     userName: 'Nombre de usuario',
     email: 'Correo electrónico',
     centerName: 'Centro',
@@ -33,7 +30,7 @@ export class UserComponent implements OnInit {
   showSearchBar = true;
   searchColumns = ['userName', 'email', 'centerName'];
   sortOptions = [{ key: 'userName', label: 'Nombre de usuario' }];
-  mobileHeaders: { [key: string]: string } = {
+  mobileHeaders: Record<string, string> = {
     userName: 'Nombre de usuario',
   };
   mobileColumns = ['userName'];

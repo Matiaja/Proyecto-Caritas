@@ -1,6 +1,4 @@
-import { computed, inject, Injectable } from '@angular/core';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { Injectable } from '@angular/core';
 import { BehaviorSubject, debounceTime, fromEvent } from 'rxjs';
 
 @Injectable({

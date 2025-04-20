@@ -3,8 +3,13 @@
   [displayedColumns]="displayedColumns"
   [dataSource]="stocks"
   [columnHeaders]="columnHeaders"
+  [mobileColumns]="mobileColumns"
+  [mobileHeaders]="mobileHeaders"
   [showAddButton]="true"
   [showSelectButton]="true"
+  [showSearchBar]="true"
+  [searchColumns]="searchColumns"
+  (pageChange)="onPageChange($event)"
   (addElement)="onAddStock()"
   (selectElement)="onSelectStock($event)"
 >

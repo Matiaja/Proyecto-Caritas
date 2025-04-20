@@ -2,8 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Product } from '../../models/product.model';
-import { Observable, BehaviorSubject, tap, map, catchError, of } from 'rxjs';
-import { PagedResult } from '../../models/paged-result.model';
+import { Observable, BehaviorSubject, tap, catchError, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -12,7 +11,7 @@ export class ProductService {
   baseUrl = environment.baseUrl + 'products';
   private productsSubject = new BehaviorSubject<Product[]>([]);
   products$ = this.productsSubject.asObservable();
-  totalItems: number = 0;
+  totalItems = 0;
   constructor(private http: HttpClient) {}
 
   getProducts(): Observable<Product[]> {
@@ -56,7 +55,7 @@ export class ProductService {
     );
   }
 
-  getFilteredProducts(categoryId?: number, sortBy?: string, order: string = 'asc'): void {
+  getFilteredProducts(categoryId?: number, sortBy?: string, order = 'asc'): void {
     let params = new HttpParams();
 
     if (categoryId) {

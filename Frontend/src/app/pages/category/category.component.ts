@@ -2,8 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { UiTableComponent } from '../../shared/components/ui-table/ui-table.component';
 import { CategoryService } from '../../services/category/category.service';
 import { MatDialog } from '@angular/material/dialog';
-import { GenericFormModalComponent } from '../../shared/components/generic-form-modal/generic-form-modal.component';
-import { Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BreadcrumbComponent } from '../../shared/components/breadcrumbs/breadcrumbs.component';
 import { ConfirmModalService } from '../../services/confirmModal/confirm-modal.service';
@@ -18,16 +16,16 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class CategoryComponent implements OnInit {
   title = 'Categorías';
-  sortBy: string = '';
-  order: string = 'asc';
+  sortBy = '';
+  order = 'asc';
   displayedColumns = ['name', 'description'];
   categories: any[] = [];
-  columnHeaders: { [key: string]: string } = {
+  columnHeaders: Record<string, string> = {
     name: 'Nombre',
     description: 'Descripción',
   };
   sortOptions = [{ key: 'name', label: 'Nombre' }];
-  mobileHeaders: { [key: string]: string } = {
+  mobileHeaders: Record<string, string> = {
     name: 'Nombre',
   };
   mobileColumns = ['name'];

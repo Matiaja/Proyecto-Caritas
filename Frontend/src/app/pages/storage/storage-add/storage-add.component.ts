@@ -1,13 +1,11 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { GenericFormComponent } from '../../../shared/components/generic-form/generic-form.component';
 import { Router } from '@angular/router';
-import { AbstractControl, AsyncValidatorFn, Validators } from '@angular/forms';
+import { Validators } from '@angular/forms';
 import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
 import { ProductService } from '../../../services/product/product.service';
 import { StockService } from '../../../services/stock/stock.service';
 import { expirationDateValidator } from '../../../shared/validators/date-compare.validator';
-import { catchError, debounceTime, distinctUntilChanged, map, switchMap, of } from 'rxjs';
 import { GlobalStateService } from '../../../services/global/global-state.service';
 import { ToastrService } from 'ngx-toastr';
 
@@ -18,7 +16,7 @@ import { ToastrService } from 'ngx-toastr';
   templateUrl: './storage-add.component.html',
   styleUrl: './storage-add.component.css',
 })
-export class StorageAddComponent implements OnInit {
+export class StorageAddComponent {
   formConfig = {
     title: 'Agregar Stock',
     fields: [
@@ -98,8 +96,6 @@ export class StorageAddComponent implements OnInit {
     private globalStateService: GlobalStateService,
     private toastr: ToastrService
   ) {}
-
-  ngOnInit(): void {}
 
   onSubmit(data: any): void {
     const centerId = this.globalStateService.getCurrentCenterId();

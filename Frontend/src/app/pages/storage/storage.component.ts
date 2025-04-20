@@ -1,13 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { UiTableComponent } from '../../shared/components/ui-table/ui-table.component';
-import { MatDialog } from '@angular/material/dialog';
-import { GenericFormModalComponent } from '../../shared/components/generic-form-modal/generic-form-modal.component';
-import { Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BreadcrumbComponent } from '../../shared/components/breadcrumbs/breadcrumbs.component';
 import { ConfirmModalService } from '../../services/confirmModal/confirm-modal.service';
 import { StockService } from '../../services/stock/stock.service';
-import { ProductService } from '../../services/product/product.service';
 import { GlobalStateService } from '../../services/global/global-state.service';
 
 @Component({
@@ -22,11 +18,22 @@ export class StorageComponent implements OnInit {
   title = 'Almacén';
   displayedColumns = ['productName', 'productCode', 'stockQuantity'];
   stocks: any[] = [];
+  mobileHeaders: { [key: string]: string } = {
+    productName: 'Nombre del producto',
+    stockQuantity: 'Cantidad',
+  };
+  mobileColumns = ['productName', 'stockQuantity'];
+  searchColumns = ['productName', 'productCode'];
+
   columnHeaders: { [key: string]: string } = {
     productName: 'Nombre del producto',
     productCode: 'Código del producto',
     stockQuantity: 'Cantidad',
   };
+
+  page = 1;
+  itemsPerPage = 10;
+  totalItems = 0;
 
   centerId: number | null = null;
 
@@ -40,8 +47,18 @@ export class StorageComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.loadStock();
+  }
+
+  onPageChange(newPage: number) {
+    this.page = newPage;
+    this.loadStock();
+  }
+
+  loadStock() {
     if (this.centerId) {
       this.stockService.getProductWithStock(this.centerId).subscribe((stocks) => {
+        console.log('Stocks recibidos:', stocks);
         this.stocks = stocks;
       });
     }

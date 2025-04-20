@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, TemplateRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, TemplateRef, OnChanges } from '@angular/core';
 import { MatTableModule } from '@angular/material/table';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -12,18 +12,18 @@ import { ResponsiveService } from '../../../services/responsive/responsive.servi
   templateUrl: './ui-table.component.html',
   styleUrl: './ui-table.component.css',
 })
-export class UiTableComponent<T extends Record<string, any>> {
+export class UiTableComponent<T extends Record<string, any>> implements OnChanges {
   paginationId = 'tablePagination';
-  @Input() title: string = '';
+  @Input() title = '';
   @Input() displayedColumns: string[] = [];
   @Input() dataSource: T[] = [];
-  @Input() columnHeaders: { [key: string]: string } = {};
-  @Input() mobileHeaders: { [key: string]: string } = {};
-  @Input() showProductsFilters: boolean = false;
+  @Input() columnHeaders: Record<string, string> = {};
+  @Input() mobileHeaders: Record<string, string> = {};
+  @Input() showProductsFilters = false;
   @Input() categories: { id: number; name: string }[] = [];
   @Input() centers: { id: number; name: string }[] = [];
   @Input() sortOptions: { key: string; label: string }[] = [];
-  @Input() showCommonFilters: boolean = false;
+  @Input() showCommonFilters = false;
 
   @Input() customActions?: TemplateRef<any>;
 
@@ -56,18 +56,18 @@ export class UiTableComponent<T extends Record<string, any>> {
     });
   }
 
-  filtersVisible: boolean = false;
+  filtersVisible = false;
   isMobileView = false;
-  searchTerm: string = '';
+  searchTerm = '';
   selectedCategory: number | null = null;
   selectedCenter: number | null = null;
   selectedSortBy: string | null = null;
-  selectedOrder: string = 'asc';
+  selectedOrder = 'asc';
   filteredDataSource: T[] = [];
 
-  p: number = 1;
-  itemsPerPage: number = 10;
-  totalItems: number = 0;
+  p = 1;
+  itemsPerPage = 10;
+  totalItems = 0;
 
   ngOnChanges() {
     this.filteredDataSource = [...this.dataSource];
@@ -80,7 +80,7 @@ export class UiTableComponent<T extends Record<string, any>> {
     this.totalItems = this.filteredDataSource.length;
   }
 
-  filterData(emitRemoteFilter: boolean = true) {
+  filterData(emitRemoteFilter = true) {
     this.applySearchFilter();
 
     if (emitRemoteFilter) {

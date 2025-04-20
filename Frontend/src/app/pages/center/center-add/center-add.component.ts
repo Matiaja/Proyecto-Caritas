@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GenericFormComponent } from '../../../shared/components/generic-form/generic-form.component';
@@ -13,7 +13,7 @@ import { ToastrService } from 'ngx-toastr';
   templateUrl: './center-add.component.html',
   styleUrl: './center-add.component.css',
 })
-export class CenterAddComponent implements OnInit {
+export class CenterAddComponent{
   formConfig = {
     title: 'Agregar Centro',
     fields: [
@@ -80,7 +80,7 @@ export class CenterAddComponent implements OnInit {
     private toastr: ToastrService
   ) {}
 
-  ngOnInit(): void {}
+
 
   onSubmit(formData: any): void {
     console.log('Datos del formulario:', formData);

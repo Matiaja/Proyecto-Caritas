@@ -15,7 +15,7 @@ import { BreadcrumbComponent } from '../../shared/components/breadcrumbs/breadcr
 })
 export class RequestComponent implements OnInit {
   title = 'Solicitudes';
-  columnHeaders: { [key: string]: string } = {
+  columnHeaders: Record<string, string> = {
     centerName: 'Centro/Parroquia',
     requestDate: 'Fecha de solicitud',
     urgencyLevel: 'Urgencia',

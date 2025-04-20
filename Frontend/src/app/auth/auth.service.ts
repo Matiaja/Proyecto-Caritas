@@ -9,7 +9,6 @@ import { jwtDecode } from 'jwt-decode';
   providedIn: 'root',
 })
 export class AuthService {
-  constructor() {}
 
   httpClient = inject(HttpClient);
   baseUrl = environment.baseUrl + 'user';

@@ -27,7 +27,7 @@ export class ProductDetailComponent implements OnInit {
   };
 
   title = 'Detalle de producto';
-  columnHeaders: { [key: string]: string } = {
+  columnHeaders: Record<string, string> = {
     id: 'ID',
     name: 'Nombre',
     description: 'Descripción',

@@ -1,9 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { Product } from '../../models/product.model';
-import { Observable, BehaviorSubject, tap, map, catchError, of } from 'rxjs';
-import { Router } from '@angular/router';
+import { Observable, BehaviorSubject, tap, catchError, of } from 'rxjs';
 import { HttpParams } from '@angular/common/http';
 
 @Injectable({
@@ -54,7 +52,7 @@ export class UserService {
     );
   }
 
-  getFilteredUsers(centerId?: number, sortBy?: string, order: string = 'asc'): void {
+  getFilteredUsers(centerId?: number, sortBy?: string, order = 'asc'): void {
     let params = new HttpParams();
     if (centerId) {
       params = params.set('centerId', centerId);

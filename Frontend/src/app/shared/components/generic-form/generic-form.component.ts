@@ -2,7 +2,6 @@ import {
   Component,
   EventEmitter,
   Input,
-  OnInit,
   Output,
   SimpleChanges,
   OnChanges,
@@ -45,7 +44,7 @@ export class GenericFormComponent implements OnChanges {
   @Output() formChange = new EventEmitter<FormGroup>();
 
   form!: FormGroup;
-  suggestions: { [key: string]: any[] } = {};
+  suggestions: Record<string, any[]> = {};
 
   constructor(
     private fb: FormBuilder,
@@ -63,7 +62,7 @@ export class GenericFormComponent implements OnChanges {
   }
 
   private initializeForm(): void {
-    const controls: { [key: string]: any } = {};
+    const controls: Record<string, any> = {};
     this.data.fields.forEach((field) => {
       controls[field.name] = [
         field.value || '',

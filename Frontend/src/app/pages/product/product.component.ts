@@ -1,8 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { UiTableComponent } from '../../shared/components/ui-table/ui-table.component';
-import { MatDialog } from '@angular/material/dialog';
-import { GenericFormModalComponent } from '../../shared/components/generic-form-modal/generic-form-modal.component';
-import { Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BreadcrumbComponent } from '../../shared/components/breadcrumbs/breadcrumbs.component';
 import { ConfirmModalService } from '../../services/confirmModal/confirm-modal.service';
@@ -25,10 +22,10 @@ export class ProductComponent implements OnInit {
   searchColumns = ['name', 'code'];
   products: any[] = [];
   selectedCategory: number | null = null;
-  sortBy: string = '';
-  order: string = 'asc';
+  sortBy = '';
+  order = 'asc';
   categories: any[] = [];
-  columnHeaders: { [key: string]: string } = {
+  columnHeaders: Record<string, string> = {
     name: 'Nombre',
     code: 'Code',
     categoryName: 'Categoría',
@@ -38,15 +35,15 @@ export class ProductComponent implements OnInit {
     { key: 'name', label: 'Nombre' },
     { key: 'quantity', label: 'Cantidad' },
   ];
-  mobileHeaders: { [key: string]: string } = {
+  mobileHeaders: Record<string, string> = {
     name: 'Nombre',
     quantity: 'Stock',
   };
   mobileColumns = ['name', 'quantity'];
 
   page = 1;
-  itemsPerPage: number = 10;
-  totalItems: number = 0;
+  itemsPerPage = 10;
+  totalItems = 0;
 
   constructor(
     private productService: ProductService,
@@ -116,7 +113,7 @@ export class ProductComponent implements OnInit {
     this.router.navigate(['/products/add']);
   }
 
-  onEditProduct(product: any) {}
+  // onEditProduct(product: any) {}
 
   onSelectProduct(product: any) {
     this.router.navigate(['/products/detail', product.id]);

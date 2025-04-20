@@ -28,7 +28,7 @@ export class RequestDetailComponent implements OnInit {
   } as RequestModel;
 
   title = 'Lista de pedidos';
-  columnHeaders: { [key: string]: string } = {
+  columnHeaders: Record<string, string> = {
     id: 'ID',
     productName: 'Producto',
     quantity: 'Cantidad',

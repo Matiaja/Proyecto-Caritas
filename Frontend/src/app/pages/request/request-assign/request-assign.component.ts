@@ -46,7 +46,7 @@ export class RequestAssignComponent implements OnInit {
   orderLine: OrderLine = {} as OrderLine;
   // variables de tabla
   title = '';
-  columnHeaders: { [key: string]: string } = {
+  columnHeaders: Record<string, string> = {
     productName: 'Producto',
     centerName: 'Centro',
     stockQuantity: 'Cantidad',

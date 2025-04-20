@@ -11,7 +11,7 @@ import { RouterModule } from '@angular/router';
   styleUrl: './breadcrumbs.component.css',
 })
 export class BreadcrumbComponent implements OnInit {
-  breadcrumbs: Array<{ label: string; url: string }> = [];
+  breadcrumbs: { label: string; url: string }[] = [];
 
   constructor(private breadcrumbService: BreadcrumbService) {}
 
