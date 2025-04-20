@@ -4,11 +4,13 @@ import { Component, OnInit } from '@angular/core';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { BreadcrumbComponent } from './shared/components/breadcrumbs/breadcrumbs.component';
 import { GlobalStateService } from './services/global/global-state.service';
+import { FooterComponent } from './shared/footer/footer.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent, BreadcrumbComponent],
+  imports: [RouterOutlet, NavbarComponent, FooterComponent, BreadcrumbComponent, CommonModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })

@@ -1,0 +1,25 @@
+.charts-container {
+    display: grid;
+    gap: 20px;
+    padding: 20px;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .charts-container.mobile {
+    grid-template-columns: 1fr;
+  }
+  
+  .chart-container {
+    background-color: #f4f6fa;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(54, 51, 127, 0.1);
+    text-align: center;
+  }
+  
+  h2 {
+    color: #36337f;
+    margin-bottom: 20px;
+    font-weight: bold;
+  }
+  
