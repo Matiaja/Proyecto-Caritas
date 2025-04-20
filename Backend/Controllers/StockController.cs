@@ -260,27 +260,55 @@ namespace ProyectoCaritas.Controllers
 
         // GET: api/Stocks/product-with-stock
         [HttpGet("product-with-stock")]
-        public async Task<ActionResult<List<ProductStockDTO>>> GetProductWithStock([FromHeader] string centerId)
+        public async Task<ActionResult<List<ProductStockDTO>>> GetProductWithStock(
+            [FromHeader] string centerId,
+            [FromQuery] int? categoryId = null,
+            [FromQuery] string? sortBy = null,
+            [FromQuery] string? order = "asc")
         {
-            if (int.TryParse(centerId, out int centerIdInt))
+            if (!int.TryParse(centerId, out int centerIdInt))
+                return BadRequest(new { message = "Invalid centerId" });
+
+            var stocksQuery = _context.Stocks
+                .Include(s => s.Product)
+                    .ThenInclude(p => p.Category)
+                .Where(s => s.CenterId == centerIdInt);
+
+            if (categoryId.HasValue && categoryId > 0)
             {
-                var productWithStock = await _context.Stocks
-                    .Where(s => s.CenterId == centerIdInt)
-                    .GroupBy(s => new { s.ProductId, s.Product.Name, s.Product.Code })
-                    .Select(s => new ProductStockDTO
-                    {
-                        ProductId = (int)s.Key.ProductId,
-                        ProductName = s.Key.Name,
-                        ProductCode = s.Key.Code,
-                        StockQuantity = s.Sum(s => s.Type == "Ingreso" ? s.Quantity : -s.Quantity)
-                    })
-                    .Where(p => p.StockQuantity > 0)
-                    .ToListAsync();
-
-                return Ok(productWithStock);
+                stocksQuery = stocksQuery.Where(s => s.Product.CategoryId == categoryId.Value);
             }
-            return BadRequest(new { message = "Invalid centerId" });
 
+            var grouped = await stocksQuery
+                   .GroupBy(s => new { s.ProductId, s.Product.Name, s.Product.Code })
+                   .Select(g => new ProductStockDTO
+                   {
+                       ProductId = (int)g.Key.ProductId,
+                       ProductName = g.Key.Name,
+                       ProductCode = g.Key.Code,
+                       StockQuantity = g.Sum(s => s.Type == "Ingreso" ? s.Quantity : -s.Quantity)
+                   })
+                   .Where(dto => dto.StockQuantity > 0)
+                   .ToListAsync();
+
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                switch (sortBy.ToLower())
+                {
+                    case "productname":
+                        grouped = (order == "desc")
+                            ? grouped.OrderByDescending(x => x.ProductName).ToList()
+                            : grouped.OrderBy(x => x.ProductName).ToList();
+                        break;
+                    case "stockquantity":
+                        grouped = (order == "desc")
+                            ? grouped.OrderByDescending(x => x.StockQuantity).ToList()
+                            : grouped.OrderBy(x => x.StockQuantity).ToList();
+                        break;
+                }
+            }
+
+            return Ok(grouped);
         }
 
         // GET: api/Stocks/product-with-all-stock

@@ -8,8 +8,12 @@
   [showAddButton]="true"
   [showSelectButton]="true"
   [showSearchBar]="true"
+  [showProductsFilters]="true"
+  [categories]="categories"
+  [sortOptions]="sortOptions"
   [searchColumns]="searchColumns"
   (pageChange)="onPageChange($event)"
+  (filterChange)="onFilterChange($event)"
   (addElement)="onAddStock()"
   (selectElement)="onSelectStock($event)"
 >

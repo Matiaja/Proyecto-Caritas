@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Observable, BehaviorSubject, tap, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { HttpParams } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -11,6 +12,7 @@ export class StockService {
   baseUrl = environment.baseUrl + 'stocks';
   private stockSubject = new BehaviorSubject<any[]>([]);
   stocks$ = this.stockSubject.asObservable();
+  totalItems = 0;
 
   constructor(private http: HttpClient) {}
 
@@ -54,9 +56,19 @@ export class StockService {
     });
   }
 
-  getProductWithStock(centerId: number): Observable<any[]> {
+  getProductWithStock(centerId: number, categoryId?: number, sortBy?: string, order = 'asc'): void {
+    let params = new HttpParams();
+    if (categoryId) {
+      params = params.set('categoryId', categoryId.toString());
+    }
+    if (sortBy) {
+      params = params.set('sortBy', sortBy);
+      params = params.set('order', order);
+    }
     const headers = { centerId: centerId.toString() };
-    return this.http.get<any[]>(`${this.baseUrl}/product-with-stock`, { headers });
+    this.http.get<any[]>(`${this.baseUrl}/product-with-stock`, { headers, params }).subscribe((products) => {
+      this.stockSubject.next(products);
+    });
   }
 
   getProductInStocks(productId: number): Observable<any[]> {

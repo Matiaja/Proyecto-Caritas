@@ -5,6 +5,7 @@ import { BreadcrumbComponent } from '../../shared/components/breadcrumbs/breadcr
 import { ConfirmModalService } from '../../services/confirmModal/confirm-modal.service';
 import { StockService } from '../../services/stock/stock.service';
 import { GlobalStateService } from '../../services/global/global-state.service';
+import { CategoryService } from '../../services/category/category.service';
 
 @Component({
   selector: 'app-storage',
@@ -30,6 +31,14 @@ export class StorageComponent implements OnInit {
     productCode: 'Código del producto',
     stockQuantity: 'Cantidad',
   };
+  sortOptions = [
+    { key: 'productName', label: 'Nombre' },
+    { key: 'stockQuantity', label: 'Cantidad' },
+  ];
+  selectedCategory: number | null = null;
+  sortBy = '';
+  order = 'asc';
+  categories: any[] = [];
 
   page = 1;
   itemsPerPage = 10;
@@ -41,13 +50,18 @@ export class StorageComponent implements OnInit {
     private stockService: StockService,
     private router: Router,
     private modalService: ConfirmModalService,
-    private globalStateService: GlobalStateService
+    private globalStateService: GlobalStateService,
+    private categoryService: CategoryService,
   ) {
     this.centerId = this.globalStateService.getCurrentCenterId();
   }
 
   ngOnInit() {
+    this.stockService.stocks$.subscribe((stocks) => {
+      this.stocks = stocks;
+    });
     this.loadStock();
+    this.loadCategories();
   }
 
   onPageChange(newPage: number) {
@@ -57,11 +71,28 @@ export class StorageComponent implements OnInit {
 
   loadStock() {
     if (this.centerId) {
-      this.stockService.getProductWithStock(this.centerId).subscribe((stocks) => {
-        console.log('Stocks recibidos:', stocks);
-        this.stocks = stocks;
-      });
-    }
+      this.stockService.getProductWithStock(
+        this.centerId,
+        this.selectedCategory ?? undefined,
+        this.sortBy,
+        this.order
+      );
+      this.totalItems = this.stockService.totalItems;
+  }
+  }
+
+  loadCategories() {
+    this.categoryService.categories$.subscribe((categories) => {
+      this.categories = categories;
+    });
+    this.categoryService.getCategories();
+  }
+
+  onFilterChange(filters: { categoryId?: number; sortBy?: string; order?: string }) {
+    this.selectedCategory = filters.categoryId || null;
+    this.sortBy = filters.sortBy || '';
+    this.order = filters.order || 'asc';
+    this.loadStock();
   }
 
   onAddStock(): void {
