@@ -15,17 +15,16 @@ import { StockService } from '../../../services/stock/stock.service';
   standalone: true,
   imports: [UiTableComponent, CommonModule, BreadcrumbComponent],
   templateUrl: './request-assign.component.html',
-  styleUrl: './request-assign.component.css'
+  styleUrl: './request-assign.component.css',
 })
 export class RequestAssignComponent implements OnInit {
-
   constructor(
     private route: ActivatedRoute,
     private productService: ProductService,
     private requestService: RequestService,
     private stockService: StockService,
     private location: Location
-  ) { }
+  ) {}
 
   // parametros
   productId: number | null = null;
@@ -39,19 +38,19 @@ export class RequestAssignComponent implements OnInit {
     urgencyLevel: '',
     requestDate: '',
     requestingCenter: {
-        id: 0,
-        name: '',
+      id: 0,
+      name: '',
     },
-    orderLines: []
+    orderLines: [],
   } as RequestModel;
   orderLine: OrderLine = {} as OrderLine;
   // variables de tabla
   title = '';
-  columnHeaders: { [key: string]: string } = {
-      productName: 'Producto',
-      centerName: 'Centro',
-      stockQuantity: 'Cantidad'
-    };
+  columnHeaders: Record<string, string> = {
+    productName: 'Producto',
+    centerName: 'Centro',
+    stockQuantity: 'Cantidad',
+  };
   displayedColumns = ['productName', 'centerName', 'stockQuantity'];
   stocks: any[] = [];
 
@@ -62,38 +61,36 @@ export class RequestAssignComponent implements OnInit {
         this.loadRequest(this.requestId);
       }
     });
-
-
   }
-  
+
   loadRequest(reqId: number) {
     this.requestService.getRequestById(reqId).subscribe({
       next: (request: RequestModel) => {
         this.request = request;
-        const ol = request.orderLines.find(line => line.id === this.orderLineId);
-        if(ol) {
+        const ol = request.orderLines.find((line) => line.id === this.orderLineId);
+        if (ol) {
           this.orderLine = ol;
         }
         this.loadProduct();
       },
       error: (error) => {
         console.error(error);
-      }
+      },
     });
   }
   loadProduct() {
     this.route.queryParams.subscribe((queryParams) => {
-        this.productId = queryParams['productId'] ? Number(queryParams['productId']) : null;
-        this.orderLineId = queryParams['orderLineId'] ? Number(queryParams['orderLineId']) : null;
-  
-        if (this.productId && this.orderLineId) {
-          this.searchProductInStock(this.productId);
-        }
-      });
+      this.productId = queryParams['productId'] ? Number(queryParams['productId']) : null;
+      this.orderLineId = queryParams['orderLineId'] ? Number(queryParams['orderLineId']) : null;
+
+      if (this.productId && this.orderLineId) {
+        this.searchProductInStock(this.productId);
+      }
+    });
   }
 
   searchProductInStock(productId: number | null) {
-    if(productId) {
+    if (productId) {
       this.productService.getProductById(productId).subscribe({
         next: (product) => {
           this.product = product;
@@ -104,7 +101,7 @@ export class RequestAssignComponent implements OnInit {
         },
         error: (error) => {
           console.error(error);
-        } 
+        },
       });
     }
   }
@@ -118,7 +115,7 @@ export class RequestAssignComponent implements OnInit {
         },
         error: (error) => {
           console.error(error);
-        }
+        },
       });
     }
   }

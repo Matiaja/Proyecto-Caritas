@@ -1,9 +1,9 @@
 <app-breadcrumbs></app-breadcrumbs>
-<ui-table 
-  [title]="title" 
-  [displayedColumns]="displayedColumns" 
+<ui-table
+  [title]="title"
+  [displayedColumns]="displayedColumns"
   [dataSource]="requests"
-  [columnHeaders]="columnHeaders" 
+  [columnHeaders]="columnHeaders"
   [showAddButton]="true"
   [showEditButton]="true"
   [showDeleteButton]="true"
@@ -11,7 +11,8 @@
   (addElement)="onAddRequest()"
   (editElement)="onEditRequest($event)"
   (deleteElement)="onDeleteRequest($event)"
-  (selectElement)="onSelectRequest($event)">
+  (selectElement)="onSelectRequest($event)"
+>
 </ui-table>
 
 <!-- <div class="shadow rounded m-5 p-3 table-responsive">

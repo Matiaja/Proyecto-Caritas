@@ -1,10 +1,16 @@
 <ui-table
-    [title]="title"
-    [displayedColumns]="displayedColumns"
-    [dataSource]="stocks"
-    [columnHeaders]="columnHeaders"
-    [showAddButton]="true"
-    [showSelectButton]="true"
-    (addElement)="onAddStock()"
-    (selectElement)="onSelectStock($event)">
+  [title]="title"
+  [displayedColumns]="displayedColumns"
+  [dataSource]="stocks"
+  [columnHeaders]="columnHeaders"
+  [mobileColumns]="mobileColumns"
+  [mobileHeaders]="mobileHeaders"
+  [showAddButton]="true"
+  [showSelectButton]="true"
+  [showSearchBar]="true"
+  [searchColumns]="searchColumns"
+  (pageChange)="onPageChange($event)"
+  (addElement)="onAddStock()"
+  (selectElement)="onSelectStock($event)"
+>
 </ui-table>

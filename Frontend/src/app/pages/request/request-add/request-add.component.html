@@ -1,119 +1,148 @@
-<mat-stepper class="custom-stepper mt-4" [linear]="isLinear" #stepper (selectionChange)="makeRequest($event)">
-    <mat-step [stepControl]="formGroup1" label="Solicitud" [completed]="false" [editable]="true">
-        @if(centers) {
-            <generic-form 
-                [data]="formConfig"
-                [showButtons]="false"
-                (formSubmit)="onSubmit()"
-                (formCancel)="onCancel()"
-                (formChange)="formGroup1 = $event">
-            </generic-form>
-        }
-        <div class="d-flex justify-content-end gap-4 mt-2 me-lg-5">
-            <button mat-button type="button" class="me-lg-5" (click)="next(formGroup1)">Sig.</button>
-        </div>
-    </mat-step>
-    <mat-step label="Pedidos" [completed]="false" [editable]="true">
+<mat-stepper
+  class="custom-stepper mt-4"
+  [linear]="isLinear"
+  #stepper
+  (selectionChange)="makeRequest($event)"
+>
+  <mat-step [stepControl]="formGroup1" label="Solicitud" [completed]="false" [editable]="true">
+    @if (centers) {
+      <generic-form
+        [data]="formConfig"
+        [showButtons]="false"
+        (formSubmit)="onSubmit()"
+        (formCancel)="onCancel()"
+        (formChange)="formGroup1 = $event"
+      >
+      </generic-form>
+    }
+    <div class="d-flex justify-content-end gap-4 mt-2 me-lg-5">
+      <button mat-button type="button" class="me-lg-5" (click)="next(formGroup1)">Sig.</button>
+    </div>
+  </mat-step>
+  <mat-step label="Pedidos" [completed]="false" [editable]="true">
     <!-- 
         Formulario de pedidos. Se elige producto (con un input/select), cantidad
          y se agrega a la lista de pedidos. 
     -->
-        <div class="d-flex justify-content-center mt-5">
-            <div class="card container p-md-3 shadow-sm">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 class="text-center mb-0">Agregar pedidos</h4>
-                </div>
-                <form [formGroup]="formGroup2" class="py-2 px-2">
-                    <div class="row">
-                        <div class="col-md-4 position-relative">
-                            <label for="productSearch">Producto:</label>
-                            <input id="productSearch" type="text" class="form-control" formControlName="product" placeholder="Buscar producto..."
-                            (input)="searchProduct($event)">
-                            <ul *ngIf="productSuggestions.length" class="list-group position-absolute w-100 bg-white shadow mt-1" 
-                                style="z-index: 1050; max-height: 200px; overflow-y: auto;">
-                                <li *ngFor="let product of productSuggestions" class="list-group-item list-group-item-action"
-                                (click)="selectProduct(product)">
-                                {{ product.name }}
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="quantity">Cantidad</label>
-                            <input id="quantity" type="number" class="form-control" formControlName="quantity" />
-                        </div>
-                        <div class="col-md-4">
-                            <label for="description">Descripción</label>
-                            <input id="description" placeholder="Descripción del pedido" class="form-control" formControlName="description" />
-                        </div>
-                    </div>
-                    <div class="d-flex justify-content-end mt-3">            
-                        <button class="btn btn-sm btn-outline-primary" (click)="addOrderLine()">Agregar Pedido</button>
-                    </div>
-                </form>
-            </div>
-            </div>  
-            <div class="d-flex justify-content-end gap-4 mt-2 me-lg-5">
-                <button mat-button matStepperPrevious type="button" class="me-lg-5">Atrás</button>
-                <button mat-button type="button" class="me-lg-5" (click)="goToNextStep()">Sig.</button>
-            </div>
-            @if(orderLines.length > 0) {
-                <ui-table 
-                    [title]="title" 
-                    [displayedColumns]="displayedColumns" 
-                    [dataSource]="orderLines"
-                    [columnHeaders]="columnHeaders" 
-                    [showAddButton]="false"
-                    [showEditButton]="false"
-                    [showDeleteButton]="true"
-                    [showSelectButton]="false"
-                    (addElement)="onAddRequest()"
-                    (editElement)="onEditRequest()"
-                    (deleteElement)="onDeleteRequest($event)"
-                    (selectElement)="onSelectRequest()">
-                </ui-table>
-            }
-    </mat-step>
-    <mat-step label="Resumen" [editable]="false" [completed]="false">
-        <div class="mb-md-3">
-            <div class="d-flex justify-content-center mt-5">
-                <div class="card container w-100 w-md-75 mx-auto p-md-3 shadow-sm">
-                    <div class="card-header d-md-flex justify-content-md-between align-items-center ">
-                        <h5 class="mb-md-0">Detalles de la solicitud</h5>
-                    </div>
-                    <div class="row align-items-center py-4 g-4 px-3">
-                        <div class="col-sm-6">
-                            <label class="fw-medium">Centro solicitante:</label>
-                            <span class="ps-2">{{ request.requestingCenter?.name }}</span>
-                        </div>
-                        <div class="col-sm-6">
-                            <label class="fw-medium">Fecha:</label>
-                            <span class="ps-2">{{ request.requestDate | date:'dd/MM/yyyy'}}</span>
-                        </div>
-                        <div class="col-sm-6">
-                            <label class="fw-medium">Nivel de urgencia:</label>
-                            <span class="ps-2">{{ request.urgencyLevel }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <ui-table 
-                [title]="title" 
-                [displayedColumns]="displayedColumns" 
-                [dataSource]="orderLines"
-                [columnHeaders]="columnHeaders" 
-                [showAddButton]="false"
-                [showEditButton]="false"
-                [showDeleteButton]="false"
-                [showSelectButton]="false"
-                (addElement)="onAddRequest()"
-                (editElement)="onEditRequest()"
-                (deleteElement)="onDeleteRequest3()"
-                (selectElement)="onSelectRequest()">
-            </ui-table>
-            <div class="d-flex justify-content-end gap-4 mt-2 me-lg-5">
-                <button mat-raised-button color="primary" (click)="goBack()">Cancelar</button>
-                <button mat-raised-button color="primary" (click)="finalizeRequest()">Agregar solicitud</button>
-            </div>
+    <div class="d-flex justify-content-center mt-5">
+      <div class="card container p-md-3 shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h4 class="text-center mb-0">Agregar pedidos</h4>
         </div>
-    </mat-step>
+        <form [formGroup]="formGroup2" class="py-2 px-2">
+          <div class="row">
+            <div class="col-md-4 position-relative">
+              <label for="productSearch">Producto:</label>
+              <input
+                id="productSearch"
+                type="text"
+                class="form-control"
+                formControlName="product"
+                placeholder="Buscar producto..."
+                (input)="searchProduct($event)"
+              />
+              <ul
+                *ngIf="productSuggestions.length"
+                class="list-group position-absolute w-100 bg-white shadow mt-1"
+                style="z-index: 1050; max-height: 200px; overflow-y: auto"
+              >
+                <li
+                  *ngFor="let product of productSuggestions"
+                  class="list-group-item list-group-item-action"
+                  (click)="selectProduct(product)"
+                >
+                  {{ product.name }}
+                </li>
+              </ul>
+            </div>
+            <div class="col-md-4">
+              <label for="quantity">Cantidad</label>
+              <input id="quantity" type="number" class="form-control" formControlName="quantity" />
+            </div>
+            <div class="col-md-4">
+              <label for="description">Descripción</label>
+              <input
+                id="description"
+                placeholder="Descripción del pedido"
+                class="form-control"
+                formControlName="description"
+              />
+            </div>
+          </div>
+          <div class="d-flex justify-content-end mt-3">
+            <button class="btn btn-sm btn-outline-primary" (click)="addOrderLine()">
+              Agregar Pedido
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="d-flex justify-content-end gap-4 mt-2 me-lg-5">
+      <button mat-button matStepperPrevious type="button" class="me-lg-5">Atrás</button>
+      <button mat-button type="button" class="me-lg-5" (click)="goToNextStep()">Sig.</button>
+    </div>
+    @if (orderLines.length > 0) {
+      <ui-table
+        [title]="title"
+        [displayedColumns]="displayedColumns"
+        [dataSource]="orderLines"
+        [columnHeaders]="columnHeaders"
+        [showAddButton]="false"
+        [showEditButton]="false"
+        [showDeleteButton]="true"
+        [showSelectButton]="false"
+        (addElement)="onAddRequest()"
+        (editElement)="onEditRequest()"
+        (deleteElement)="onDeleteRequest($event)"
+        (selectElement)="onSelectRequest()"
+      >
+      </ui-table>
+    }
+  </mat-step>
+  <mat-step label="Resumen" [editable]="false" [completed]="false">
+    <div class="mb-md-3">
+      <div class="d-flex justify-content-center mt-5">
+        <div class="card container w-100 w-md-75 mx-auto p-md-3 shadow-sm">
+          <div class="card-header d-md-flex justify-content-md-between align-items-center">
+            <h5 class="mb-md-0">Detalles de la solicitud</h5>
+          </div>
+          <div class="row align-items-center py-4 g-4 px-3">
+            <div class="col-sm-6">
+              <label class="fw-medium">Centro solicitante:</label>
+              <span class="ps-2">{{ request.requestingCenter?.name }}</span>
+            </div>
+            <div class="col-sm-6">
+              <label class="fw-medium">Fecha:</label>
+              <span class="ps-2">{{ request.requestDate | date: 'dd/MM/yyyy' }}</span>
+            </div>
+            <div class="col-sm-6">
+              <label class="fw-medium">Nivel de urgencia:</label>
+              <span class="ps-2">{{ request.urgencyLevel }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ui-table
+        [title]="title"
+        [displayedColumns]="displayedColumns"
+        [dataSource]="orderLines"
+        [columnHeaders]="columnHeaders"
+        [showAddButton]="false"
+        [showEditButton]="false"
+        [showDeleteButton]="false"
+        [showSelectButton]="false"
+        (addElement)="onAddRequest()"
+        (editElement)="onEditRequest()"
+        (deleteElement)="onDeleteRequest3()"
+        (selectElement)="onSelectRequest()"
+      >
+      </ui-table>
+      <div class="d-flex justify-content-end gap-4 mt-2 me-lg-5">
+        <button mat-raised-button color="primary" (click)="goBack()">Cancelar</button>
+        <button mat-raised-button color="primary" (click)="finalizeRequest()">
+          Agregar solicitud
+        </button>
+      </div>
+    </div>
+  </mat-step>
 </mat-stepper>

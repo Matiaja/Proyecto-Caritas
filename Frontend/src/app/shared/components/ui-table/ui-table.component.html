@@ -1,7 +1,10 @@
 <div class="d-flex justify-content-center mt-5">
   <div class="card container w-100 w-md-75 mx-auto p-md-3 shadow-sm">
     <div>
-      <button class="btn btn-link text-primary p-0 border-0 d-flex align-items-center mb-2" (click)="toggleFilters()">
+      <button
+        class="btn btn-link text-primary p-0 border-0 d-flex align-items-center mb-2"
+        (click)="toggleFilters()"
+      >
         <span class="me-2">{{ filtersVisible ? 'Ocultar filtros' : 'Mostrar filtros' }}</span>
         <i class="bi bi-chevron-down transition-icon" [class.rotate-icon]="filtersVisible"></i>
       </button>
@@ -20,7 +23,9 @@
           <label>Ordenar por:</label>
           <select class="form-select w-auto" [(ngModel)]="selectedSortBy" (change)="filterData()">
             <option [ngValue]="null">Sin orden</option>
-            <option *ngFor="let option of sortOptions" [value]="option.key">{{ option.label }}</option>
+            <option *ngFor="let option of sortOptions" [value]="option.key">
+              {{ option.label }}
+            </option>
           </select>
 
           <label>Dirección:</label>
@@ -42,14 +47,21 @@
       <div *ngIf="showCommonFilters" class="filters-container" [class.visible]="filtersVisible">
         <div class="card-body d-flex flex-wrap gap-2 align-items-center">
           <label *ngIf="showCenterSelect">Centros:</label>
-          <select *ngIf="showCenterSelect" class="form-select w-auto" [(ngModel)]="selectedCenter" (change)="filterData()">
+          <select
+            *ngIf="showCenterSelect"
+            class="form-select w-auto"
+            [(ngModel)]="selectedCenter"
+            (change)="filterData()"
+          >
             <option [ngValue]="null">Todos</option>
             <option *ngFor="let cen of centers" [value]="cen.id">{{ cen.name }}</option>
           </select>
           <label>Ordenar por:</label>
           <select class="form-select w-auto" [(ngModel)]="selectedSortBy" (change)="filterData()">
             <option [ngValue]="null">Sin orden</option>
-            <option *ngFor="let option of sortOptions" [value]="option.key">{{ option.label }}</option>
+            <option *ngFor="let option of sortOptions" [value]="option.key">
+              {{ option.label }}
+            </option>
           </select>
 
           <label>Dirección:</label>
@@ -81,7 +93,9 @@
           <label>Ordenar por:</label>
           <select class="form-select" [(ngModel)]="selectedSortBy" (change)="filterData()">
             <option [ngValue]="null">Sin orden</option>
-            <option *ngFor="let option of sortOptions" [value]="option.key">{{ option.label }}</option>
+            <option *ngFor="let option of sortOptions" [value]="option.key">
+              {{ option.label }}
+            </option>
           </select>
 
           <label>Dirección:</label>
@@ -103,14 +117,21 @@
       <div *ngIf="showCommonFilters" class="filters-container" [class.visible]="filtersVisible">
         <div class="card-body">
           <label *ngIf="showCenterSelect">Centros:</label>
-          <select *ngIf="showCenterSelect" class="form-select" [(ngModel)]="selectedCenter" (change)="filterData()">
+          <select
+            *ngIf="showCenterSelect"
+            class="form-select"
+            [(ngModel)]="selectedCenter"
+            (change)="filterData()"
+          >
             <option [ngValue]="null">Todos</option>
             <option *ngFor="let cen of centers" [value]="cen.id">{{ cen.name }}</option>
           </select>
           <label>Ordenar por:</label>
           <select class="form-select" [(ngModel)]="selectedSortBy" (change)="filterData()">
             <option [ngValue]="null">Sin orden</option>
-            <option *ngFor="let option of sortOptions" [value]="option.key">{{ option.label }}</option>
+            <option *ngFor="let option of sortOptions" [value]="option.key">
+              {{ option.label }}
+            </option>
           </select>
 
           <label>Dirección:</label>
@@ -129,137 +150,226 @@
         </div>
       </div>
     }
-    
 
-        <!-- Tabla -->
-  <div class="card container w-100 w-md-75 mx-auto p-md-3 shadow-sm">
-    <div class="card-header d-flex justify-content-between align-items-center">
-    <h5 class="mb-0">{{ title }}</h5>
-    @if(showAddButton) {
-      <button *ngIf="canAdd" class="btn btn-primary btn-sm button-add" (click)="onAddElement()">Agregar Nuevo</button>
-    }
-  </div>
-  
-  @if (isMobileView) {
-    <div class="mobile-table-container">
-      <table mat-table [dataSource]="filteredDataSource" class="mobile-table">
-        <!-- Columnas -->
-        <ng-container *ngFor="let column of mobileColumns" [matColumnDef]="column">
-          <th mat-header-cell *matHeaderCellDef class="mobile-header">
-            {{ mobileHeaders[column] || column | titlecase }}
-          </th>
-          <td mat-cell *matCellDef="let element" class="mobile-cell">
-            {{ element[column] }}
-          </td>
-        </ng-container>
-            
-        <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef class="border-bottom"></th>
-          <td mat-cell *matCellDef="let element" style="text-align: right;" class="border-bottom">
-            <div class="btn-group mobile-btn-group">
-              @if(showSelectButton) {
-                <button class="btn btn-outline-primary btn-xs mobile-action-btn" (click)="onSelectElement(element)">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="mobile-btn-icon" viewBox="0 0 24 24">
-                    <path fill="currentColor"
-                      d="M12 9a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3a3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5a5 5 0 0 1 5-5a5 5 0 0 1 5 5a5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5" />
-                  </svg>  
-                  <span class="mobile-btn-text">Ver</span>
-                </button>
-              }
-              @if(showEditButton) {
-                <button *ngIf="canEdit" class="btn btn-outline-primary btn-xs mobile-action-btn" (click)="onEditElement(element)">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="mobile-btn-icon" viewBox="0 0 24 24">
-                    <path fill="currentColor"
-                      d="M9 15v-4.25L19.625.125L23.8 4.4L13.25 15zm10.6-9.2l1.425-1.4l-1.4-1.4L18.2 4.4zM3 21V3h10.925L7 9.925V17h7.05L21 10.05V21z" />
-                  </svg>
-                  <span class="mobile-btn-text">Editar</span>
-                </button>          
-              }
-              @if(showDeleteButton) {
-                <!-- propuesta -->
-                <!-- <button class="btn btn-outline-primary btn-xs mobile-action-btn" style="background-color: rgb(239, 77, 77); color: rgb(255, 255, 255);" (click)="onDeleteElement(element)"> -->
+    <!-- Tabla -->
+    <div class="card container w-100 w-md-75 mx-auto p-md-3 shadow-sm">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">{{ title }}</h5>
+        @if (showAddButton) {
+          <button *ngIf="canAdd" class="btn btn-primary btn-sm button-add" (click)="onAddElement()">
+            Agregar Nuevo
+          </button>
+        }
+      </div>
 
-                <button *ngIf="canDelete" class="btn btn-outline-primary btn-xs mobile-action-btn" (click)="onDeleteElement(element)">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="mobile-btn-icon" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M9 17h2V8H9zm4 0h2V8h-2zm-8 4V6H4V4h5V3h6v1h5v2h-1v15z" />
-                  </svg>
-                  <span class="mobile-btn-text">Eliminar</span>
-                </button>
-              }
-              @if(customActions){
-                <ng-container *ngTemplateOutlet="customActions; context: { $implicit: element }">
-                </ng-container>
-              }
-            </div>
-          </td>
-        </ng-container>
-  
+      @if (isMobileView) {
+        <div class="mobile-table-container">
+          <table mat-table [dataSource]="filteredDataSource" class="mobile-table">
+            <!-- Columnas -->
+            <ng-container *ngFor="let column of mobileColumns" [matColumnDef]="column">
+              <th mat-header-cell *matHeaderCellDef class="mobile-header">
+                {{ mobileHeaders[column] || column | titlecase }}
+              </th>
+              <td mat-cell *matCellDef="let element" class="mobile-cell">
+                {{ element[column] }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef class="border-bottom"></th>
+              <td
+                mat-cell
+                *matCellDef="let element"
+                style="text-align: right"
+                class="border-bottom"
+              >
+                <div class="btn-group mobile-btn-group">
+                  @if (showSelectButton) {
+                    <button
+                      class="btn btn-outline-primary btn-xs mobile-action-btn"
+                      (click)="onSelectElement(element)"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="mobile-btn-icon"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          fill="currentColor"
+                          d="M12 9a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3a3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5a5 5 0 0 1 5-5a5 5 0 0 1 5 5a5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5"
+                        />
+                      </svg>
+                      <span class="mobile-btn-text">Ver</span>
+                    </button>
+                  }
+                  @if (showEditButton) {
+                    <button
+                      *ngIf="canEdit"
+                      class="btn btn-outline-primary btn-xs mobile-action-btn"
+                      (click)="onEditElement(element)"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="mobile-btn-icon"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          fill="currentColor"
+                          d="M9 15v-4.25L19.625.125L23.8 4.4L13.25 15zm10.6-9.2l1.425-1.4l-1.4-1.4L18.2 4.4zM3 21V3h10.925L7 9.925V17h7.05L21 10.05V21z"
+                        />
+                      </svg>
+                      <span class="mobile-btn-text">Editar</span>
+                    </button>
+                  }
+                  @if (showDeleteButton) {
+                    <!-- propuesta -->
+                    <!-- <button class="btn btn-outline-primary btn-xs mobile-action-btn" style="background-color: rgb(239, 77, 77); color: rgb(255, 255, 255);" (click)="onDeleteElement(element)"> -->
+
+                    <button
+                      *ngIf="canDelete"
+                      class="btn btn-outline-primary btn-xs mobile-action-btn"
+                      (click)="onDeleteElement(element)"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="mobile-btn-icon"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          fill="currentColor"
+                          d="M9 17h2V8H9zm4 0h2V8h-2zm-8 4V6H4V4h5V3h6v1h5v2h-1v15z"
+                        />
+                      </svg>
+                      <span class="mobile-btn-text">Eliminar</span>
+                    </button>
+                  }
+                  @if (customActions) {
+                    <ng-container
+                      *ngTemplateOutlet="customActions; context: { $implicit: element }"
+                    >
+                    </ng-container>
+                  }
+                </div>
+              </td>
+            </ng-container>
+
             <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
-            <tr mat-row *matRowDef="let row; columns: columnsToDisplay;"></tr>
+            <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
           </table>
         </div>
-  }
+      }
 
-  @if (!isMobileView) {
-  <div class="table-responsive overflow-x-auto">
-    <table mat-table [dataSource]="filteredDataSource | paginate: { id: paginationId, itemsPerPage: itemsPerPage, currentPage: p }" class="table table-hover table-borderless">
-      <ng-container *ngFor="let column of displayedColumns" [matColumnDef]="column">
-        <th mat-header-cell *matHeaderCellDef class="border-bottom fixed-width-column" >
-          {{ columnHeaders[column] || column | titlecase }}
-        </th>
-        <td mat-cell *matCellDef="let element" class="border-bottom fixed-width-column">{{ element[column] }}</td>
-      </ng-container>
-          
-      <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef class="border-bottom"></th>
-        <td mat-cell *matCellDef="let element" style="text-align: right;" class="border-bottom">
-          <div class="btn-group " >
-            @if(showSelectButton) {
-              <button class="btn btn-outline-primary btn-sm" (click)="onSelectElement(element)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                  <path fill="currentColor"
-                    d="M12 9a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3a3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5a5 5 0 0 1 5-5a5 5 0 0 1 5 5a5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5" />
-                </svg>  
-                Ver</button>
-            }
-            @if(showEditButton) {
-              <button *ngIf="canEdit" class="btn btn-outline-primary btn-sm" (click)="onEditElement(element)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                  <path fill="currentColor"
-                    d="M9 15v-4.25L19.625.125L23.8 4.4L13.25 15zm10.6-9.2l1.425-1.4l-1.4-1.4L18.2 4.4zM3 21V3h10.925L7 9.925V17h7.05L21 10.05V21z" />
-                </svg>
-                Editar</button>          
-            }
-            @if(showDeleteButton) {
-              <button *ngIf="canDelete" class="btn btn-outline-primary btn-sm" (click)="onDeleteElement(element)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                  <path fill="currentColor" d="M9 17h2V8H9zm4 0h2V8h-2zm-8 4V6H4V4h5V3h6v1h5v2h-1v15z" />
-                </svg>
-                Eliminar</button>
-            }
-            @if(customActions){
-              <ng-container *ngTemplateOutlet="customActions; context: { $implicit: element }">
-              </ng-container>
-            }
-          </div>
-        </td>
-      </ng-container>
+      @if (!isMobileView) {
+        <div class="table-responsive overflow-x-auto">
+          <table
+            mat-table
+            [dataSource]="
+              filteredDataSource
+                | paginate: { id: paginationId, itemsPerPage: itemsPerPage, currentPage: p }
+            "
+            class="table table-hover table-borderless"
+          >
+            <ng-container *ngFor="let column of displayedColumns" [matColumnDef]="column">
+              <th mat-header-cell *matHeaderCellDef class="border-bottom fixed-width-column">
+                {{ columnHeaders[column] || column | titlecase }}
+              </th>
+              <td mat-cell *matCellDef="let element" class="border-bottom fixed-width-column">
+                {{ element[column] }}
+              </td>
+            </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
-          <tr mat-row *matRowDef="let row; columns: columnsToDisplay;"></tr>
-        </table>
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef class="border-bottom"></th>
+              <td
+                mat-cell
+                *matCellDef="let element"
+                style="text-align: right"
+                class="border-bottom"
+              >
+                <div class="btn-group">
+                  @if (showSelectButton) {
+                    <button
+                      class="btn btn-outline-primary btn-sm"
+                      (click)="onSelectElement(element)"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          fill="currentColor"
+                          d="M12 9a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3a3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5a5 5 0 0 1 5-5a5 5 0 0 1 5 5a5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5"
+                        />
+                      </svg>
+                      Ver
+                    </button>
+                  }
+                  @if (showEditButton) {
+                    <button
+                      *ngIf="canEdit"
+                      class="btn btn-outline-primary btn-sm"
+                      (click)="onEditElement(element)"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          fill="currentColor"
+                          d="M9 15v-4.25L19.625.125L23.8 4.4L13.25 15zm10.6-9.2l1.425-1.4l-1.4-1.4L18.2 4.4zM3 21V3h10.925L7 9.925V17h7.05L21 10.05V21z"
+                        />
+                      </svg>
+                      Editar
+                    </button>
+                  }
+                  @if (showDeleteButton) {
+                    <button
+                      *ngIf="canDelete"
+                      class="btn btn-outline-primary btn-sm"
+                      (click)="onDeleteElement(element)"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          fill="currentColor"
+                          d="M9 17h2V8H9zm4 0h2V8h-2zm-8 4V6H4V4h5V3h6v1h5v2h-1v15z"
+                        />
+                      </svg>
+                      Eliminar
+                    </button>
+                  }
+                  @if (customActions) {
+                    <ng-container
+                      *ngTemplateOutlet="customActions; context: { $implicit: element }"
+                    >
+                    </ng-container>
+                  }
+                </div>
+              </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+            <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
+          </table>
+        </div>
+      }
+      <div class="d-flex justify-content-end mt-3">
+        <pagination-controls
+          id="tablePagination"
+          (pageChange)="onPageChange($event)"
+          previousLabel="Anterior"
+          nextLabel="Siguiente"
+          [responsive]="true"
+          [autoHide]="totalItems <= itemsPerPage"
+        ></pagination-controls>
       </div>
-    }
-  <div class="d-flex justify-content-end mt-3">
-    <pagination-controls
-      id="tablePagination"
-      (pageChange)="onPageChange($event)"
-      previousLabel="Anterior"
-      nextLabel="Siguiente"
-      [responsive]="true"
-      [autoHide]="totalItems <= itemsPerPage"
-    ></pagination-controls>
+    </div>
   </div>
 </div>
-</div>
-

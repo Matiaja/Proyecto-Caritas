@@ -1,46 +1,50 @@
 .custom-stepper {
-    background-color: #fafafa;
-    padding: 16px;
-    
-    .mat-step-header {
-        background-color: #dfdaff;
-        color: #333;
-        border-radius: 4px;
-        padding:  5px 10px 5px 10px;
-    }
+  background-color: #fafafa;
+  padding: 16px;
 
-    .mat-step-header:hover, [aria-selected="true"], .mat-step-header:hover:not([aria-disabled]) {
-        background-color: #36337f;
-        color: white;
-        border-radius: 4px;
-    }
-    
-    .mat-step-icon {
-        background-color: #36337f;
-        color: white;
-    }
-    
-    .mdc-button, .mat-mdc-button, .mat-mdc-button:not(:disabled) {
-        background-color: #0d6efd;
-        color: #dfdaff;
-        font-weight: 600;
-        border-radius: 4px;
-        padding: 5px 20px 5px 20px;
-    }
-    
-    .mdc-button:hover, .mat-mdc-button:hover {
-        background-color: #2079ff;
-        color: #ffffff;
-    }
+  .mat-step-header {
+    background-color: #dfdaff;
+    color: #333;
+    border-radius: 4px;
+    padding: 5px 10px 5px 10px;
+  }
 
-    .mat-step-icon-state-done {
-        background-color: transparent !important;
-        display: none !important;
-    }
-    
+  .mat-step-header:hover,
+  [aria-selected='true'],
+  .mat-step-header:hover:not([aria-disabled]) {
+    background-color: #36337f;
+    color: white;
+    border-radius: 4px;
+  }
+
+  .mat-step-icon {
+    background-color: #36337f;
+    color: white;
+  }
+
+  .mdc-button,
+  .mat-mdc-button,
+  .mat-mdc-button:not(:disabled) {
+    background-color: #0d6efd;
+    color: #dfdaff;
+    font-weight: 600;
+    border-radius: 4px;
+    padding: 5px 20px 5px 20px;
+  }
+
+  .mdc-button:hover,
+  .mat-mdc-button:hover {
+    background-color: #2079ff;
+    color: #ffffff;
+  }
+
+  .mat-step-icon-state-done {
+    background-color: transparent !important;
+    display: none !important;
+  }
 }
 
 .list-group-item-action:hover {
-    background-color: #f8f9fa;
-    cursor: pointer;
+  background-color: #f8f9fa;
+  cursor: pointer;
 }

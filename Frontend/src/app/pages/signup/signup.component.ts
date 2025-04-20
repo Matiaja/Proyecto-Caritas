@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
-import { EmailValidator, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { passwordMatchValidator } from '../../shared/validators/password-match.validator';
 import { CommonModule } from '@angular/common';
 
@@ -11,20 +11,21 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [ReactiveFormsModule, RouterModule, CommonModule],
   templateUrl: './signup.component.html',
-  styleUrl: './signup.component.css'
+  styleUrl: './signup.component.css',
 })
 export class SignupComponent {
   authService = inject(AuthService);
   router = inject(Router);
 
-  public signupForm = new FormGroup({
-    firstname: new FormControl('', [Validators.required]),
-    lastname: new FormControl('', [Validators.required]),
-    username: new FormControl('', [Validators.required]),
-    phonenumber: new FormControl('', [Validators.required]),
-    email: new FormControl('', [Validators.required, Validators.email]),
-    password: new FormControl('', [Validators.required]),
-    confirmPassword: new FormControl('', [Validators.required])
+  public signupForm = new FormGroup(
+    {
+      firstname: new FormControl('', [Validators.required]),
+      lastname: new FormControl('', [Validators.required]),
+      username: new FormControl('', [Validators.required]),
+      phonenumber: new FormControl('', [Validators.required]),
+      email: new FormControl('', [Validators.required, Validators.email]),
+      password: new FormControl('', [Validators.required]),
+      confirmPassword: new FormControl('', [Validators.required]),
     },
     { validators: passwordMatchValidator }
   );
@@ -41,14 +42,13 @@ export class SignupComponent {
         role: 'User',
       };
       console.log('Form Submitted!', formData);
-      this.authService.signup(formData)
-        .subscribe({
-          next: (data: any) => {
-            console.log('Data: ', data);
-            this.router.navigate(['/login']);
-          },
-          error: (error: any) => console.log('Error: ', error)
-        });
+      this.authService.signup(formData).subscribe({
+        next: (data: any) => {
+          console.log('Data: ', data);
+          this.router.navigate(['/login']);
+        },
+        error: (error: any) => console.log('Error: ', error),
+      });
     }
   }
 }

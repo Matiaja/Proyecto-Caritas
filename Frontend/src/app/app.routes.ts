@@ -27,97 +27,133 @@ import { UserAddComponent } from './pages/user/user-add/user-add.component';
 import { UserDetailComponent } from './pages/user/user-detail/user-detail.component';
 import { UserEditComponent } from './pages/user/user-edit/user-edit.component';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
+import { roleGuard } from './guards/role.guard';
+import { UnauthorizedComponent } from './pages/unauthorized/unauthorized.component';
 
 export const routes: Routes = [
-    {
-        path: '', redirectTo: '/login', pathMatch: 'full'
-    },
-    {
-        path: 'login', component: LoginComponent, data: { hideNavbar: true }
-    },
-    {
-        path: 'signup', component: SignupComponent, data: { hideNavbar: true }
-    },
-    {
-        path: 'admin', 
-        component: AdminComponent, 
-        canActivate: [authGuard],
-        children: [
-            
-        ]
-    },
-    { 
-        path: 'home', component: HomeComponent, canActivate: [authGuard]
-    },
-    { 
-        path: 'requests', canActivate: [authGuard],
-        children: [
-            { path: '', component: RequestComponent },
-            { path: 'add', component: RequestAddComponent },
-            { path: ':id', component: RequestDetailComponent },
-            { path: ':id/assign', component: RequestAssignComponent }
-        ]
-    },
-    {path: 'center/:id', component: CenterDetailComponent, data: { breadcrumb: 'Detalle de Centro' }} ,
-    { 
-        path: 'centers',
-        data: { breadcrumb: 'Centros' },  
-        canActivate: [authGuard],
-         children: [
-            {path: '', component: CenterComponent},
-            {path: 'add', component: CenterAddComponent, data: { breadcrumb: 'Agregar Centro' } },
-            {path: 'edit/:id', component: CenterEditComponent, data: { breadcrumb: 'Editar Centro' } },
-            //{path: 'center/:id', component: CenterDetailComponent, data: { breadcrumb: 'Detalle de Centro' }} 
-        ]
-    },
-    {
-        path: 'categories',
-        data: { breadcrumb: 'Categorías' },
-        canActivate: [authGuard],
-        children: [
-          { path: '', component: CategoryComponent },
-          { path: 'add', component: AddCategoryComponent, data: { breadcrumb: 'Agregar Categoría' } },
-          { path: 'edit/:id', component: EditCategoryComponent, data: { breadcrumb: 'Editar Categoría' } },
-          { path: 'detail/:id', component: CategoryDetailComponent, data: { breadcrumb: 'Detalle de Categoría' } }
-        ]
-    },
-    {
-        path: 'products',
-        data: { breadcrumb: 'Productos' },
-        canActivate: [authGuard],
-        children: [
-            { path: '', component: ProductComponent },
-            { path: 'add', component: ProductAddComponent, data: { breadcrumb: 'Agregar Producto' } },
-            { path: 'detail/:id', component: ProductDetailComponent, data: { breadcrumb: 'Detalle de Producto' } }
-        ]
-    },
-    {
-        path: 'storage',
-        data: { breadcrumb: 'Almacén' },
-        canActivate: [authGuard],
-        children: [
-            {path: '', component: StorageComponent},
-            {path: 'add', component: StorageAddComponent, data: { breadcrumb: 'Agregar Stock' }},
-            {path: 'detail/:id', component: StorageDetailComponent, data: { breadcrumb: 'Detalle de Stock' }}
-        ]
-    },
-    {
-        path: 'users',
-        data: { breadcrumb: 'Usuarios' },
-        canActivate: [authGuard],
-        children: [
-            {path: '', component: UserComponent},
-            {path: 'add', component: UserAddComponent, data: { breadcrumb: 'Agregar Usuario' }},
-            {path: 'detail/:id', component: UserDetailComponent, data: { breadcrumb: 'Detalle de Usuario' }},
-            {path: 'edit', component: UserEditComponent, data: { breadcrumb: 'Editar Usuario' }}
-            ]
-    },
-    //Esta ruta tiene que estar siempre ultima para capturar cualquier ruta no definida
-    //y redirigir a la página de error 404
-    {
-        path: '**',
-        component: NotFoundComponent,
-        data: { hideNavbar: true }
-    }
-      
+  {
+    path: '',
+    redirectTo: '/login',
+    pathMatch: 'full',
+  },
+  {
+    path: 'login',
+    component: LoginComponent,
+    data: { hideNavbar: true },
+  },
+  {
+    path: 'signup',
+    component: SignupComponent,
+    data: { hideNavbar: true },
+  },
+  {
+    path: 'admin',
+    component: AdminComponent,
+    canActivate: [authGuard],
+    children: [],
+  },
+  {
+    path: 'home',
+    component: HomeComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'requests',
+    canActivate: [authGuard],
+    children: [
+      { path: '', component: RequestComponent },
+      { path: 'add', component: RequestAddComponent },
+      { path: ':id', component: RequestDetailComponent },
+      { path: ':id/assign', component: RequestAssignComponent },
+    ],
+  },
+  {
+    path: 'center/:id',
+    component: CenterDetailComponent,
+    data: { breadcrumb: 'Detalle de Centro' },
+  },
+  {
+    path: 'centers',
+    data: { breadcrumb: 'Centros' },
+    canActivate: [authGuard],
+    children: [
+      { path: '', component: CenterComponent },
+      { path: 'add', component: CenterAddComponent, data: { breadcrumb: 'Agregar Centro' } },
+      { path: 'edit/:id', component: CenterEditComponent, data: { breadcrumb: 'Editar Centro' } },
+      //{path: 'center/:id', component: CenterDetailComponent, data: { breadcrumb: 'Detalle de Centro' }}
+    ],
+  },
+  {
+    path: 'categories',
+    data: { breadcrumb: 'Categorías' },
+    canActivate: [authGuard],
+    children: [
+      { path: '', component: CategoryComponent },
+      { path: 'add', component: AddCategoryComponent, data: { breadcrumb: 'Agregar Categoría' } },
+      {
+        path: 'edit/:id',
+        component: EditCategoryComponent,
+        data: { breadcrumb: 'Editar Categoría' },
+      },
+      {
+        path: 'detail/:id',
+        component: CategoryDetailComponent,
+        data: { breadcrumb: 'Detalle de Categoría' },
+      },
+    ],
+  },
+  {
+    path: 'products',
+    data: { breadcrumb: 'Productos' },
+    canActivate: [authGuard],
+    children: [
+      { path: '', component: ProductComponent },
+      { path: 'add', component: ProductAddComponent, data: { breadcrumb: 'Agregar Producto' } },
+      {
+        path: 'detail/:id',
+        component: ProductDetailComponent,
+        data: { breadcrumb: 'Detalle de Producto' },
+      },
+    ],
+  },
+  {
+    path: 'storage',
+    data: { breadcrumb: 'Almacén' },
+    canActivate: [authGuard],
+    children: [
+      { path: '', component: StorageComponent },
+      { path: 'add', component: StorageAddComponent, data: { breadcrumb: 'Agregar Stock' } },
+      {
+        path: 'detail/:id',
+        component: StorageDetailComponent,
+        data: { breadcrumb: 'Detalle de Stock' },
+      },
+    ],
+  },
+  {
+    path: 'users',
+    data: { breadcrumb: 'Usuarios' },
+    canActivate: [authGuard],
+    children: [
+      { path: '', component: UserComponent },
+      { path: 'add', component: UserAddComponent, data: { breadcrumb: 'Agregar Usuario' } },
+      {
+        path: 'detail/:id',
+        component: UserDetailComponent,
+        data: { breadcrumb: 'Detalle de Usuario' },
+      },
+      { path: 'edit', component: UserEditComponent, data: { breadcrumb: 'Editar Usuario' } },
+    ],
+  },
+  {
+    path: 'unauthorized',
+    component: UnauthorizedComponent,
+  },
+  //Esta ruta tiene que estar siempre ultima para capturar cualquier ruta no definida
+  //y redirigir a la página de error 404
+  {
+    path: '**',
+    component: NotFoundComponent,
+    data: { hideNavbar: true },
+  },
 ];

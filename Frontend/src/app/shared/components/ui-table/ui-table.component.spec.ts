@@ -8,9 +8,8 @@ describe('UiTableComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [UiTableComponent]
-    })
-    .compileComponents();
+      imports: [UiTableComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(UiTableComponent);
     component = fixture.componentInstance;

@@ -1,51 +1,50 @@
 /* Cambiar color del navbar */
 .navbar {
-    background-color: #36337f;
-    position: sticky;
+  background-color: #36337f;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+@media (max-width: 767px) {
+  .hidden {
+    transform: translateY(-100%);
+    transition: transform 0.3s ease-in-out;
+  }
+}
+
+/* Hacerlo fijo en móviles */
+@media (max-width: 767px) {
+  .navbar {
+    width: 100%;
     top: 0;
+    left: 0;
     z-index: 1000;
   }
+}
 
-  @media (max-width: 767px) {
-    .hidden {
-        transform: translateY(-100%);
-        transition: transform 0.3s ease-in-out;
-      }
-  }
-    
-  
-  /* Hacerlo fijo en móviles */
-  @media (max-width: 767px) {
-    .navbar {
-      width: 100%;
-      top: 0;
-      left: 0;
-      z-index: 1000;
-    }
-  }
-  
-  .navbar-brand {
-    font-weight: bold;
-    color: #686a74;
-  }
-  
-  .nav-link {
-    color: #98999b;
-  }
-  
-  .nav-link:hover {
-    color: #5ba4f1;
-  }
-  
-  .nav-link.active {
-    color: #ffffff;
-    font-weight: bold;
-  }
+.navbar-brand {
+  font-weight: bold;
+  color: #686a74;
+}
 
-  .logout-link:hover {
-    color: #ff4040de;
-  }
-  
-  .logout-link {
-    color: #ff0000;
-  }
+.nav-link {
+  color: #98999b;
+}
+
+.nav-link:hover {
+  color: #5ba4f1;
+}
+
+.nav-link.active {
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.logout-link:hover {
+  color: #ff4040de;
+}
+
+.logout-link {
+  color: #ff0000;
+}

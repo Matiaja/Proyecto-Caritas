@@ -6,12 +6,12 @@ import { RouterModule } from '@angular/router';
 @Component({
   selector: 'app-breadcrumbs',
   standalone: true,
-  imports: [ CommonModule, RouterModule ],
+  imports: [CommonModule, RouterModule],
   templateUrl: './breadcrumbs.component.html',
-  styleUrl: './breadcrumbs.component.css'
+  styleUrl: './breadcrumbs.component.css',
 })
 export class BreadcrumbComponent implements OnInit {
-  breadcrumbs: Array<{ label: string, url: string }> = [];
+  breadcrumbs: { label: string; url: string }[] = [];
 
   constructor(private breadcrumbService: BreadcrumbService) {}
 

@@ -13,11 +13,11 @@ import { ToastrService } from 'ngx-toastr';
   standalone: true,
   imports: [CommonModule, UiTableComponent, BreadcrumbComponent],
   templateUrl: './center.component.html',
-  styleUrl: './center.component.css'
+  styleUrl: './center.component.css',
 })
 export class CenterComponent implements OnInit {
   title = 'Centros';
-  columnHeaders: { [key: string]: string } = {
+  columnHeaders: Record<string, string> = {
     name: 'Nombre',
     location: 'Ubicación',
     manager: 'Encargado',
@@ -43,7 +43,7 @@ export class CenterComponent implements OnInit {
       },
       error: (err) => {
         console.log(err);
-      }
+      },
     });
   }
 
@@ -56,7 +56,8 @@ export class CenterComponent implements OnInit {
   }
 
   async onDeleteCenter(center: any) {
-    const confirmed = await this.modalService.confirm('Eliminar Centro',
+    const confirmed = await this.modalService.confirm(
+      'Eliminar Centro',
       '¿Estás seguro de que quieres eliminar este centro?'
     );
 
@@ -70,6 +71,5 @@ export class CenterComponent implements OnInit {
 
   onSelectCenter(center: CenterModel) {
     this.router.navigate(['/center', center.id]);
-
   }
 }

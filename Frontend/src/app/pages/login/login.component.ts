@@ -11,10 +11,9 @@ import { GlobalStateService } from '../../services/global/global-state.service';
   standalone: true,
   imports: [ReactiveFormsModule, RouterModule, CommonModule],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  styleUrl: './login.component.css',
 })
-export class LoginComponent{
-
+export class LoginComponent {
   constructor(private globalStateService: GlobalStateService) {}
 
   authService = inject(AuthService);
@@ -23,7 +22,7 @@ export class LoginComponent{
 
   protected loginForm = new FormGroup({
     username: new FormControl('', [Validators.required]),
-    password: new FormControl('', [Validators.required])
+    password: new FormControl('', [Validators.required]),
   });
 
   onSubmit() {
@@ -42,7 +41,8 @@ export class LoginComponent{
       },
       error: (error) => {
         console.error('Login error:', error);
-        this.errorMessage = 'Credenciales incorrectas.<br>Por favor, verifica tu usuario y contraseña.';
+        this.errorMessage =
+          'Credenciales incorrectas.<br>Por favor, verifica tu usuario y contraseña.';
       },
     });
   }

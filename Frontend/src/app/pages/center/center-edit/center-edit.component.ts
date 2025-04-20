@@ -12,7 +12,7 @@ import { ToastrService } from 'ngx-toastr';
   standalone: true,
   imports: [GenericFormComponent, BreadcrumbComponent],
   templateUrl: './center-edit.component.html',
-  styleUrl: './center-edit.component.css'
+  styleUrl: './center-edit.component.css',
 })
 export class CenterEditComponent implements OnInit {
   centerData: any;

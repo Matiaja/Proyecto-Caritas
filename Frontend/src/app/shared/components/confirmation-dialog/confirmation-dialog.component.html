@@ -1,35 +1,23 @@
-<div class="modal show d-block" tabindex="-1" role="dialog" aria-labelledby="modalTitle" aria-hidden="false">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="modalTitle">{{ data.title }}</h5>
-          <button
-            type="button"
-            class="btn-close"
-            aria-label="Cerrar"
-            (click)="close(false)"
-          ></button>
-        </div>
-        <div class="modal-body">
-          <p>{{ data.message }}</p>
-        </div>
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            (click)="close(false)"
-          >
-            Cancelar
-          </button>
-          <button
-            type="button"
-            class="btn btn-primary"
-            (click)="close(true)"
-          >
-            Confirmar
-          </button>
-        </div>
+<div
+  class="modal show d-block"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="modalTitle"
+  aria-hidden="false"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitle">{{ data.title }}</h5>
+        <button type="button" class="btn-close" aria-label="Cerrar" (click)="close(false)"></button>
+      </div>
+      <div class="modal-body">
+        <p>{{ data.message }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="close(false)">Cancelar</button>
+        <button type="button" class="btn btn-primary" (click)="close(true)">Confirmar</button>
       </div>
     </div>
   </div>
-  
+</div>

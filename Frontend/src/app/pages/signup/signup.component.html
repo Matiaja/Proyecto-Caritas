@@ -1,22 +1,28 @@
 <div class="signup-card">
-    <div class="card-title">
-        <h1>Create Account</h1>
-        <span>Already have an account? <a routerLink="/login">Sign In</a></span>
-    </div>
-    <form class="form-group" [formGroup]="signupForm" (ngSubmit)="onSubmit()">
-        <input type="text" name="firstname" placeholder="Nombre" formControlName="firstname">
-        <input type="text" name="lastname" placeholder="Apellido" formControlName="lastname">
-        <input type="text" name="username" placeholder="Nombre de usuario" formControlName="username">
-        <input type="text" name="phonenumber" placeholder="Teléfono" formControlName="phonenumber">
-        <input type="email" name="email" placeholder="Email" formControlName="email">
-        <input type="password" name="password" placeholder="Contraseña" formControlName="password">
-        <input type="password" name="confirmPassword" placeholder="Confirmar Contraseña" formControlName="confirmPassword">
-        <input type="submit" value="Signup">
-    </form>
-    <div class="card-terms">
-        <input type="checkbox"> <span>I have read and agree to the <a href="">Terms of Service</a></span>
-    </div>
-    <div *ngIf="signupForm.errors?.['passwordsMismatch'] && signupForm.touched">
-        <span class="error">Las contraseñas no coinciden.</span>
-    </div>
+  <div class="card-title">
+    <h1>Create Account</h1>
+    <span>Already have an account? <a routerLink="/login">Sign In</a></span>
+  </div>
+  <form class="form-group" [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+    <input type="text" name="firstname" placeholder="Nombre" formControlName="firstname" />
+    <input type="text" name="lastname" placeholder="Apellido" formControlName="lastname" />
+    <input type="text" name="username" placeholder="Nombre de usuario" formControlName="username" />
+    <input type="text" name="phonenumber" placeholder="Teléfono" formControlName="phonenumber" />
+    <input type="email" name="email" placeholder="Email" formControlName="email" />
+    <input type="password" name="password" placeholder="Contraseña" formControlName="password" />
+    <input
+      type="password"
+      name="confirmPassword"
+      placeholder="Confirmar Contraseña"
+      formControlName="confirmPassword"
+    />
+    <input type="submit" value="Signup" />
+  </form>
+  <div class="card-terms">
+    <input type="checkbox" />
+    <span>I have read and agree to the <a href="">Terms of Service</a></span>
+  </div>
+  <div *ngIf="signupForm.errors?.['passwordsMismatch'] && signupForm.touched">
+    <span class="error">Las contraseñas no coinciden.</span>
+  </div>
 </div>

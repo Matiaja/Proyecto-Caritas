@@ -7,12 +7,12 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [],
   templateUrl: './admin.component.html',
-  styleUrl: './admin.component.css'
+  styleUrl: './admin.component.css',
 })
 export class AdminComponent {
   authService = inject(AuthService);
   router = inject(Router);
-  public logout(){
+  public logout() {
     this.authService.logout();
     this.router.navigate(['/login']);
   }

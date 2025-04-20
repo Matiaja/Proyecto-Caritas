@@ -7,11 +7,13 @@ import { AuthService } from '../../auth/auth.service';
   standalone: true,
   imports: [],
   templateUrl: './not-found.component.html',
-  styleUrl: './not-found.component.css'
+  styleUrl: './not-found.component.css',
 })
 export class NotFoundComponent {
-
-  constructor(private router: Router, private authService: AuthService) { }
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   goHome() {
     if (this.authService.isLoggedIn()) {

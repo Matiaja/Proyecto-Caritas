@@ -8,9 +8,8 @@ describe('StorageComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [StorageComponent]
-    })
-    .compileComponents();
+      imports: [StorageComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(StorageComponent);
     component = fixture.componentInstance;

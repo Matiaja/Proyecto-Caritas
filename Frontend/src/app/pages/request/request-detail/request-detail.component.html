@@ -3,7 +3,7 @@
 <div class="mb-md-3">
   <div class="d-flex justify-content-center mt-5">
     <div class="card container w-100 w-md-75 mx-auto p-md-3 shadow-sm">
-      <div class="card-header d-md-flex justify-content-md-between align-items-center ">
+      <div class="card-header d-md-flex justify-content-md-between align-items-center">
         <h5 class="mb-md-0">Detalles de la solicitud Nro. {{ request.id }}</h5>
         <button class="btn btn-outline-secondary btn-sm" (click)="goBack()">Volver</button>
       </div>
@@ -14,7 +14,7 @@
         </div>
         <div class="col-sm-6">
           <label class="fw-medium">Fecha:</label>
-          <span class="ps-2">{{ request.requestDate | date:'dd/MM/yyyy'}}</span>
+          <span class="ps-2">{{ request.requestDate | date: 'dd/MM/yyyy' }}</span>
         </div>
         <div class="col-sm-6">
           <label class="fw-medium">Nivel de urgencia:</label>
@@ -23,31 +23,39 @@
       </div>
     </div>
   </div>
-  
-  @if(request.id) {
-    <ui-table 
-        [title]="title" 
-        [displayedColumns]="displayedColumns"
-        [dataSource]="orderLines" 
-        [columnHeaders]="columnHeaders"
-        [customActions]="actionTemplate"
-        [showAddButton]="false"
-        [showEditButton]="false"
-        [showDeleteButton]="false"
-        [showSelectButton]="true"
-        (addElement)="onAddElement" 
-        (editElement)="onEditElement" 
-        (deleteElement)="onDeleteElement"
-        (selectElement)="onSelectOrderLine($event)">
+
+  @if (request.id) {
+    <ui-table
+      [title]="title"
+      [displayedColumns]="displayedColumns"
+      [dataSource]="orderLines"
+      [columnHeaders]="columnHeaders"
+      [customActions]="actionTemplate"
+      [showAddButton]="false"
+      [showEditButton]="false"
+      [showDeleteButton]="false"
+      [showSelectButton]="true"
+      (addElement)="(onAddElement)"
+      (editElement)="(onEditElement)"
+      (deleteElement)="(onDeleteElement)"
+      (selectElement)="onSelectOrderLine($event)"
+    >
     </ui-table>
 
     <ng-template #actionTemplate let-row>
-      <button class="btn btn-outline-primary btn-sm" (click)="assign(row)" [disabled]="row.isAssigned=='Sí'">
+      <button
+        class="btn btn-outline-primary btn-sm"
+        (click)="assign(row)"
+        [disabled]="row.isAssigned === 'Sí'"
+      >
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-          <path fill="currentColor"
-            d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m-7 0c.55 0 1 .45 1 1s-.45 1-1 1s-1-.45-1-1s.45-1 1-1m4 12h-4v3l-5-5l5-5v3h4z" />
+          <path
+            fill="currentColor"
+            d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m-7 0c.55 0 1 .45 1 1s-.45 1-1 1s-1-.45-1-1s.45-1 1-1m4 12h-4v3l-5-5l5-5v3h4z"
+          />
         </svg>
-        Asignar</button>
+        Asignar
+      </button>
     </ng-template>
   }
 </div>

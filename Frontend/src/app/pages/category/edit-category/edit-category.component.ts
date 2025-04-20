@@ -11,7 +11,7 @@ import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/brea
   standalone: true,
   imports: [GenericFormComponent, BreadcrumbComponent],
   templateUrl: './edit-category.component.html',
-  styleUrl: './edit-category.component.css'
+  styleUrl: './edit-category.component.css',
 })
 export class EditCategoryComponent implements OnInit {
   categoryData: any;
@@ -19,7 +19,7 @@ export class EditCategoryComponent implements OnInit {
   form!: FormGroup;
 
   formConfig = {
-    title : 'Editar Categoría',
+    title: 'Editar Categoría',
     fields: [
       {
         name: 'name',
@@ -40,10 +40,12 @@ export class EditCategoryComponent implements OnInit {
     ],
   };
 
-  constructor(private categoryService: CategoryService,
+  constructor(
+    private categoryService: CategoryService,
     private router: Router,
     private route: ActivatedRoute,
-    private fb: FormBuilder) {}
+    private fb: FormBuilder
+  ) {}
 
   ngOnInit(): void {
     this.categoryId = Number(this.route.snapshot.paramMap.get('id'));
@@ -54,7 +56,7 @@ export class EditCategoryComponent implements OnInit {
     this.categoryService.getCategory(this.categoryId).subscribe((category) => {
       this.categoryData = category;
       console.log(this.categoryData);
-  
+
       this.formConfig = {
         title: 'Editar Categoría',
         fields: [
@@ -80,7 +82,7 @@ export class EditCategoryComponent implements OnInit {
   }
 
   onSubmit(formData: any): void {
-    this.categoryService.updateCategory(this.categoryId,formData).subscribe(() => {
+    this.categoryService.updateCategory(this.categoryId, formData).subscribe(() => {
       this.router.navigate(['/categories']);
     });
   }
@@ -88,5 +90,4 @@ export class EditCategoryComponent implements OnInit {
   onCancel(): void {
     this.router.navigate(['/categories']);
   }
-
 }
