@@ -54,6 +54,7 @@ namespace ProyectoCaritas.Controllers
         }
 
         // POST: api/Categories
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<CategoryDTO>> CreateCategory(CategoryDTO addCategoryDto)
         {
@@ -81,6 +82,7 @@ namespace ProyectoCaritas.Controllers
         }
 
         // PUT: api/Categories/{id}
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCategory(int id, CategoryDTO updateCategoryDto)
         {
@@ -101,6 +103,7 @@ namespace ProyectoCaritas.Controllers
         }
 
         // DELETE: api/Categories/{id}
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCategory(int id)
         {

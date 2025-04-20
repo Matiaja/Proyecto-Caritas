@@ -37,6 +37,11 @@ export class UiTableComponent<T extends Record<string, any>>{
   @Input() showCenterSelect = false;
   @Input() searchColumns: string[] = [];
 
+  @Input() canEdit = true;
+  @Input() canDelete = true;
+  @Input() canAdd = true;
+
+
   @Output() filterChange = new EventEmitter<{ categoryId?: number; sortBy?: string; order?: string; centerId?: number }>();
   @Output() addElement = new EventEmitter<void>();
   @Output() editElement = new EventEmitter<T>();

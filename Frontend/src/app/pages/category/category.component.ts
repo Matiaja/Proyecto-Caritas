@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 import { BreadcrumbComponent } from '../../shared/components/breadcrumbs/breadcrumbs.component';
 import { ConfirmModalService } from '../../services/confirmModal/confirm-modal.service';
 import { ToastrService } from 'ngx-toastr';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-category',
@@ -33,16 +34,28 @@ export class CategoryComponent implements OnInit {
     name: 'Nombre'
   };
   mobileColumns = ['name'];
+  canEdit: boolean = false;
+  canDelete: boolean = false;
+  canAdd: boolean = false;
 
   constructor(
     private categoryService: CategoryService, 
     private router: Router,
     private dialog: MatDialog,
     private modalService: ConfirmModalService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private authService: AuthService,
     ) {}
   ngOnInit() {
+    this.checkRole();
     this.loadCategories();
+  }
+
+  checkRole(){
+    const userRole = this.authService.getUserRole();
+    this.canEdit = userRole === 'Admin';
+    this.canDelete = userRole === 'Admin';
+    this.canAdd = userRole === 'Admin';
   }
 
   onAddCategory(): void {

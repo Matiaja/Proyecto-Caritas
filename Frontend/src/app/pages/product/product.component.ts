@@ -10,6 +10,7 @@ import { ProductService } from '../../services/product/product.service';
 import { ToastrService } from 'ngx-toastr';
 import { CategoryService } from '../../services/category/category.service';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-product',
@@ -49,20 +50,29 @@ export class ProductComponent implements OnInit {
   itemsPerPage: number = 10;
   totalItems: number = 0;
 
+  canEdit: boolean = false;
+  canDelete: boolean = false;
+  canAdd: boolean = false;
+
   constructor(
     private productService: ProductService, 
     private router: Router, 
     private modalService: ConfirmModalService,
     private toastr: ToastrService,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private authService: AuthService,
   ) { }
   ngOnInit() {
+    this.checkRole();
     this.loadCategories();
-
-    // this.productService.products$.subscribe(products => {
-    //   this.products = products;
-    // });
     this.loadProducts();
+  }
+
+  checkRole(){
+    const userRole = this.authService.getUserRole();
+    this.canEdit = userRole === 'Admin';
+    this.canDelete = userRole === 'Admin';
+    this.canAdd = userRole === 'Admin';
   }
 
   loadCategories() {

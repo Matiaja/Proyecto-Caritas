@@ -20,17 +20,17 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/home" routerLinkActive="active">Inicio</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/requests" routerLinkActive="active">Solicitudes</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/storage" routerLinkActive="active">Almacenamiento</a>
-        </li>
-        @if (checkUserRole("Admin")) {
+      @if (checkUserRole("Admin")) {
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/home" routerLinkActive="active">Inicio</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/requests" routerLinkActive="active">Solicitudes</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/storage" routerLinkActive="active">Almacenamiento</a>
+          </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               Configuración
@@ -46,11 +46,33 @@
               </li>
             </ul>
           </li>
+          <li class="nav-item">
+            <a class="nav-link logout-link" role="button" (click)="logout()">Cerrar sesión</a>
+          </li>
+        </ul>
         }
-        <li class="nav-item">
-          <a class="nav-link logout-link" role="button" (click)="logout()">Cerrar sesión</a>
-        </li>
-      </ul>
+      @else {
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/home" routerLinkActive="active">Inicio</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/requests" routerLinkActive="active">Solicitudes</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/storage" routerLinkActive="active">Almacenamiento</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/products" routerLinkActive="active">Productos</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/categories" routerLinkActive="active">Categorias</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link logout-link" role="button" (click)="logout()">Cerrar sesión</a>
+          </li>
+        </ul>
+        }
     </div>
   </div>
 </nav>

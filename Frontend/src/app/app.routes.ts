@@ -26,16 +26,17 @@ import { UserComponent } from './pages/user/user.component';
 import { UserAddComponent } from './pages/user/user-add/user-add.component';
 import { UserDetailComponent } from './pages/user/user-detail/user-detail.component';
 import { UserEditComponent } from './pages/user/user-edit/user-edit.component';
+import { NotFoundComponent } from './pages/not-found/not-found.component';
 
 export const routes: Routes = [
     {
         path: '', redirectTo: '/login', pathMatch: 'full'
     },
     {
-        path: 'login', component: LoginComponent
+        path: 'login', component: LoginComponent, data: { hideNavbar: true }
     },
     {
-        path: 'signup', component: SignupComponent
+        path: 'signup', component: SignupComponent, data: { hideNavbar: true }
     },
     {
         path: 'admin', 
@@ -110,5 +111,13 @@ export const routes: Routes = [
             {path: 'detail/:id', component: UserDetailComponent, data: { breadcrumb: 'Detalle de Usuario' }},
             {path: 'edit', component: UserEditComponent, data: { breadcrumb: 'Editar Usuario' }}
             ]
+    },
+    //Esta ruta tiene que estar siempre ultima para capturar cualquier ruta no definida
+    //y redirigir a la página de error 404
+    {
+        path: '**',
+        component: NotFoundComponent,
+        data: { hideNavbar: true }
     }
+      
 ];
