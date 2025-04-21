@@ -71,6 +71,16 @@ export class StockService {
     });
   }
 
+  getMoreQuantityProducts(centerId: number): Observable<any[]> {
+    const headers = { centerId: centerId.toString() };
+    return this.http.get<any[]>(`${this.baseUrl}/more-quantity-product-with-stock`, { headers });
+  }
+
+  getStockByCategory(centerId: number): Observable<any[]> {
+    const headers = { centerId: centerId.toString() };
+    return this.http.get<any[]>(`${this.baseUrl}/stock-by-category`, { headers });
+  }  
+
   getProductInStocks(productId: number): Observable<any[]> {
     const headers = new HttpHeaders().set('productId', productId.toString());
     return this.http.get<any[]>(`${this.baseUrl}/product-with-all-stocks`, { headers });

@@ -311,6 +311,62 @@ namespace ProyectoCaritas.Controllers
             return Ok(grouped);
         }
 
+        [HttpGet("more-quantity-product-with-stock")]
+        public async Task<ActionResult<List<ProductStockDTO>>> GetMoreQuantityProduct(
+            [FromHeader] string centerId)
+        {
+            if (!int.TryParse(centerId, out int centerIdInt))
+                return BadRequest(new { message = "Invalid centerId" });
+
+            var stocksQuery = _context.Stocks
+                .Include(s => s.Product)
+                    .ThenInclude(p => p.Category)
+                .Where(s => s.CenterId == centerIdInt);
+
+            var grouped = await stocksQuery
+                .GroupBy(s => new { s.ProductId, s.Product.Name, s.Product.Code })
+                .Select(g => new ProductStockDTO
+                {
+                    ProductId = (int)g.Key.ProductId,
+                    ProductName = g.Key.Name,
+                    ProductCode = g.Key.Code,
+                    StockQuantity = g.Sum(s => s.Type == "Ingreso" ? s.Quantity : -s.Quantity)
+                })
+                .Where(dto => dto.StockQuantity > 0)
+                .OrderByDescending(dto => dto.StockQuantity)
+                .Take(5)
+                .ToListAsync();
+
+            return Ok(grouped);
+        }
+
+
+        [HttpGet("stock-by-category")]
+        public async Task<ActionResult<List<CategoryStockDTO>>> GetStockByCategory([FromHeader] string centerId)
+        {
+            if (!int.TryParse(centerId, out int centerIdInt))
+                return BadRequest(new { message = "Invalid centerId" });
+
+            var stocksQuery = _context.Stocks
+                .Include(s => s.Product)
+                    .ThenInclude(p => p.Category)
+                .Where(s => s.CenterId == centerIdInt);
+
+            var groupedByCategory = await stocksQuery
+                .GroupBy(s => new { s.Product.CategoryId, s.Product.Category.Name })
+                .Select(g => new CategoryStockDTO
+                {
+                    CategoryId = g.Key.CategoryId,
+                    CategoryName = g.Key.Name,
+                    TotalStock = g.Sum(s => s.Type == "Ingreso" ? s.Quantity : -s.Quantity)
+                })
+                .Where(c => c.TotalStock > 0)
+                .ToListAsync();
+
+            return Ok(groupedByCategory);
+        }
+
+
         // GET: api/Stocks/product-with-all-stock
         [HttpGet("product-with-all-stocks")]
         public async Task<ActionResult<List<ProductStockDTO>>> GetProductWithAllStocks([FromHeader] string productId)
