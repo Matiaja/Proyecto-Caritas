@@ -66,9 +66,11 @@ export class StockService {
       params = params.set('order', order);
     }
     const headers = { centerId: centerId.toString() };
-    this.http.get<any[]>(`${this.baseUrl}/product-with-stock`, { headers, params }).subscribe((products) => {
-      this.stockSubject.next(products);
-    });
+    this.http
+      .get<any[]>(`${this.baseUrl}/product-with-stock`, { headers, params })
+      .subscribe((products) => {
+        this.stockSubject.next(products);
+      });
   }
 
   getMoreQuantityProducts(centerId: number): Observable<any[]> {
@@ -79,7 +81,7 @@ export class StockService {
   getStockByCategory(centerId: number): Observable<any[]> {
     const headers = { centerId: centerId.toString() };
     return this.http.get<any[]>(`${this.baseUrl}/stock-by-category`, { headers });
-  }  
+  }
 
   getProductInStocks(productId: number): Observable<any[]> {
     const headers = new HttpHeaders().set('productId', productId.toString());

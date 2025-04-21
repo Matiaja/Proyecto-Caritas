@@ -1,17 +1,21 @@
 <div class="charts-container" [class.mobile]="isMobile">
-    <div class="chart-container">
-      <h2>Top 5 productos con más stock</h2>
-      <canvas baseChart [data]="topProductsData" [options]="chartOptions" [type]="'bar'"></canvas>
-    </div>
-  
-    <div class="chart-container">
-      <h2>Stock total por categoría</h2>
-      <canvas baseChart [data]="stockByCategoryData" [options]="chartOptions" [type]="'doughnut'"></canvas>
-    </div>
-  
-    <div class="chart-container">
-      <h2>Movimientos de stock (último mes)</h2>
-      <canvas baseChart [data]="movementData" [options]="chartOptions" [type]="'pie'"></canvas>
-    </div>
+  <div class="chart-container">
+    <h2>Top 5 productos con más stock</h2>
+    <canvas baseChart [data]="topProductsData" [options]="chartOptions" [type]="'bar'"></canvas>
   </div>
-  
+
+  <div class="chart-container">
+    <h2>Stock total por categoría</h2>
+    <canvas
+      baseChart
+      [data]="stockByCategoryData"
+      [options]="chartOptions"
+      [type]="'doughnut'"
+    ></canvas>
+  </div>
+
+  <div class="chart-container">
+    <h2>Movimientos de stock (último mes)</h2>
+    <canvas baseChart [data]="movementData" [options]="chartOptions" [type]="'pie'"></canvas>
+  </div>
+</div>

@@ -51,7 +51,7 @@ export class StorageComponent implements OnInit {
     private router: Router,
     private modalService: ConfirmModalService,
     private globalStateService: GlobalStateService,
-    private categoryService: CategoryService,
+    private categoryService: CategoryService
   ) {
     this.centerId = this.globalStateService.getCurrentCenterId();
   }
@@ -78,7 +78,7 @@ export class StorageComponent implements OnInit {
         this.order
       );
       this.totalItems = this.stockService.totalItems;
-  }
+    }
   }
 
   loadCategories() {

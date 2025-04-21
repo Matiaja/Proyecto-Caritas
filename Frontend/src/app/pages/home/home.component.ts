@@ -19,7 +19,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   topProductsData: any;
   stockByCategoryData: any;
 
-  constructor(private responsiveService: ResponsiveService, private stockService: StockService, private globalStateService: GlobalStateService) {}
+  constructor(
+    private responsiveService: ResponsiveService,
+    private stockService: StockService,
+    private globalStateService: GlobalStateService
+  ) {}
   ngOnInit() {
     this.resizeSub = this.responsiveService.isMobile$.subscribe((isMobile) => {
       this.isMobile = isMobile;
