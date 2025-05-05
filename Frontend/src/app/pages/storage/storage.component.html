@@ -1,10 +1,20 @@
 <ui-table
-    [title]="title"
-    [displayedColumns]="displayedColumns"
-    [dataSource]="stocks"
-    [columnHeaders]="columnHeaders"
-    [showAddButton]="true"
-    [showSelectButton]="true"
-    (addElement)="onAddStock()"
-    (selectElement)="onSelectStock($event)">
+  [title]="title"
+  [displayedColumns]="displayedColumns"
+  [dataSource]="stocks"
+  [columnHeaders]="columnHeaders"
+  [mobileColumns]="mobileColumns"
+  [mobileHeaders]="mobileHeaders"
+  [showAddButton]="true"
+  [showSelectButton]="true"
+  [showSearchBar]="true"
+  [showProductsFilters]="true"
+  [categories]="categories"
+  [sortOptions]="sortOptions"
+  [searchColumns]="searchColumns"
+  (pageChange)="onPageChange($event)"
+  (filterChange)="onFilterChange($event)"
+  (addElement)="onAddStock()"
+  (selectElement)="onSelectStock($event)"
+>
 </ui-table>

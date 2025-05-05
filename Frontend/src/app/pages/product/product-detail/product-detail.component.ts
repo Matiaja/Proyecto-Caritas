@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../../services/product/product.service';
-import { UiTableComponent } from "../../../shared/components/ui-table/ui-table.component";
+import { UiTableComponent } from '../../../shared/components/ui-table/ui-table.component';
 import { CommonModule, Location } from '@angular/common';
 import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
 import { Product } from '../../../models/product.model';
@@ -12,10 +12,9 @@ import { switchMap } from 'rxjs';
   standalone: true,
   imports: [UiTableComponent, CommonModule, BreadcrumbComponent],
   templateUrl: './product-detail.component.html',
-  styleUrl: './product-detail.component.css'
+  styleUrl: './product-detail.component.css',
 })
-export class ProductDetailComponent implements OnInit{
-
+export class ProductDetailComponent implements OnInit {
   product: Product = {
     id: 0,
     name: '',
@@ -28,7 +27,7 @@ export class ProductDetailComponent implements OnInit{
   };
 
   title = 'Detalle de producto';
-  columnHeaders: { [key: string]: string } = {
+  columnHeaders: Record<string, string> = {
     id: 'ID',
     name: 'Nombre',
     description: 'Descripción',
@@ -41,30 +40,32 @@ export class ProductDetailComponent implements OnInit{
     private route: ActivatedRoute,
     private router: Router,
     private location: Location
-  ) { }
+  ) {}
 
   ngOnInit(): void {
-    this.route.params.pipe(
-      switchMap((params) => {
-        const productId = params['id'];
-        return this.productService.getProductById(productId);
-      }),
-      switchMap((product: Product) => {
-        this.product = product;
-        return this.categoryService.getCategory(product.categoryId);
-      } )
-    ).subscribe({
-      next: (category: any) => {
-        this.category = category;
-      }
-    });
+    this.route.params
+      .pipe(
+        switchMap((params) => {
+          const productId = params['id'];
+          return this.productService.getProductById(productId);
+        }),
+        switchMap((product: Product) => {
+          this.product = product;
+          return this.categoryService.getCategory(product.categoryId);
+        })
+      )
+      .subscribe({
+        next: (category: any) => {
+          this.category = category;
+        },
+      });
   }
 
   loadProductDetails(productId: any): void {
     this.productService.getProductById(productId).subscribe({
       next: (product: Product) => {
         this.product = product;
-      }
+      },
     });
   }
 
@@ -72,7 +73,7 @@ export class ProductDetailComponent implements OnInit{
     this.categoryService.getCategory(categoryId).subscribe({
       next: (category: any) => {
         this.category = category;
-      }
+      },
     });
   }
 
@@ -83,5 +84,4 @@ export class ProductDetailComponent implements OnInit{
   onAddElement = null;
   onEditElement = null;
   onDeleteElement = null;
-
 }

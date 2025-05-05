@@ -13,7 +13,6 @@ import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/brea
   styleUrl: './center-detail.component.css',
 })
 export class CenterDetailComponent implements OnInit {
-
   center: CenterModel = {
     id: 0,
     name: '',
@@ -21,7 +20,7 @@ export class CenterDetailComponent implements OnInit {
     manager: '',
     capacityLimit: 0,
     phone: '',
-    email: ''
+    email: '',
   } as CenterModel;
 
   constructor(
@@ -29,7 +28,7 @@ export class CenterDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private location: Location
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.route.params.subscribe((params) => {
@@ -46,7 +45,7 @@ export class CenterDetailComponent implements OnInit {
       },
       error: (err) => {
         console.log(err);
-      }
+      },
     });
   }
 

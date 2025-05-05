@@ -1,13 +1,11 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { GenericFormComponent } from '../../../shared/components/generic-form/generic-form.component';
 import { Router } from '@angular/router';
-import { AbstractControl, AsyncValidatorFn, Validators } from '@angular/forms';
+import { Validators } from '@angular/forms';
 import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
 import { ProductService } from '../../../services/product/product.service';
 import { StockService } from '../../../services/stock/stock.service';
 import { expirationDateValidator } from '../../../shared/validators/date-compare.validator';
-import { catchError, debounceTime, distinctUntilChanged, map, switchMap, of } from 'rxjs';
 import { GlobalStateService } from '../../../services/global/global-state.service';
 import { ToastrService } from 'ngx-toastr';
 
@@ -16,9 +14,9 @@ import { ToastrService } from 'ngx-toastr';
   standalone: true,
   imports: [GenericFormComponent, BreadcrumbComponent],
   templateUrl: './storage-add.component.html',
-  styleUrl: './storage-add.component.css'
+  styleUrl: './storage-add.component.css',
 })
-export class StorageAddComponent implements OnInit{
+export class StorageAddComponent {
   formConfig = {
     title: 'Agregar Stock',
     fields: [
@@ -58,9 +56,7 @@ export class StorageAddComponent implements OnInit{
         type: 'date',
         value: '',
         placeholder: 'Seleccione la fecha de expiración',
-        validators: [
-          expirationDateValidator('date'),
-        ],
+        validators: [expirationDateValidator('date')],
         errorMessage: 'La fecha de expiracion no puede ser menor a hoy ni a la fecha de creación',
       },
       {
@@ -101,10 +97,6 @@ export class StorageAddComponent implements OnInit{
     private toastr: ToastrService
   ) {}
 
-  
-  ngOnInit(): void {
-  }
-
   onSubmit(data: any): void {
     const centerId = this.globalStateService.getCurrentCenterId();
     const payload = {
@@ -112,9 +104,9 @@ export class StorageAddComponent implements OnInit{
       type: data.type,
       date: data.date,
       expirationDate: data.expirationDate,
-      description: data.description? data.description : '',
+      description: data.description ? data.description : '',
       quantity: data.quantity,
-      weight: data.weight? data.weight : 0,
+      weight: data.weight ? data.weight : 0,
       centerId: centerId,
     };
 
@@ -127,5 +119,4 @@ export class StorageAddComponent implements OnInit{
   onCancel(): void {
     this.router.navigate(['/storage']);
   }
-
 }

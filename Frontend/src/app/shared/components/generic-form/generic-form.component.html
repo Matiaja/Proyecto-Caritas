@@ -1,8 +1,8 @@
 <div class="d-flex justify-content-center mt-5">
-<div class="card container p-md-3 shadow-sm">
-  <div class="card-header d-flex justify-content-between align-items-center">
-    <h4 class="text-center mb-0">{{ data.title }}</h4>
-  </div>
+  <div class="card container p-md-3 shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h4 class="text-center mb-0">{{ data.title }}</h4>
+    </div>
     <form [formGroup]="form" class="py-3 px-2" (ngSubmit)="onSubmit()">
       <div class="form-group mb-3" *ngFor="let field of data.fields">
         <label [for]="field.name" class="form-label">{{ field.label }}</label>
@@ -16,7 +16,7 @@
             [type]="field.type"
             [placeholder]="field.placeholder || ''"
           />
-          <input 
+          <input
             *ngSwitchCase="'text'"
             [id]="field.name"
             [formControlName]="field.name"
@@ -24,7 +24,7 @@
             [type]="field.type"
             [placeholder]="field.placeholder || ''"
           />
-          
+
           <input
             *ngSwitchCase="'textarea'"
             [id]="field.name"
@@ -44,7 +44,7 @@
               {{ option.label }}
             </option>
           </select>
-        
+
           <!-- Campo numérico -->
           <input
             *ngSwitchCase="'number'"
@@ -66,7 +66,7 @@
             pattern="[0-9]{10}"
             inputmode="numeric"
           />
-        
+
           <div class="position-relative" *ngSwitchCase="'searchProducts'">
             <input
               [id]="field.name"
@@ -76,13 +76,17 @@
               [placeholder]="field.placeholder || ''"
               (input)="onSearchChange($event, field.name)"
               [value]="getProductLabel(field.name)"
-              />
-            <ul *ngIf="suggestions[field.name]?.length" 
-                class="list-group position-absolute w-100 bg-white shadow mt-1"
-                style="z-index: 1050; max-height: 200px; overflow-y: auto;">
-              <li *ngFor="let option of suggestions[field.name]" 
-                  class="list-group-item list-group-item-action"
-                  (click)="selectSearchResult(field.name, option)">
+            />
+            <ul
+              *ngIf="suggestions[field.name]?.length"
+              class="list-group position-absolute w-100 bg-white shadow mt-1"
+              style="z-index: 1050; max-height: 200px; overflow-y: auto"
+            >
+              <li
+                *ngFor="let option of suggestions[field.name]"
+                class="list-group-item list-group-item-action"
+                (click)="selectSearchResult(field.name, option)"
+              >
                 {{ option.label }}
               </li>
             </ul>
@@ -98,61 +102,130 @@
             [placeholder]="field.placeholder || ''"
           />
         </ng-container>
-        
-        <div *ngIf="form.get(field.name)?.invalid && form.get(field.name)?.touched && field.name !== 'quantity'" class="text-danger">
+
+        <div
+          *ngIf="
+            form.get(field.name)?.invalid &&
+            form.get(field.name)?.touched &&
+            field.name !== 'quantity'
+          "
+          class="text-danger"
+        >
           {{ field.errorMessage }}
         </div>
 
-        <div *ngIf="field.name === 'quantity' && form.get(field.name)?.touched && (form.get(field.name)?.hasError('required') || form.get(field.name)?.hasError('min'))" class="text-danger">
+        <div
+          *ngIf="
+            field.name === 'quantity' &&
+            form.get(field.name)?.touched &&
+            (form.get(field.name)?.hasError('required') || form.get(field.name)?.hasError('min'))
+          "
+          class="text-danger"
+        >
           {{ field.errorMessage }}
         </div>
 
-        <div *ngIf="field.name === 'quantity' && form.get(field.name)?.touched && !form.get(field.name)?.hasError('required') && !form.get(field.name)?.hasError('min') && form.get(field.name)?.hasError('quantityInvalid')" class="text-danger">
+        <div
+          *ngIf="
+            field.name === 'quantity' &&
+            form.get(field.name)?.touched &&
+            !form.get(field.name)?.hasError('required') &&
+            !form.get(field.name)?.hasError('min') &&
+            form.get(field.name)?.hasError('quantityInvalid')
+          "
+          class="text-danger"
+        >
           {{ form.get(field.name)?.getError('quantityInvalid') }}
         </div>
 
-        <div *ngIf="field.name === 'phoneNumber' && form.get(field.name)?.touched && form.get(field.name)?.hasError('required')" class="text-danger">
+        <div
+          *ngIf="
+            field.name === 'phoneNumber' &&
+            form.get(field.name)?.touched &&
+            form.get(field.name)?.hasError('required')
+          "
+          class="text-danger"
+        >
           El número de teléfono es requerido.
         </div>
 
-        <div *ngIf="field.name === 'phoneNumber' && form.get(field.name)?.touched && !form.get(field.name)?.hasError('required') && form.get(field.name)?.hasError('pattern')" class="text-danger">
+        <div
+          *ngIf="
+            field.name === 'phoneNumber' &&
+            form.get(field.name)?.touched &&
+            !form.get(field.name)?.hasError('required') &&
+            form.get(field.name)?.hasError('pattern')
+          "
+          class="text-danger"
+        >
           El teléfono debe tener 10 dígitos numéricos.
         </div>
 
-        <div *ngIf="field.name === 'email' && form.get(field.name)?.touched && form.get(field.name)?.hasError('required')" class="text-danger">
+        <div
+          *ngIf="
+            field.name === 'email' &&
+            form.get(field.name)?.touched &&
+            form.get(field.name)?.hasError('required')
+          "
+          class="text-danger"
+        >
           El correo electrónico es requerido.
         </div>
 
-        <div *ngIf="field.name === 'email' && form.get(field.name)?.touched && !form.get(field.name)?.hasError('required') && form.get(field.name)?.hasError('email')" class="text-danger">
+        <div
+          *ngIf="
+            field.name === 'email' &&
+            form.get(field.name)?.touched &&
+            !form.get(field.name)?.hasError('required') &&
+            form.get(field.name)?.hasError('email')
+          "
+          class="text-danger"
+        >
           El correo electrónico no es válido.
         </div>
 
-        <div *ngIf="field.name === 'password' && form.get(field.name)?.touched && form.get(field.name)?.hasError('required')" class="text-danger">
+        <div
+          *ngIf="
+            field.name === 'password' &&
+            form.get(field.name)?.touched &&
+            form.get(field.name)?.hasError('required')
+          "
+          class="text-danger"
+        >
           La contraseña es requerida.
         </div>
 
-        <div *ngIf="field.name === 'password' && form.get(field.name)?.touched && !form.get(field.name)?.hasError('required') && form.get(field.name)?.hasError('minlength')" class="text-danger">
+        <div
+          *ngIf="
+            field.name === 'password' &&
+            form.get(field.name)?.touched &&
+            !form.get(field.name)?.hasError('required') &&
+            form.get(field.name)?.hasError('minlength')
+          "
+          class="text-danger"
+        >
           La contraseña debe tener al menos 8 caracteres.
         </div>
 
-        <div *ngIf="field.name === 'password' && form.get(field.name)?.touched && !form.get(field.name)?.hasError('required') && !form.get(field.name)?.hasError('minlength') && form.get(field.name)?.hasError('pattern')" class="text-danger">
+        <div
+          *ngIf="
+            field.name === 'password' &&
+            form.get(field.name)?.touched &&
+            !form.get(field.name)?.hasError('required') &&
+            !form.get(field.name)?.hasError('minlength') &&
+            form.get(field.name)?.hasError('pattern')
+          "
+          class="text-danger"
+        >
           La contraseña debe contener al menos un número.
         </div>
-
       </div>
-      @if(showButtons) {
+      @if (showButtons) {
         <div class="form-actions d-flex justify-content-end gap-4 mt-3">
-          <button type="button" class="btn btn-secondary" (click)="onCancel()">
-            Cancelar
-          </button>
-          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
-            Guardar
-          </button>
+          <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancelar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Guardar</button>
         </div>
       }
     </form>
   </div>
 </div>
-
-
-  

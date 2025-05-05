@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, OnChanges } from '@angular/core';
+import { Component, EventEmitter, Input, Output, SimpleChanges, OnChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -11,9 +11,9 @@ import { GlobalStateService } from '../../../services/global/global-state.servic
 @Component({
   selector: 'generic-form',
   standalone: true,
-  imports: [ ReactiveFormsModule, CommonModule ],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './generic-form.component.html',
-  styleUrl: './generic-form.component.css'
+  styleUrl: './generic-form.component.css',
 })
 export class GenericFormComponent implements OnChanges {
   @Input() data!: {
@@ -37,10 +37,10 @@ export class GenericFormComponent implements OnChanges {
   @Output() formChange = new EventEmitter<FormGroup>();
 
   form!: FormGroup;
-  suggestions: { [key: string]: any[] } = {};
+  suggestions: Record<string, any[]> = {};
 
   constructor(
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     private productService: ProductService,
     private stockService: StockService,
     private globalStateService: GlobalStateService
@@ -51,13 +51,11 @@ export class GenericFormComponent implements OnChanges {
       this.initializeForm();
       this.formChange.emit(this.form);
       this.addAsyncValidatorsForEgreso();
-
     }
-    
   }
 
   private initializeForm(): void {
-    const controls: { [key: string]: any } = {};
+    const controls: Record<string, any> = {};
     this.data.fields.forEach((field) => {
       controls[field.name] = [
         field.value || '',
@@ -70,7 +68,7 @@ export class GenericFormComponent implements OnChanges {
   private addAsyncValidatorsForEgreso(): void {
     const typeControl = this.form.get('type');
     const quantityControl = this.form.get('quantity');
-    
+
     if (typeControl && quantityControl) {
       typeControl.valueChanges.subscribe((type: string) => {
         if (type === 'Egreso') {
@@ -89,17 +87,15 @@ export class GenericFormComponent implements OnChanges {
       const centerId = this.globalStateService.getCurrentCenterId();
       const newQuantity = control.value;
 
-      return this.stockService
-        .validateQuantity(centerId!, productId, newQuantity)
-        .pipe(
-          switchMap(() => {
-            return of(null);
-          }),
-          catchError((error) => {
-            console.log('Error validating quantity:', error);
-            return of({ quantityInvalid: error.error.message });
-          })
-        );
+      return this.stockService.validateQuantity(centerId!, productId, newQuantity).pipe(
+        switchMap(() => {
+          return of(null);
+        }),
+        catchError((error) => {
+          console.log('Error validating quantity:', error);
+          return of({ quantityInvalid: error.error.message });
+        })
+      );
     };
   }
 
@@ -110,16 +106,18 @@ export class GenericFormComponent implements OnChanges {
       this.suggestions[value] = [];
       return;
     }
-    this.productService.searchProducts(searchTerm).subscribe((products) => {
-      this.suggestions[value] = products.map((product: any) => ({
-        value: product.id,
-        label: product.name,
+    this.productService.searchProducts(searchTerm).subscribe(
+      (products) => {
+        this.suggestions[value] = products.map((product: any) => ({
+          value: product.id,
+          label: product.name,
         }));
-    },
-    (error) => {
-      console.error('Error searching products:', error);
-      this.suggestions[value] = [];
-    });
+      },
+      (error) => {
+        console.error('Error searching products:', error);
+        this.suggestions[value] = [];
+      }
+    );
   }
 
   selectSearchResult(field: string, value: any) {
@@ -142,5 +140,4 @@ export class GenericFormComponent implements OnChanges {
   onCancel(): void {
     this.formCancel.emit();
   }
-
 }
