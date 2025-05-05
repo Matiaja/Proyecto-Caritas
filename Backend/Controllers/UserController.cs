@@ -274,6 +274,7 @@ namespace ProyectoCaritas.Controllers
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim("CenterId", centerId.ToString() ?? string.Empty),
                 new Claim(ClaimTypes.Name, user.UserName ?? string.Empty)
             };
 
