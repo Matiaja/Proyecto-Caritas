@@ -21,3 +21,5 @@ obj/
 
 # Ignorar archivos de logs
 *.log
+
+appsettings.json
