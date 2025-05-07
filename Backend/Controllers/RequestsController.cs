@@ -87,6 +87,7 @@ namespace ProyectoCaritas.Controllers
             var request = await _context.Requests
                 .Include(r => r.RequestingCenter)
                 .Include(r => r.OrderLines)
+                    .ThenInclude(ol => ol.DonationRequests)
                 .FirstOrDefaultAsync(r => r.Id == id);
 
             if (request == null)
@@ -346,10 +347,16 @@ namespace ProyectoCaritas.Controllers
                {
                    Id = ol.Id,
                    RequestId = ol.RequestId,
-                   DonationRequestId = ol.DonationRequestId,
                    Quantity = ol.Quantity,
                    Description = ol.Description,
-                   ProductId = ol.ProductId
+                   ProductId = ol.ProductId,
+                   DonationRequests = ol.DonationRequests?.Select(dr => new GetDonationRequestDTO
+                   {
+                       Id = dr.Id,
+                       AssignedCenterId = dr.AssignedCenterId,
+                       Quantity = dr.Quantity,
+                       Status = dr.Status
+                   }).ToList()
                }).ToList() ?? new List<OrderLineDTO>(),
                RequestingCenter = request.RequestingCenter != null ? new GetCenterDTO
                {

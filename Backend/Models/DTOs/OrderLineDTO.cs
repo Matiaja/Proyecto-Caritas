@@ -6,10 +6,11 @@ namespace ProyectoCaritas.Models.DTOs
     {
         public int Id { get; set; }
         public int? RequestId { get; set; }
-        public int? DonationRequestId { get; set; }
+
         [Range(1, int.MaxValue, ErrorMessage = "Quantity must be greater than 0.")]
         public int Quantity { get; set; }
         public string? Description { get; set; }
         public int? ProductId { get; set; }
+        public ICollection<GetDonationRequestDTO>? DonationRequests { get; set; } = new List<GetDonationRequestDTO>();
     }
 }

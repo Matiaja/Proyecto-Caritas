@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../../services/product/product.service';
 import { Product } from '../../../models/product.model';
 import { CommonModule, Location } from '@angular/common';
@@ -9,11 +9,15 @@ import { OrderLine } from '../../../models/orderLine.model';
 import { UiTableComponent } from '../../../shared/components/ui-table/ui-table.component';
 import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
 import { StockService } from '../../../services/stock/stock.service';
+import { FormsModule } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
+import { DonationRequestService } from '../../../services/donationRequest/donation-request.service';
+import { DonationRequest } from '../../../models/donationRequest.model';
 
 @Component({
   selector: 'app-request-assign',
   standalone: true,
-  imports: [UiTableComponent, CommonModule, BreadcrumbComponent],
+  imports: [UiTableComponent, CommonModule, BreadcrumbComponent, FormsModule],
   templateUrl: './request-assign.component.html',
   styleUrl: './request-assign.component.css',
 })
@@ -23,7 +27,10 @@ export class RequestAssignComponent implements OnInit {
     private productService: ProductService,
     private requestService: RequestService,
     private stockService: StockService,
-    private location: Location
+    private donationRequestService: DonationRequestService,
+    private location: Location,
+    private toastr: ToastrService,
+    private router: Router,
   ) {}
 
   // parametros
@@ -44,6 +51,7 @@ export class RequestAssignComponent implements OnInit {
     orderLines: [],
   } as RequestModel;
   orderLine: OrderLine = {} as OrderLine;
+  pendingQuantity = 0;
   // variables de tabla
   title = '';
   columnHeaders: Record<string, string> = {
@@ -56,8 +64,14 @@ export class RequestAssignComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.subscribe((params) => {
-      this.requestId = params['id'];
-      if (this.requestId) {
+      this.requestId = +params['id'];
+    });
+
+    this.route.queryParams.subscribe((queryParams) => {
+      this.productId = queryParams['productId'] ? Number(queryParams['productId']) : null;
+      this.orderLineId = queryParams['orderLineId'] ? Number(queryParams['orderLineId']) : null;
+
+      if (this.requestId && this.productId && this.orderLineId) {
         this.loadRequest(this.requestId);
       }
     });
@@ -70,6 +84,8 @@ export class RequestAssignComponent implements OnInit {
         const ol = request.orderLines.find((line) => line.id === this.orderLineId);
         if (ol) {
           this.orderLine = ol;
+          const assigned = ol.donationRequests?.reduce((sum, dr) => sum + dr.quantity, 0) ?? 0;
+          this.pendingQuantity = ol.quantity - assigned;
         }
         this.loadProduct();
       },
@@ -79,14 +95,9 @@ export class RequestAssignComponent implements OnInit {
     });
   }
   loadProduct() {
-    this.route.queryParams.subscribe((queryParams) => {
-      this.productId = queryParams['productId'] ? Number(queryParams['productId']) : null;
-      this.orderLineId = queryParams['orderLineId'] ? Number(queryParams['orderLineId']) : null;
-
-      if (this.productId && this.orderLineId) {
-        this.searchProductInStock(this.productId);
-      }
-    });
+    if (this.productId && this.orderLineId) {
+      this.searchProductInStock(this.productId);
+    }
   }
 
   searchProductInStock(productId: number | null) {
@@ -110,8 +121,10 @@ export class RequestAssignComponent implements OnInit {
     if (this.product && this.product.stocks && this.request && this.request.requestingCenter) {
       this.stockService.getProductInStocks(this.product.id).subscribe({
         next: (stocks) => {
-          this.stocks = stocks;
-          console.log(stocks);
+          this.stocks = stocks.map(stock => ({
+            ...stock,
+            assignQuantity: this.getMaxAssignableQuantity(stock) // Inicializar con el valor máximo
+          }));
         },
         error: (error) => {
           console.error(error);
@@ -125,7 +138,38 @@ export class RequestAssignComponent implements OnInit {
   }
 
   assign(row: any): void {
-    console.log(row);
+    const quantity = Number(row.assignQuantity);
+
+    if (!quantity || quantity <= 0) {
+      this.toastr.warning('Ingresá una cantidad válida.');
+      return;
+    }
+
+    if (quantity > this.getMaxAssignableQuantity(row)) {
+      this.toastr.warning('La cantidad excede el máximo permitido.');
+      return;
+    }
+
+    const donationRequest: DonationRequest = {
+      orderLineId: this.orderLineId!,
+      assignedCenterId: row.centerId,
+      quantity: quantity,
+      status: 'Asignada'
+    };
+    
+    this.donationRequestService.addDonationRequest(donationRequest).subscribe({
+      next: () => {
+        this.toastr.success('Centro asignado correctamente.');
+        this.router.navigate(['/requests', this.requestId]);
+      },
+      error: (err) => {
+        this.toastr.error(err.error.message || 'Error al asignar el centro.');
+      }
+    });
+  }
+
+  getMaxAssignableQuantity(row: any): number {
+    return Math.min(row.stockQuantity, this.pendingQuantity);
   }
 
   onAddElement = null;

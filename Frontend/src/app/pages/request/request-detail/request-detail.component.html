@@ -9,15 +9,15 @@
       </div>
       <div class="row align-items-center py-4 g-4 px-3">
         <div class="col-sm-6">
-          <label class="fw-medium">Centro solicitante:</label>
+          <span class="fw-medium">Centro solicitante:</span>
           <span class="ps-2">{{ request.requestingCenter?.name }}</span>
         </div>
         <div class="col-sm-6">
-          <label class="fw-medium">Fecha:</label>
+          <span class="fw-medium">Fecha:</span>
           <span class="ps-2">{{ request.requestDate | date: 'dd/MM/yyyy' }}</span>
         </div>
         <div class="col-sm-6">
-          <label class="fw-medium">Nivel de urgencia:</label>
+          <span class="fw-medium">Nivel de urgencia:</span>
           <span class="ps-2">{{ request.urgencyLevel }}</span>
         </div>
       </div>

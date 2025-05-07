@@ -70,7 +70,7 @@ export class RequestDetailComponent implements OnInit {
     this.orderLines = this.request.orderLines.map((line) => {
       const orderLine = {
         ...line,
-        isAssigned: line.donationRequestId !== null ? 'Sí' : 'No',
+        isAssigned: 'No',
         productName: '',
       };
       this.productService.getProductById(line.productId).subscribe({

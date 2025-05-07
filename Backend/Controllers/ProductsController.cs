@@ -320,7 +320,6 @@ namespace ProyectoCaritas.Controllers
                {
                    Id = x.Id,
                    RequestId = x.RequestId,
-                   DonationRequestId = x.DonationRequestId,
                    Quantity = x.Quantity,
                    Description = x.Description,
                    ProductId = x.ProductId

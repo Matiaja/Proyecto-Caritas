@@ -68,7 +68,6 @@ namespace ProyectoCaritas.Controllers
             var orderLine = new OrderLine
             {
                 RequestId = orderLineDTO.RequestId,
-                DonationRequestId = orderLineDTO.DonationRequestId,
                 Quantity = orderLineDTO.Quantity,
                 Description = orderLineDTO.Description,
                 Product = product
@@ -124,7 +123,6 @@ namespace ProyectoCaritas.Controllers
             orderLine.Description = orderLineDTO.Description;
             orderLine.Product = product;
             orderLine.RequestId = orderLineDTO.RequestId;
-            orderLine.DonationRequestId = orderLineDTO.DonationRequestId;
 
             await context.SaveChangesAsync();
 
@@ -174,7 +172,6 @@ namespace ProyectoCaritas.Controllers
             {
                 Id = orderLine.Id,
                 RequestId = orderLine.RequestId,
-                DonationRequestId = orderLine.DonationRequestId,
                 Quantity = orderLine.Quantity,
                 Description = orderLine.Description,
                 ProductId = orderLine.ProductId

@@ -1,7 +1,9 @@
+import { DonationRequest } from "./donationRequest.model";
+
 export interface OrderLine {
   id?: number;
   requestId?: number;
-  donationRequestId?: number;
+  donationRequests?: DonationRequest[];
   productId: number;
   quantity: number;
   description: string;

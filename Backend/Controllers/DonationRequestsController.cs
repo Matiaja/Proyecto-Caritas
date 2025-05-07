@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProyectoCaritas.Data;
@@ -51,6 +52,7 @@ namespace ProyectoCaritas.Controllers
 
         // POST: api/DonationRequests
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<DonationRequestDTO>> CreateDonationRequest(DonationRequestDTO addDonationRequestDto)
         {
             // validate if the DonationRequest was sended
@@ -65,7 +67,7 @@ namespace ProyectoCaritas.Controllers
             }
 
             // validate if the Center was sended
-            if (addDonationRequestDto.AssignedCenterId.ToString() == null || addDonationRequestDto.AssignedCenterId.ToString() == "0")
+            if (addDonationRequestDto.AssignedCenterId <= 0 || addDonationRequestDto.AssignedCenterId.ToString() == null)
             {
                 return BadRequest(new
                 {
@@ -101,6 +103,16 @@ namespace ProyectoCaritas.Controllers
                     Status = "400",
                     Error = "Bad Request",
                     Message = $"Order Line with ID {addDonationRequestDto.OrderLineId} not found."
+                });
+            }
+            // validate if quantity is greater than 0
+            if (addDonationRequestDto.Quantity <= 0)
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "Quantity must be greater than 0."
                 });
             }
 
@@ -142,7 +154,7 @@ namespace ProyectoCaritas.Controllers
                 OrderLineId = addDonationRequestDto.OrderLineId,
                 AssignedCenterId = addDonationRequestDto.AssignedCenterId,
                 Quantity = addDonationRequestDto.Quantity,
-                Status = "Pendiente"
+                Status = "Asignada"
             };
             _context.DonationRequests.Add(donationRequest);
             await _context.SaveChangesAsync();
@@ -245,7 +257,6 @@ namespace ProyectoCaritas.Controllers
                 {
                     Id = donationRequest.OrderLine.Id,
                     RequestId = donationRequest.OrderLine.RequestId,
-                    DonationRequestId = donationRequest.OrderLine.DonationRequestId,
                     Quantity = donationRequest.OrderLine.Quantity,
                     Description = donationRequest.OrderLine.Description,
                     ProductId = donationRequest.OrderLine.ProductId
