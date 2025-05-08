@@ -33,6 +33,7 @@ export class UiTableComponent<T extends Record<string, any>> implements OnChange
   @Input() showEditButton = false;
   @Input() showDeleteButton = false;
   @Input() showSelectButton = true;
+  @Input() showFilterButton = true;
   @Input() showSearchBar = false;
   @Input() showCenterSelect = false;
   @Input() searchColumns: string[] = [];

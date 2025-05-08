@@ -1,5 +1,6 @@
 <div class="d-flex justify-content-center mt-5">
   <div class="card container w-100 w-md-75 mx-auto p-md-3 shadow-sm">
+    @if (showFilterButton) {
     <div>
       <button
         class="btn btn-link text-primary p-0 border-0 d-flex align-items-center mb-2"
@@ -9,7 +10,7 @@
         <i class="bi bi-chevron-down transition-icon" [class.rotate-icon]="filtersVisible"></i>
       </button>
     </div>
-
+    }
     @if (!isMobileView) {
       <!-- Filtros -->
       <div *ngIf="showProductsFilters" class="filters-container" [class.visible]="filtersVisible">

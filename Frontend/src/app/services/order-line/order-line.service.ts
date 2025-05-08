@@ -12,6 +12,6 @@ export class OrderLineService {
   constructor(private http: HttpClient) {}
 
   getOrderLineById(orderLineId: number): Observable<OrderLine> {
-    return this.http.get<OrderLine>(`${this.baseUrl}/orderLines/${orderLineId}`);
+    return this.http.get<OrderLine>(this.baseUrl + 'orderLines/' + orderLineId);
   }
 }

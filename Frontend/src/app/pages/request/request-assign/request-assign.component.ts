@@ -65,16 +65,12 @@ export class RequestAssignComponent implements OnInit {
   ngOnInit(): void {
     this.route.params.subscribe((params) => {
       this.requestId = +params['id'];
+      this.orderLineId = +params['idorderline'];
     });
 
-    this.route.queryParams.subscribe((queryParams) => {
-      this.productId = queryParams['productId'] ? Number(queryParams['productId']) : null;
-      this.orderLineId = queryParams['orderLineId'] ? Number(queryParams['orderLineId']) : null;
-
-      if (this.requestId && this.productId && this.orderLineId) {
-        this.loadRequest(this.requestId);
-      }
-    });
+    if (this.requestId && this.orderLineId) {
+      this.loadRequest(this.requestId);
+    }
   }
 
   loadRequest(reqId: number) {
@@ -95,7 +91,8 @@ export class RequestAssignComponent implements OnInit {
     });
   }
   loadProduct() {
-    if (this.productId && this.orderLineId) {
+    if (this.orderLineId) {
+      this.productId = this.orderLine.productId;
       this.searchProductInStock(this.productId);
     }
   }
@@ -160,7 +157,7 @@ export class RequestAssignComponent implements OnInit {
     this.donationRequestService.addDonationRequest(donationRequest).subscribe({
       next: () => {
         this.toastr.success('Centro asignado correctamente.');
-        this.router.navigate(['/requests', this.requestId]);
+        this.router.navigate(['/orderline', this.orderLineId]);
       },
       error: (err) => {
         this.toastr.error(err.error.message || 'Error al asignar el centro.');

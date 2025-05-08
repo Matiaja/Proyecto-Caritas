@@ -90,13 +90,11 @@ export class RequestDetailComponent implements OnInit {
   }
 
   assign(row: any): void {
-    this.router.navigate(['/requests', this.request.id, 'assign'], {
-      queryParams: { orderLineId: row.id, productId: row.productId },
-    });
+    this.router.navigate(['/requests', this.request.id, 'assign', row.id]);
   }
 
   onSelectOrderLine(ol: any) {
-    console.log('Select order line', ol);
+    this.router.navigate(['/orderline', ol.id]);
   }
 
   goBack() {
