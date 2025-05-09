@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using ProyectoCaritas.Data;
@@ -19,6 +21,7 @@ namespace ProyectoCaritas.Controllers
         }
 
         // GET: api/Stocks
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GetStockDTO>>> GetAllStocks()
         {
@@ -30,6 +33,7 @@ namespace ProyectoCaritas.Controllers
         }
 
         // GET: api/Stocks/{id}
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<GetStockDTO>> GetStockById(int id)
         {
@@ -52,19 +56,11 @@ namespace ProyectoCaritas.Controllers
         }
 
         // POST: api/Stocks
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<StockDTO>> AddStock(StockDTO StockDTO)
         {
             // Validaciones
-            //if (StockDTO.CenterId <= 0 || string.IsNullOrEmpty(StockDTO.Status))
-            //{
-            //    return BadRequest(new
-            //    {
-            //        Status = "400",
-            //        Error = "Bad Request",
-            //        Message = "Invalid data. Ensure all required fields are provided."
-            //    });
-            //}
 
             var center = await _context.Centers.FindAsync(StockDTO.CenterId);
             if (center == null)
@@ -234,6 +230,7 @@ namespace ProyectoCaritas.Controllers
         }
 
         // GET: api/Stocks/validate-quantity
+        [Authorize]
         [HttpGet("validate-quantity")]
         public async Task<IActionResult> ValidateQuantity(int centerId, int productId, int newQuantity, string type)
         {
@@ -259,6 +256,7 @@ namespace ProyectoCaritas.Controllers
         }
 
         // GET: api/Stocks/product-with-stock
+        [Authorize]
         [HttpGet("product-with-stock")]
         public async Task<ActionResult<List<ProductStockDTO>>> GetProductWithStock(
             [FromHeader] string centerId,
@@ -266,6 +264,25 @@ namespace ProyectoCaritas.Controllers
             [FromQuery] string? sortBy = null,
             [FromQuery] string? order = "asc")
         {
+            /*
+            Devuelve todos los productos con stock en un centro específico,
+            con la opción de filtrar por categoría y ordenar por nombre o cantidad de stock.
+            */
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return Unauthorized();
+
+            var user = await _context.Users.Include(u => u.Center).FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+                return Unauthorized();
+
+            // Si no es admin, forzar su propio centro
+            if (!User.IsInRole("Admin"))
+            {
+                centerId = user.CenterId?.ToString() ?? throw new InvalidOperationException("CenterId cannot be null.");
+            }
+
             if (!int.TryParse(centerId, out int centerIdInt))
                 return BadRequest(new { message = "Invalid centerId" });
 
@@ -315,6 +332,9 @@ namespace ProyectoCaritas.Controllers
         public async Task<ActionResult<List<ProductStockDTO>>> GetMoreQuantityProduct(
             [FromHeader] string centerId)
         {
+            /*
+            Devuelve los 5 productos con más stock en un centro específico.
+            */
             if (!int.TryParse(centerId, out int centerIdInt))
                 return BadRequest(new { message = "Invalid centerId" });
 
@@ -371,6 +391,9 @@ namespace ProyectoCaritas.Controllers
         [HttpGet("product-with-all-stocks")]
         public async Task<ActionResult<List<ProductStockDTO>>> GetProductWithAllStocks([FromHeader] string productId)
         {
+            /*
+            Devuelve la cantidad de stock en todos los centros para un producto específico. 
+             */
             if (int.TryParse(productId, out int productIdInt))
             {
                 var productWithStock = await _context.Stocks
@@ -400,6 +423,9 @@ namespace ProyectoCaritas.Controllers
         [HttpGet("product-with-stock-for-id")]
         public async Task<ActionResult<List<GetStockDTO>>> GetProductWithStock([FromHeader] int centerId, [FromHeader] int productId)
         {
+            /*
+            Devuelve todos los movimientos (ingresos y egresos) de un producto en un centro específico.
+            */
             var productWithStock = await _context.Stocks
                 .Where(s => s.CenterId == centerId && s.ProductId == productId)
                 .Include(s => s.Product)
