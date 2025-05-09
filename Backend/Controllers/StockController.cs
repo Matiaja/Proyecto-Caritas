@@ -61,6 +61,13 @@ namespace ProyectoCaritas.Controllers
         public async Task<ActionResult<StockDTO>> AddStock(StockDTO StockDTO)
         {
             // Validaciones
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return Unauthorized();
+
+            var user = await _context.Users.Include(u => u.Center).FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+                return Unauthorized();
 
             var center = await _context.Centers.FindAsync(StockDTO.CenterId);
             if (center == null)
@@ -72,18 +79,31 @@ namespace ProyectoCaritas.Controllers
                     Message = "Center not found."
                 });
             }
-            if (StockDTO.ProductId.HasValue)
+
+            if (user.CenterId != StockDTO.CenterId)
             {
-                var product = await _context.Products.FindAsync(StockDTO.ProductId);
-                if (product == null)
+                return BadRequest(new
                 {
-                    return BadRequest(new
-                    {
-                        Status = "400",
-                        Error = "Bad Request",
-                        Message = "Product not found."
-                    });
-                }
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "You cannot modify stock to a different center."
+                });
+            }
+
+            if (!StockDTO.ProductId.HasValue)
+            {
+                return BadRequest(new { message = "ProductId is required." });
+            }
+
+            var product = await _context.Products.FindAsync(StockDTO.ProductId);
+            if (product == null)
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "Product not found."
+                });
             }
 
             var result = await ValidateQuantity(StockDTO.CenterId, (int)StockDTO.ProductId, StockDTO.Quantity, StockDTO.Type);
@@ -179,7 +199,6 @@ namespace ProyectoCaritas.Controllers
             existingStock.Description = updateGetStockDTO.Description;
             existingStock.Quantity = updateGetStockDTO.Quantity;
             existingStock.Weight = updateGetStockDTO.Weight;
-            //existingStock.Status = updateGetStockDTO.Status;
             existingStock.Type = updateGetStockDTO.Type;
 
             _context.Entry(existingStock).State = EntityState.Modified;
@@ -388,12 +407,13 @@ namespace ProyectoCaritas.Controllers
 
 
         // GET: api/Stocks/product-with-all-stock
+        [Authorize]
         [HttpGet("product-with-all-stocks")]
         public async Task<ActionResult<List<ProductStockDTO>>> GetProductWithAllStocks([FromHeader] string productId)
         {
             /*
             Devuelve la cantidad de stock en todos los centros para un producto específico. 
-             */
+            */
             if (int.TryParse(productId, out int productIdInt))
             {
                 var productWithStock = await _context.Stocks
@@ -420,6 +440,7 @@ namespace ProyectoCaritas.Controllers
 
 
         // GET: api/Stocks/product-with-stock-for-id"
+        [Authorize]
         [HttpGet("product-with-stock-for-id")]
         public async Task<ActionResult<List<GetStockDTO>>> GetProductWithStock([FromHeader] int centerId, [FromHeader] int productId)
         {
