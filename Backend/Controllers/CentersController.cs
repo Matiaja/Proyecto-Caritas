@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,7 @@ namespace ProyectoCaritas.Controllers
 
         // GET: api/Centers
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<GetCenterDTO>>> GetAllCenters()
         {
             return await _context.Centers
@@ -34,6 +36,7 @@ namespace ProyectoCaritas.Controllers
 
         // GET: api/Centers/{id}
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<GetCenterDTO>> GetCenterById(int id)
         {
             var center = await _context.Centers
@@ -85,6 +88,7 @@ namespace ProyectoCaritas.Controllers
 
         // PUT: api/Centers/{id}
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdateCenter(int id, CenterDTO centerDto)
         {
             var center = _context.Centers.Find(id);
@@ -92,6 +96,20 @@ namespace ProyectoCaritas.Controllers
             {
                 return NotFound();
             }
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return Unauthorized();
+
+            var user = await _context.Users.Include(u => u.Center).FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+                return Unauthorized();
+
+            if (!User.IsInRole("Admin") && user.CenterId != center.Id)
+            {
+                return Forbid();
+            }
+
             center.Name = centerDto.Name;
             center.Location = centerDto.Location;
             center.Manager = centerDto.Manager;

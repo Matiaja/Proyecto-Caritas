@@ -30,6 +30,7 @@ namespace ProyectoCaritas.Controllers
 
         // GET: api/User
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<UserDTO>>> GetAllUsers()
         {
             var users = await _userManager.Users.ToListAsync();
@@ -151,6 +152,7 @@ namespace ProyectoCaritas.Controllers
 
         // GET: api/User/{id}
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<UserDTO>> GetUserById(string id)
         {
             var user = await _userManager.Users
@@ -161,6 +163,13 @@ namespace ProyectoCaritas.Controllers
             if (user == null)
             {
                 return NotFound(new { message = "User not found" });
+            }
+
+            // Check if the user is authorized to access this information
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (currentUserId != null && currentUserId != id && !User.IsInRole("Admin"))
+            {
+                return Forbid();
             }
 
             var userDTO = new UserDTO
@@ -181,12 +190,23 @@ namespace ProyectoCaritas.Controllers
 
         // GET: api/User/username/{username}
         [HttpGet("username/{username}")]
+        [Authorize]
         public async Task<ActionResult<UserDTO>> GetUserByUsername(string username)
         {
             var user = await _userManager.Users.SingleOrDefaultAsync(u => u.UserName == username);
             if (user == null)
             {
                 return NotFound(new { message = "User not found" });
+            }
+
+            // Check if the user is authorized to access this information
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (currentUserId == null)
+                return Unauthorized();
+
+            if (currentUserId != user.Id && !User.IsInRole("Admin"))
+            {
+                return Forbid();
             }
 
             var userDTO = new UserDTO
@@ -206,6 +226,7 @@ namespace ProyectoCaritas.Controllers
 
         // POST: api/User/register
         [HttpPost("register")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddUser(UserRegisterDTO userRegisterDTO)
         {
             if (string.IsNullOrWhiteSpace(userRegisterDTO.Email))
@@ -301,7 +322,7 @@ namespace ProyectoCaritas.Controllers
         // Creo que la actualizacion de la contraseña conviene hacerla por otra ruta por el tema del hasheo de la contraseña
         // PUT: api/User/{id}
         [HttpPut("{id}")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> UpdateUser(string id, UserDTO userDTO)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -309,6 +330,17 @@ namespace ProyectoCaritas.Controllers
             {
                 return NotFound(new { message = "User not found" });
             }
+            // Check if the user is authorized to update this information
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (currentUserId == null)
+                return Unauthorized();
+
+            if (currentUserId != id && !User.IsInRole("Admin"))
+            {
+                return Forbid();
+            }
+
+            // Validate the input
             if (string.IsNullOrWhiteSpace(userDTO.Email))
             {
                 return BadRequest(new { message = "Email is required." });
@@ -383,6 +415,7 @@ namespace ProyectoCaritas.Controllers
 
         // DELETE: api/User/{id}
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteUser(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
