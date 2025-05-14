@@ -56,7 +56,7 @@ export class StockService {
     });
   }
 
-  getProductWithStock(centerId: number, categoryId?: number, sortBy?: string, order = 'asc'): void {
+  getProductWithStock(centerId: number | null, categoryId?: number, sortBy?: string, order = 'asc', groupByCenter?: boolean): void {
     let params = new HttpParams();
     if (categoryId) {
       params = params.set('categoryId', categoryId.toString());
@@ -65,7 +65,10 @@ export class StockService {
       params = params.set('sortBy', sortBy);
       params = params.set('order', order);
     }
-    const headers = { centerId: centerId.toString() };
+    if (centerId == null && groupByCenter) {
+      params = params.set('groupByCenter', groupByCenter.toString());
+    }
+    const headers = { centerId: centerId?.toString() ?? 'null' };
     this.http
       .get<any[]>(`${this.baseUrl}/product-with-stock`, { headers, params })
       .subscribe((products) => {

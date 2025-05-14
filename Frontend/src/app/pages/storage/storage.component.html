@@ -1,3 +1,25 @@
+@if (isAdmin) {
+  <div class="filters-container">
+    <div class="card-body d-flex flex-wrap gap-2 align-items-center">
+      <span>Centro:</span>
+      <select class="form-select w-auto" [(ngModel)]="selectedCenter" (change)="filterStocks()">
+        <option [ngValue]="null">Todos</option>
+        <option *ngFor="let center of centers" [ngValue]="center.id" [ngClass]="selectedCenter === center.id ? 'selected' : ''">
+          {{ center.name }}
+          </option>
+      </select>
+    </div>
+    @if (selectedCenter === null) {
+      <div class="form-group mt-2">
+        <label>
+          <input type="checkbox" [(ngModel)]="groupByCenter" (change)="loadStock()" />
+          Desglosar por centro
+        </label>
+      </div>
+    }
+  </div>
+}
+
 <ui-table
   [title]="title"
   [displayedColumns]="displayedColumns"
