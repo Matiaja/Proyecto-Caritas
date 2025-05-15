@@ -144,7 +144,7 @@ export class StorageComponent implements OnInit {
       this.groupByCenter = true; // si selecciona todos, al inicio se muestra desglozado
     }
     else {
-      this.groupByCenter = false; // por defecto no desgloza
+      this.groupByCenter = false; // si selecciona un centro no desgloza
     }
     this.loadStock();
   }

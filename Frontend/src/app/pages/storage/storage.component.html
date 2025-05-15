@@ -1,23 +1,39 @@
 @if (isAdmin) {
-  <div class="filters-container">
-    <div class="card-body d-flex flex-wrap gap-2 align-items-center">
-      <span>Centro:</span>
-      <select class="form-select w-auto" [(ngModel)]="selectedCenter" (change)="filterStocks()">
-        <option [ngValue]="null">Todos</option>
-        <option *ngFor="let center of centers" [ngValue]="center.id" [ngClass]="selectedCenter === center.id ? 'selected' : ''">
-          {{ center.name }}
-          </option>
-      </select>
+<div class="container mt-3">
+  <div class="row justify-content-center align-items-center">
+    <!-- select -->
+    <div class="col-md-6 col-sm-12">
+      <div class="row align-items-center">
+        <div class="col-12 col-md-auto">
+          <label for="selectCenter" class="col-form-label mb-0">Centro:</label>
+        </div>
+        <div class="col-12 col-md">
+          <select id="selectCenter" class="form-select" [(ngModel)]="selectedCenter" (change)="filterStocks()">
+            <option [ngValue]="null">Todos</option>
+            <option *ngFor="let center of centers" [ngValue]="center.id"
+              [ngClass]="selectedCenter === center.id ? 'selected' : ''">
+              {{ center.name }}
+            </option>
+          </select>
+        </div>
+      </div>
     </div>
-    @if (selectedCenter === null) {
-      <div class="form-group mt-2">
-        <label>
-          <input type="checkbox" [(ngModel)]="groupByCenter" (change)="loadStock()" />
+
+    <!-- switch -->
+    <div class="col-md-6 col-sm-12 mt-2 mt-md-0 text-center">
+      @if (selectedCenter === null) {
+      <div class="form-check form-switch d-flex justify-content-center align-items-center gap-2">
+        <input class="form-check-input" id="checkBreackdown" type="checkbox" role="switch" [(ngModel)]="groupByCenter"
+          (change)="loadStock()" />
+        <label class="form-check-label" for="checkBreackdown">
           Desglosar por centro
         </label>
       </div>
-    }
+      }
+    </div>
+
   </div>
+</div>
 }
 
 <ui-table
