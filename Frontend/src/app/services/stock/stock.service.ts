@@ -65,7 +65,7 @@ export class StockService {
       params = params.set('sortBy', sortBy);
       params = params.set('order', order);
     }
-    if (centerId == null && groupByCenter) {
+    if (groupByCenter) {
       params = params.set('groupByCenter', groupByCenter.toString());
     }
     const headers = { centerId: centerId?.toString() ?? 'null' };

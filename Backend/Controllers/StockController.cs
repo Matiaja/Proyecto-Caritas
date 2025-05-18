@@ -475,6 +475,32 @@ namespace ProyectoCaritas.Controllers
             /*
             Devuelve todos los movimientos (ingresos y egresos) de un producto en un centro específico.
             */
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return Unauthorized();
+
+            var user = await _context.Users.Include(u => u.Center).FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+                return Unauthorized();
+
+            if (!User.IsInRole("Admin"))
+            {
+                if (!user.CenterId.HasValue)
+                    return BadRequest(new { message = "User does not belong to any center." });
+
+                int userCenterId = user.CenterId ?? 0;
+                if (userCenterId != centerId)
+                    return new ObjectResult(new
+                    {
+                        Status = 403,
+                        Message = "You cannot access stock moves from a different center."
+                    })
+                    {
+                        StatusCode = StatusCodes.Status403Forbidden
+                    };
+            }
+
             var productWithStock = await _context.Stocks
                 .Where(s => s.CenterId == centerId && s.ProductId == productId)
                 .Include(s => s.Product)

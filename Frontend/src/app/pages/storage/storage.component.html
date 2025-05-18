@@ -5,7 +5,7 @@
     <div class="col-md-6 col-sm-12">
       <div class="row align-items-center">
         <div class="col-12 col-md-auto">
-          <label for="selectCenter" class="col-form-label mb-0">Centro:</label>
+          <label for="selectCenter" class="col-form-label mb-0">Seleccione el centro para ver stock:</label>
         </div>
         <div class="col-12 col-md">
           <select id="selectCenter" class="form-select" [(ngModel)]="selectedCenter" (change)="filterStocks()">
@@ -44,7 +44,7 @@
   [mobileColumns]="mobileColumns"
   [mobileHeaders]="mobileHeaders"
   [showAddButton]="true"
-  [showSelectButton]="true"
+  [showSelectButton]="showSelectButton"
   [showSearchBar]="true"
   [showProductsFilters]="true"
   [categories]="categories"

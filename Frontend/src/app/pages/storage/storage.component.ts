@@ -23,9 +23,10 @@ export class StorageComponent implements OnInit {
   isAdmin = false;
   centers: any[] = [];
   selectedCenter: number | null = null;
-  groupByCenter = false;
+  groupByCenter = true;
 
   title = 'Almacén';
+  showSelectButton = true;
   displayedColumns = ['productName', 'productCode', 'stockQuantity'];
   stocks: any[] = [];
   mobileHeaders: { [key: string]: string } = {
@@ -68,7 +69,7 @@ export class StorageComponent implements OnInit {
   ngOnInit() {
     this.stockService.stocks$.subscribe((stocks) => {
       // Si groupByCenter está activado, agregamos el nombre del centro
-      if (this.groupByCenter) {
+      if (this.groupByCenter && this.selectedCenter == null) {
         this.stocks = stocks.map(stock => ({
           ...stock,
           centerName: this.getCenterNameById(stock.centerId)
@@ -106,6 +107,11 @@ export class StorageComponent implements OnInit {
 
   loadStock() {
     if (this.centerId) {
+      if(!this.groupByCenter) {
+        this.showSelectButton = false;
+      } else {
+        this.showSelectButton = true;
+      }
       this.stockService.getProductWithStock(
         this.selectedCenter ?? null,
         this.selectedCategory ?? undefined,
@@ -116,7 +122,7 @@ export class StorageComponent implements OnInit {
       this.totalItems = this.stockService.totalItems;
 
       // Ajustar columnas visibles según si se agrupa por centro
-      if (this.groupByCenter) {
+      if (this.groupByCenter && this.selectedCenter == null) {
         this.displayedColumns = ['productName', 'productCode', 'centerName', 'stockQuantity'];
         this.mobileColumns = ['productName', 'centerName', 'stockQuantity'];
         this.columnHeaders['centerName'] = 'Centro';
@@ -140,12 +146,7 @@ export class StorageComponent implements OnInit {
   }
 
   filterStocks() {
-    if (this.selectedCenter == null) {
-      this.groupByCenter = true; // si selecciona todos, al inicio se muestra desglozado
-    }
-    else {
-      this.groupByCenter = false; // si selecciona un centro no desgloza
-    }
+    this.groupByCenter = true; // si selecciona todos, al inicio se muestra desglozado
     this.loadStock();
   }
 
@@ -161,6 +162,8 @@ export class StorageComponent implements OnInit {
   }
 
   onSelectStock(stock: any) {
-    this.router.navigate(['/storage/detail', stock.productId]);
+    console.log(stock);
+    const extras = this.isAdmin ? { queryParams: { centerId: stock.centerId } } : {};
+    this.router.navigate(['/storage/detail', stock.productId], extras);
   }
 }
