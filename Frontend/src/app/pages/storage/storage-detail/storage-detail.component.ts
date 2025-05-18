@@ -1,16 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UiTableComponent } from '../../../shared/components/ui-table/ui-table.component';
-import { CommonModule, Location } from '@angular/common';
+import { CommonModule, Location, NgClass } from '@angular/common';
 import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
 import { StockService } from '../../../services/stock/stock.service';
 import { ProductService } from '../../../services/product/product.service';
 import { GlobalStateService } from '../../../services/global/global-state.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-storage-detail',
   standalone: true,
-  imports: [UiTableComponent, CommonModule, BreadcrumbComponent],
+  imports: [UiTableComponent, CommonModule, BreadcrumbComponent, FormsModule],
   templateUrl: './storage-detail.component.html',
   styleUrl: './storage-detail.component.css',
 })
@@ -31,6 +32,12 @@ export class StorageDetailComponent implements OnInit {
   ];
 
   centerId: number | null = null;
+
+    filters = {
+      type: '',
+      fromDate: '',
+      toDate: '',
+    };
 
   constructor(
     private stockService: StockService,
@@ -64,6 +71,32 @@ export class StorageDetailComponent implements OnInit {
         console.error('Error al cargar los detalles del stock', error);
       }
     );
+  }
+
+  get dateRangeInvalid(): boolean {
+    const from = this.filters.fromDate ? new Date(this.filters.fromDate) : null;
+    const to = this.filters.toDate ? new Date(this.filters.toDate) : null;
+    return from && to ? from > to : false;
+  }
+
+  get filteredStock() {
+    if (this.dateRangeInvalid) return [];
+
+    return this.stock.filter((item) => {
+      const matchesType = this.filters.type ? item.type === this.filters.type : true;
+      const itemDate = new Date(item.date);
+      const from = this.filters.fromDate ? new Date(this.filters.fromDate) : null;
+      const to = this.filters.toDate ? new Date(this.filters.toDate) : null;
+      const matchesFrom = from ? itemDate >= from : true;
+      const matchesTo = to ? itemDate <= to : true;
+      return matchesType && matchesFrom && matchesTo;
+    });
+  }
+
+
+  formatDate(dateStr: string): string {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('es-AR'); // Ej: 28/01/2025
   }
 
   goBack() {
