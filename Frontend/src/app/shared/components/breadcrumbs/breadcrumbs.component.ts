@@ -11,11 +11,11 @@ import { RouterModule } from '@angular/router';
   styleUrl: './breadcrumbs.component.css',
 })
 export class BreadcrumbComponent implements OnInit {
-  breadcrumbs: { label: string; url: string }[] = [];
+  breadcrumbs$: typeof this.breadcrumbService.breadcrumbs$;
 
-  constructor(private breadcrumbService: BreadcrumbService) {}
-
-  ngOnInit(): void {
-    this.breadcrumbs = this.breadcrumbService.breadcrumbs;
+  constructor(private breadcrumbService: BreadcrumbService) {
+    this.breadcrumbs$ = this.breadcrumbService.breadcrumbs$;
   }
+
+  ngOnInit(): void {}
 }

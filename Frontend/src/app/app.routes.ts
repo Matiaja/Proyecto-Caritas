@@ -39,12 +39,12 @@ export const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent,
-    data: { hideNavbar: true },
+    data: { hideNavbar: true, hideFooter: true },
   },
   {
     path: 'signup',
     component: SignupComponent,
-    data: { hideNavbar: true },
+    data: { hideNavbar: true, hideFooter: true },
   },
   {
     path: 'admin',

@@ -1,40 +1,39 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { BehaviorSubject } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class BreadcrumbService {
-  breadcrumbs: { label: string; url: string }[] = [];
+  private _breadcrumbs$ = new BehaviorSubject<{ label: string; url: string }[]>([]);
+  breadcrumbs$ = this._breadcrumbs$.asObservable();
 
-  constructor(
-    private router: Router,
-    private activatedRoute: ActivatedRoute
-  ) {
-    this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
-      this.breadcrumbs = this.createBreadcrumbs(this.activatedRoute.root);
+  constructor(private router: Router, private activatedRoute: ActivatedRoute) {
+    this.router.events.pipe(filter(event => event instanceof NavigationEnd)).subscribe(() => {
+      const root = this.activatedRoute.root;
+      const breadcrumbs = this.createBreadcrumbs(root);
+      this._breadcrumbs$.next(breadcrumbs);
     });
   }
 
   private createBreadcrumbs(
     route: ActivatedRoute,
-    url = '',
+    url: string = '',
     breadcrumbs: { label: string; url: string }[] = []
   ): { label: string; url: string }[] {
     const children: ActivatedRoute[] = route.children;
 
-    if (children.length === 0) {
-      return breadcrumbs;
-    }
-
     for (const child of children) {
-      const routeURL: string = child.snapshot.url.map((segment) => segment.path).join('/');
+      const routeURL: string = child.snapshot.url.map(segment => segment.path).join('/');
       if (routeURL !== '') {
         url += `/${routeURL}`;
       }
 
-      breadcrumbs.push({ label: child.snapshot.data['breadcrumb'], url: url });
+      const label = child.snapshot.data['breadcrumb'];
+      if (label) {
+        breadcrumbs.push({ label, url });
+      }
+
       return this.createBreadcrumbs(child, url, breadcrumbs);
     }
 

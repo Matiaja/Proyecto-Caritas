@@ -126,7 +126,7 @@ export class ProductComponent implements OnInit {
   // onEditProduct(product: any) {}
 
   onSelectProduct(product: any) {
-    this.router.navigate(['/products/detail', product.id]);
+    this.router.navigate(['/storage/detail', product.id]);
   }
 
   async onDeleteProduct(product: any) {

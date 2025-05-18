@@ -17,6 +17,7 @@ import { CommonModule } from '@angular/common';
 export class AppComponent implements OnInit {
   title = 'Frontend';
   showNavbar = true;
+  showFooter = true;
 
   constructor(
     private router: Router,
@@ -25,6 +26,7 @@ export class AppComponent implements OnInit {
   ) {
     this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
       this.updateNavbarVisibility();
+      this.updateFooterVisibility();
     });
   }
 
@@ -35,6 +37,15 @@ export class AppComponent implements OnInit {
       this.globalStateService.setCenterId(userData.centerId);
       this.globalStateService.setUserId(userData.userId);
     }
+  }
+
+  private updateFooterVisibility() {  
+    let currentRoute = this.route.root;
+    while (currentRoute.firstChild) {
+      currentRoute = currentRoute.firstChild;
+    }
+    const hideFooter = currentRoute.snapshot.data['hideFooter'];
+    this.showFooter = !hideFooter;
   }
 
   private updateNavbarVisibility() {
