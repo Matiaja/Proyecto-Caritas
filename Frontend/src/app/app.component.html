@@ -8,7 +8,10 @@
     <router-outlet></router-outlet>
   </main>
 
-@if (showFooter) {
-    <app-footer></app-footer>
-  }
+  @if (showFooter) {
+      <app-footer></app-footer>
+    }
+
+
+  <app-chatbot *ngIf="showNavbar"></app-chatbot>
 </div>

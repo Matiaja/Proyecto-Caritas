@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UiTableComponent } from '../../../shared/components/ui-table/ui-table.component';
-import { CommonModule, Location, NgClass } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
 import { StockService } from '../../../services/stock/stock.service';
 import { ProductService } from '../../../services/product/product.service';

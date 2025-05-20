@@ -60,7 +60,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection")) // Especifica la versión de MySQL
     ));
 builder.Services.AddScoped<OrderLineService>();
-
+builder.Services.AddHttpClient();
 // Configurar Identity
 builder.Services.AddIdentity<User, IdentityRole>(
     options =>

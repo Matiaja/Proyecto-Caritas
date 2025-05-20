@@ -1,0 +1,125 @@
+.chatbot-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 350px;
+  max-height: 500px;
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow: hidden;
+}
+
+.chat-header {
+  background-color: #4a6fa5;
+  color: white;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chat-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.chat-messages {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  background-color: #f9f9f9;
+}
+
+.message-bubble {
+  margin-bottom: 12px;
+  max-width: 80%;
+}
+
+.message-bubble.user {
+  margin-left: auto;
+}
+
+.message-content {
+  padding: 10px 15px;
+  border-radius: 18px;
+  display: inline-block;
+  word-wrap: break-word;
+}
+
+.user .message-content {
+  background-color: #4a6fa5;
+  color: white;
+  border-bottom-right-radius: 2px;
+}
+
+.assistant .message-content {
+  background-color: #e5e5ea;
+  color: black;
+  border-bottom-left-radius: 2px;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: #4a6fa5;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.chat-input {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid #ddd;
+  background-color: white;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  outline: none;
+}
+
+.chat-input button {
+  margin-left: 10px;
+  padding: 10px 15px;
+  background-color: #4a6fa5;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.chat-input button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.chat-input button:hover:not(:disabled) {
+  background-color: #3a5a80;
+}

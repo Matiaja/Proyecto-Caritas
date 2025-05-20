@@ -6,11 +6,12 @@ import { BreadcrumbComponent } from './shared/components/breadcrumbs/breadcrumbs
 import { GlobalStateService } from './services/global/global-state.service';
 import { FooterComponent } from './shared/footer/footer.component';
 import { CommonModule } from '@angular/common';
+import { ChatbotComponent } from './shared/components/chatbot/chatbot.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent, FooterComponent, BreadcrumbComponent, CommonModule],
+  imports: [RouterOutlet, NavbarComponent, FooterComponent, BreadcrumbComponent, CommonModule, ChatbotComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
