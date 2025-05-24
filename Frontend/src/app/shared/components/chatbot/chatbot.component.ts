@@ -12,7 +12,8 @@ import { environment } from '../../../../environments/environment';
   styleUrl: './chatbot.component.css'
 })
 export class ChatbotComponent {
-  @Input() show = true;
+  @Input() show = false;
+  hasGreeted = false;
   baseUrl = environment.baseUrl + 'chat/send';
 
   messages: { role: 'user' | 'assistant' | 'system', content: string }[] = [
@@ -95,5 +96,17 @@ export class ChatbotComponent {
       role: 'assistant', 
       content: errorMessage 
     });
+  }
+
+  toggleChat() {
+    this.show = !this.show;
+
+    if (this.show && !this.hasGreeted) {
+      this.messages.push({
+        role: 'assistant',
+        content: '¡Hola! Soy Botín de Cáritas, tu asistente para el sistema de gestión de inventario. ¿En qué puedo ayudarte hoy?'
+      });
+      this.hasGreeted = true;
+    }
   }
 }

@@ -1,3 +1,7 @@
+<button *ngIf="!show" class="chatbot-bubble" (click)="toggleChat()">
+  💬
+</button>
+
 <div *ngIf="show" class="chatbot-container">
   <div class="chat-header">
     <h3>Asistente Cáritas</h3>
@@ -5,13 +9,15 @@
   </div>
 
   <div class="chat-messages">
-    <div *ngFor="let msg of messages" [ngClass]="msg.role">
-      <div class="message-bubble" [class.user]="msg.role === 'user'" [class.assistant]="msg.role === 'assistant'">
-        <strong *ngIf="msg.role === 'user'">Tú:</strong>
-        <strong *ngIf="msg.role === 'assistant'">Asistente:</strong>
-        <div class="message-content">{{ msg.content }}</div>
+    <ng-container *ngFor="let msg of messages">
+      <div *ngIf="msg.role !== 'system'" [ngClass]="msg.role">
+        <div class="message-bubble" [class.user]="msg.role === 'user'" [class.assistant]="msg.role === 'assistant'">
+          <strong *ngIf="msg.role === 'user'">Tú:</strong>
+          <strong *ngIf="msg.role === 'assistant'">Asistente:</strong>
+          <div class="message-content">{{ msg.content }}</div>
+        </div>
       </div>
-    </div>
+    </ng-container>
     <div *ngIf="isLoading" class="loading-spinner">
       <div class="spinner"></div>
     </div>
