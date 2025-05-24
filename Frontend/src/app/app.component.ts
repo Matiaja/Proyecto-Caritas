@@ -19,6 +19,7 @@ export class AppComponent implements OnInit {
   title = 'Frontend';
   showNavbar = true;
   showFooter = true;
+  showBreadcrumbs = true;
 
   constructor(
     private router: Router,
@@ -28,6 +29,7 @@ export class AppComponent implements OnInit {
     this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
       this.updateNavbarVisibility();
       this.updateFooterVisibility();
+      this.updateBreadcrumbsVisibility();
     });
   }
 
@@ -56,5 +58,14 @@ export class AppComponent implements OnInit {
     }
     const hideNavbar = currentRoute.snapshot.data['hideNavbar'];
     this.showNavbar = !hideNavbar;
+  }
+
+  private updateBreadcrumbsVisibility() {
+    let currentRoute = this.route.root;
+    while (currentRoute.firstChild) {
+      currentRoute = currentRoute.firstChild;
+    }
+    const hideBreadcrumbs = currentRoute.snapshot.data['hideBreadcrumbs'];
+    this.showBreadcrumbs = !hideBreadcrumbs;
   }
 }

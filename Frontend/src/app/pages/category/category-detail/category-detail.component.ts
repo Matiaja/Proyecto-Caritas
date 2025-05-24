@@ -2,14 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Category } from '../../../models/category.model';
 import { CategoryService } from '../../../services/category/category.service';
-import { UiTableComponent } from '../../../shared/components/ui-table/ui-table.component';
 import { CommonModule, Location } from '@angular/common';
-import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
 
 @Component({
   selector: 'app-category-detail',
   standalone: true,
-  imports: [UiTableComponent, CommonModule, BreadcrumbComponent],
+  imports: [CommonModule],
   templateUrl: './category-detail.component.html',
   styleUrl: './category-detail.component.css',
 })

@@ -7,13 +7,12 @@ import { RequestModel } from '../../../models/request.model';
 import { RequestService } from '../../../services/request/request.service';
 import { OrderLine } from '../../../models/orderLine.model';
 import { UiTableComponent } from '../../../shared/components/ui-table/ui-table.component';
-import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
 import { StockService } from '../../../services/stock/stock.service';
 
 @Component({
   selector: 'app-request-assign',
   standalone: true,
-  imports: [UiTableComponent, CommonModule, BreadcrumbComponent],
+  imports: [UiTableComponent, CommonModule],
   templateUrl: './request-assign.component.html',
   styleUrl: './request-assign.component.css',
 })

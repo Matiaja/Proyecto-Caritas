@@ -4,14 +4,13 @@ import { CenterService } from '../../services/center/center.service';
 import { CommonModule } from '@angular/common';
 import { UiTableComponent } from '../../shared/components/ui-table/ui-table.component';
 import { Router } from '@angular/router';
-import { BreadcrumbComponent } from '../../shared/components/breadcrumbs/breadcrumbs.component';
 import { ConfirmModalService } from '../../services/confirmModal/confirm-modal.service';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-center',
   standalone: true,
-  imports: [CommonModule, UiTableComponent, BreadcrumbComponent],
+  imports: [CommonModule, UiTableComponent],
   templateUrl: './center.component.html',
   styleUrl: './center.component.css',
 })

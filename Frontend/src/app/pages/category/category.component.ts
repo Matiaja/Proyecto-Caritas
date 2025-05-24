@@ -3,7 +3,6 @@ import { UiTableComponent } from '../../shared/components/ui-table/ui-table.comp
 import { CategoryService } from '../../services/category/category.service';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { BreadcrumbComponent } from '../../shared/components/breadcrumbs/breadcrumbs.component';
 import { ConfirmModalService } from '../../services/confirmModal/confirm-modal.service';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../auth/auth.service';
@@ -11,7 +10,7 @@ import { AuthService } from '../../auth/auth.service';
 @Component({
   selector: 'app-category',
   standalone: true,
-  imports: [UiTableComponent, BreadcrumbComponent],
+  imports: [UiTableComponent],
   templateUrl: './category.component.html',
   styleUrl: './category.component.css',
 })

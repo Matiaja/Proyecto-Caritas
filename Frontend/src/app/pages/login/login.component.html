@@ -1,7 +1,6 @@
 <div class="login-card">
   <div class="card-title">
     <h1>Iniciar sesión</h1>
-    <span>¿No tienes cuenta? <a routerLink="/signup">Regístrate</a></span>
   </div>
   <form class="form-group" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
     <input name="username" type="text" formControlName="username" placeholder="Nombre de usuario" />

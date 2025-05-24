@@ -3,6 +3,8 @@ import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../../../environments/environment';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { marked } from 'marked';
 
 @Component({
   selector: 'app-chatbot',
@@ -26,7 +28,7 @@ export class ChatbotComponent {
   userInput: string = '';
   isLoading: boolean = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private sanitizer: DomSanitizer) {}
 
   async sendMessage() {
     if (!this.userInput.trim()) return;
@@ -69,6 +71,17 @@ export class ChatbotComponent {
       this.handleError(error);
     } finally {
       this.isLoading = false;
+    }
+  }
+
+  parseMarkdownToHtml(markdown: string): SafeHtml {
+    const htmlOrPromise = marked.parse(markdown);
+    if (typeof htmlOrPromise === 'string') {
+      return this.sanitizer.bypassSecurityTrustHtml(htmlOrPromise);
+    } else {
+      // If it's a Promise, return a placeholder or handle asynchronously
+      // For now, return an empty string as SafeHtml
+      return this.sanitizer.bypassSecurityTrustHtml('');
     }
   }
 
