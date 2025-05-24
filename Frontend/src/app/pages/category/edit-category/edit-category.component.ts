@@ -4,12 +4,11 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CategoryService } from '../../../services/category/category.service';
 import { FormGroup } from '@angular/forms';
-import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
 
 @Component({
   selector: 'app-edit-category',
   standalone: true,
-  imports: [GenericFormComponent, BreadcrumbComponent],
+  imports: [GenericFormComponent],
   templateUrl: './edit-category.component.html',
   styleUrl: './edit-category.component.css',
 })

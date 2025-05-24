@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { UiTableComponent } from '../../../shared/components/ui-table/ui-table.component';
 import { CommonModule, Location } from '@angular/common';
-import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
 import { first, switchMap } from 'rxjs';
 import { UserService } from '../../../services/user/user.service';
 import { CenterService } from '../../../services/center/center.service';
@@ -10,7 +8,7 @@ import { CenterService } from '../../../services/center/center.service';
 @Component({
   selector: 'app-user-detail',
   standalone: true,
-  imports: [UiTableComponent, CommonModule, BreadcrumbComponent],
+  imports: [CommonModule],
   templateUrl: './user-detail.component.html',
   styleUrl: './user-detail.component.css',
 })

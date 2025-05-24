@@ -79,7 +79,7 @@ export class StorageAddComponent {
       },
       {
         name: 'weight',
-        label: 'Peso',
+        label: 'Peso (kg)',
         type: 'number',
         value: '',
         placeholder: 'Ingrese el peso',

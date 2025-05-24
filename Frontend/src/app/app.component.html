@@ -4,9 +4,16 @@
 
 <div class="app-container" [ngClass]="{ 'navbar-hidden': !showNavbar }">
   <main class="content">
-    <app-breadcrumbs></app-breadcrumbs>
+    @if(showBreadcrumbs) {
+      <app-breadcrumbs></app-breadcrumbs>
+    }
     <router-outlet></router-outlet>
   </main>
 
-  <app-footer></app-footer>
+  @if (showFooter) {
+      <app-footer></app-footer>
+    }
+
+
+  <app-chatbot *ngIf="showNavbar"></app-chatbot>
 </div>

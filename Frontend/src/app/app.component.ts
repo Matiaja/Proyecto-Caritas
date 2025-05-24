@@ -6,17 +6,20 @@ import { BreadcrumbComponent } from './shared/components/breadcrumbs/breadcrumbs
 import { GlobalStateService } from './services/global/global-state.service';
 import { FooterComponent } from './shared/footer/footer.component';
 import { CommonModule } from '@angular/common';
+import { ChatbotComponent } from './shared/components/chatbot/chatbot.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent, FooterComponent, BreadcrumbComponent, CommonModule],
+  imports: [RouterOutlet, NavbarComponent, FooterComponent, BreadcrumbComponent, CommonModule, ChatbotComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
 export class AppComponent implements OnInit {
   title = 'Frontend';
   showNavbar = true;
+  showFooter = true;
+  showBreadcrumbs = true;
 
   constructor(
     private router: Router,
@@ -25,6 +28,8 @@ export class AppComponent implements OnInit {
   ) {
     this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
       this.updateNavbarVisibility();
+      this.updateFooterVisibility();
+      this.updateBreadcrumbsVisibility();
     });
   }
 
@@ -37,6 +42,15 @@ export class AppComponent implements OnInit {
     }
   }
 
+  private updateFooterVisibility() {  
+    let currentRoute = this.route.root;
+    while (currentRoute.firstChild) {
+      currentRoute = currentRoute.firstChild;
+    }
+    const hideFooter = currentRoute.snapshot.data['hideFooter'];
+    this.showFooter = !hideFooter;
+  }
+
   private updateNavbarVisibility() {
     let currentRoute = this.route.root;
     while (currentRoute.firstChild) {
@@ -44,5 +58,14 @@ export class AppComponent implements OnInit {
     }
     const hideNavbar = currentRoute.snapshot.data['hideNavbar'];
     this.showNavbar = !hideNavbar;
+  }
+
+  private updateBreadcrumbsVisibility() {
+    let currentRoute = this.route.root;
+    while (currentRoute.firstChild) {
+      currentRoute = currentRoute.firstChild;
+    }
+    const hideBreadcrumbs = currentRoute.snapshot.data['hideBreadcrumbs'];
+    this.showBreadcrumbs = !hideBreadcrumbs;
   }
 }

@@ -3,12 +3,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CenterService } from '../../../services/center/center.service';
 import { CenterModel } from '../../../models/center.model';
 import { CommonModule, Location } from '@angular/common';
-import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
 
 @Component({
   selector: 'app-center-detail',
   standalone: true,
-  imports: [CommonModule, BreadcrumbComponent],
+  imports: [CommonModule],
   templateUrl: './center-detail.component.html',
   styleUrl: './center-detail.component.css',
 })

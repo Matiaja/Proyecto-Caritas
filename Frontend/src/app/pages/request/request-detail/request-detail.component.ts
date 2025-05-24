@@ -5,12 +5,11 @@ import { RequestModel } from '../../../models/request.model';
 import { ProductService } from '../../../services/product/product.service';
 import { UiTableComponent } from '../../../shared/components/ui-table/ui-table.component';
 import { CommonModule, Location } from '@angular/common';
-import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
 
 @Component({
   selector: 'app-request-detail',
   standalone: true,
-  imports: [UiTableComponent, CommonModule, BreadcrumbComponent],
+  imports: [UiTableComponent, CommonModule],
   templateUrl: './request-detail.component.html',
   styleUrl: './request-detail.component.css',
 })

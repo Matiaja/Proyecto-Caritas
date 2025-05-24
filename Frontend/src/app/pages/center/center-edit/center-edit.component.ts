@@ -4,13 +4,12 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CenterService } from '../../../services/center/center.service';
 import { FormGroup } from '@angular/forms';
-import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-edit-center',
   standalone: true,
-  imports: [GenericFormComponent, BreadcrumbComponent],
+  imports: [GenericFormComponent],
   templateUrl: './center-edit.component.html',
   styleUrl: './center-edit.component.css',
 })

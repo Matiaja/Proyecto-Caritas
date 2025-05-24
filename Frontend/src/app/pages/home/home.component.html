@@ -1,21 +1,3 @@
 <div class="charts-container" [class.mobile]="isMobile">
-  <div class="chart-container">
-    <h2>Top 5 productos con más stock</h2>
-    <canvas baseChart [data]="topProductsData" [options]="chartOptions" [type]="'bar'"></canvas>
-  </div>
-
-  <div class="chart-container">
-    <h2>Stock total por categoría</h2>
-    <canvas
-      baseChart
-      [data]="stockByCategoryData"
-      [options]="chartOptions"
-      [type]="'doughnut'"
-    ></canvas>
-  </div>
-
-  <div class="chart-container">
-    <h2>Movimientos de stock (último mes)</h2>
-    <canvas baseChart [data]="movementData" [options]="chartOptions" [type]="'pie'"></canvas>
-  </div>
+<iframe width="1280" height="960" src="https://lookerstudio.google.com/embed/reporting/0b4bfdae-2d42-48fe-b338-e3de353cead8/page/GbFKF" frameborder="0" style="border:0" allowfullscreen sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
 </div>
