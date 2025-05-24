@@ -27,6 +27,7 @@ namespace ProyectoCaritas.Controllers
 
         // GET: api/products
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAllProducts()
         {
             return await context.Products
@@ -52,6 +53,7 @@ namespace ProyectoCaritas.Controllers
 
         // GET: api/Products/id
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<ProductDTO>> GetProductById(int id)
         {
             var prod = await context.Products
@@ -89,6 +91,7 @@ namespace ProyectoCaritas.Controllers
         }
 
         [HttpGet("search")]
+        [Authorize]
         public async Task<ActionResult> Search([FromQuery] string query)
         {
             if (string.IsNullOrEmpty(query))
@@ -109,6 +112,7 @@ namespace ProyectoCaritas.Controllers
         }
 
         [HttpGet("filter")]
+        [Authorize]
         public async Task<ActionResult<List<ProductDTO>>> GetProductsByFilter(
             [FromQuery] int? categoryId = null,
             [FromQuery] string? sortBy = null,

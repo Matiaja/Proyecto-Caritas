@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,7 @@ namespace ProyectoCaritas.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<OrderLineDTO>> AddOrderLine(OrderLineDTO orderLineDTO)
         {
             // Validaciones
@@ -70,7 +72,8 @@ namespace ProyectoCaritas.Controllers
                 RequestId = orderLineDTO.RequestId,
                 Quantity = orderLineDTO.Quantity,
                 Description = orderLineDTO.Description,
-                Product = product
+                Product = product,
+                Status = orderLineDTO.Status ?? "",
             };
 
             context.OrderLines.Add(orderLine);

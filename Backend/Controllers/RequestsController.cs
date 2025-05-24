@@ -48,6 +48,7 @@ namespace ProyectoCaritas.Controllers
                 return await _context.Requests
                     .Include(r => r.RequestingCenter)
                     .Include(r => r.OrderLines)
+                    .OrderByDescending(r => r.RequestDate)
                     .Select(r => RequestToDTO(r))
                     .ToListAsync();
             }
@@ -64,6 +65,7 @@ namespace ProyectoCaritas.Controllers
                 .Include(r => r.RequestingCenter)
                 .Include(r => r.OrderLines)
                 .Where(r => r.RequestingCenterId == user.CenterId)
+                .OrderByDescending(r => r.RequestDate)
                 .Select(r => RequestToDTO(r))
                 .ToListAsync();
 
@@ -342,6 +344,7 @@ namespace ProyectoCaritas.Controllers
                Id = request.Id,
                RequestingCenterId = request.RequestingCenterId,
                UrgencyLevel = request.UrgencyLevel,
+               Status = request.Status,
                RequestDate = request.RequestDate,
                OrderLines = request.OrderLines?.Select(ol => new OrderLineDTO
                {

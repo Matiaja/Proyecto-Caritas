@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,7 @@ namespace ProyectoCaritas.Controllers
 
         // GET: api/DonationRequests
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<GetDonationRequestDTO>>> GetAllDonationRequests()
         {
             return await _context.DonationRequests
@@ -31,6 +33,7 @@ namespace ProyectoCaritas.Controllers
 
         // GET: api/DonationRequests/{id}
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<GetDonationRequestDTO>> GetDonationRequestById(int id)
         {
             var donationRequest = await _context.DonationRequests
@@ -87,6 +90,25 @@ namespace ProyectoCaritas.Controllers
                     Status = "400",
                     Error = "Bad Request",
                     Message = $"Assigned Center with ID {addDonationRequestDto.AssignedCenterId} not found."
+                });
+            }
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return Unauthorized();
+
+            var user = await _context.Users.Include(u => u.Center).FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+                return Unauthorized();
+
+            // validate if the user is assigned to the center
+            if (!User.IsInRole("Admin") && user.CenterId != addDonationRequestDto.AssignedCenterId)
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "User is not assigned to the center assigned."
                 });
             }
 
