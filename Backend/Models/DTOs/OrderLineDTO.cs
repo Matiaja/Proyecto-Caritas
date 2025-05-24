@@ -12,6 +12,7 @@ namespace ProyectoCaritas.Models.DTOs
         public int Quantity { get; set; }
         public string? Description { get; set; }
         public int? ProductId { get; set; }
+        public string? Status { get; set; } = "Pending"; // Default status
         public ProductDTO? Product { get; set; }
         public ICollection<GetDonationRequestDTO>? DonationRequests { get; set; } = new List<GetDonationRequestDTO>();
     }

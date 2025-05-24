@@ -5,6 +5,7 @@ export interface RequestModel {
   requestingCenterId: number;
   urgencyLevel: string;
   requestDate: Date | string;
+  status: string;
   requestingCenter?: {
     id: number;
     name: string;

@@ -44,6 +44,7 @@ export class RequestAssignComponent implements OnInit {
     requestingCenterId: 0,
     urgencyLevel: '',
     requestDate: '',
+    status: '',
     requestingCenter: {
       id: 0,
       name: '',

@@ -57,6 +57,7 @@ export class RequestAddComponent implements OnInit {
     requestingCenterId: 0,
     urgencyLevel: '',
     requestDate: '',
+    status: 'Pendiente',
     orderLines: [],
   } as RequestModel;
   productSuggestions: any[] = [];

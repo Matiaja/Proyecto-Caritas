@@ -72,7 +72,8 @@ namespace ProyectoCaritas.Controllers
                 RequestId = orderLineDTO.RequestId,
                 Quantity = orderLineDTO.Quantity,
                 Description = orderLineDTO.Description,
-                Product = product
+                Product = product,
+                Status = orderLineDTO.Status ?? "",
             };
 
             context.OrderLines.Add(orderLine);

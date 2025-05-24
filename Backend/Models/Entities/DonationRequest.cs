@@ -6,6 +6,7 @@
         public int AssignedCenterId { get; set; } // Una Solicitud de Donación pertenece a cero o un Centro
         public int OrderLineId { get; set; } // Una Solicitud de Donación tiene cero o una linea de pedido
         public int Quantity { get; set; } // Cantidad de productos donados
+        public DateTime AsignationDate { get; set; } // Fecha de asignación de la solicitud
         public DateTime? ShipmentDate { get; set; }
         public DateTime? ReceptionDate { get; set; }
         public required string Status { get; set; }

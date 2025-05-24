@@ -19,9 +19,14 @@ export class UiTableComponent<T extends Record<string, any>> implements OnChange
   @Input() dataSource: T[] = [];
   @Input() columnHeaders: Record<string, string> = {};
   @Input() mobileHeaders: Record<string, string> = {};
+
   @Input() showProductsFilters = false;
   @Input() categories: { id: number; name: string }[] = [];
   @Input() centers: { id: number; name: string }[] = [];
+
+  @Input() showStatusFilter = false;
+  @Input() statusOptions: string[] = [];
+
   @Input() sortOptions: { key: string; label: string }[] = [];
   @Input() showCommonFilters = false;
 
@@ -44,6 +49,7 @@ export class UiTableComponent<T extends Record<string, any>> implements OnChange
 
   @Output() filterChange = new EventEmitter<{
     categoryId?: number;
+    status?: string;
     sortBy?: string;
     order?: string;
     centerId?: number;
@@ -65,6 +71,8 @@ export class UiTableComponent<T extends Record<string, any>> implements OnChange
   isMobileView = false;
   searchTerm = '';
   selectedCategory: number | null = null;
+  selectedStatus: string | null = null;
+  selectedOption: number | null = null;
   selectedCenter: number | null = null;
   selectedSortBy: string | null = null;
   selectedOrder = 'asc';
@@ -91,6 +99,7 @@ export class UiTableComponent<T extends Record<string, any>> implements OnChange
     if (emitRemoteFilter) {
       this.filterChange.emit({
         categoryId: this.selectedCategory || undefined,
+        status: this.selectedStatus || undefined,
         centerId: this.selectedCenter || undefined,
         sortBy: this.selectedSortBy || undefined,
         order: this.selectedOrder,
