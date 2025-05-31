@@ -8,11 +8,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Security.Claims;
+using ProyectoCaritas.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
@@ -60,6 +62,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection")) // Especifica la versión de MySQL
     ));
 builder.Services.AddScoped<OrderLineService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddHttpClient();
 // Configurar Identity
 builder.Services.AddIdentity<User, IdentityRole>(
@@ -103,6 +106,23 @@ builder.Services.AddAuthentication(options =>
         RequireExpirationTime = true,
         ValidateLifetime = true,
         RoleClaimType = ClaimTypes.Role
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var token = context.Request.Query["access_token"];
+
+            // Si es una solicitud a SignalR
+            var path = context.HttpContext.Request.Path;
+            if (!string.IsNullOrEmpty(token) &&
+                path.StartsWithSegments("/notificationHub"))
+            {
+                context.Token = token;
+            }
+            return Task.CompletedTask;
+        },
     };
 });
 
@@ -174,5 +194,8 @@ app.UseAuthorization();
 
 // Mapear controladores
 app.MapControllers();
+
+// Mapear el hub
+app.MapHub<NotificationHub>("/notificationHub");
 
 app.Run();
