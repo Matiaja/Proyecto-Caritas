@@ -46,6 +46,22 @@ export class AuthService {
     return localStorage.getItem('authUser') !== null;
   }
 
+  getUserCenterId(): number | null {
+    const authUser = localStorage.getItem('authUser');
+    if (authUser) {
+      try {
+        const parsed = JSON.parse(authUser);
+        // El backend retorna centerId en el login
+        if (parsed.centerId !== undefined && parsed.centerId !== null) {
+          return Number(parsed.centerId);
+        }
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  }
+
   getToken(): string {
     const authUser = localStorage.getItem('authUser');
     if (!authUser) return '';
@@ -65,5 +81,10 @@ export class AuthService {
       return userRol;
     }
     return null;
+  }
+
+  isAdmin(): boolean {
+    const role = this.getUserRole();
+    return role === 'Admin';
   }
 }
