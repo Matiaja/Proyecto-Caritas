@@ -11,7 +11,7 @@ namespace ProyectoCaritas.Models.Entities
         public int OrderLineId { get; set; } // Order line que esta relacionada
         public int DonationRequestId { get; set; } // Donacion que esta relacionada
         public int RecipientCenterId { get; set; } // Para notificaciones de asignación y envío a centros
-        public int UserId { get; set; } // Usuario que generó la notificación
+        public string? UserId { get; set; } // Usuario que generó la notificación
         public DateTime CreatedAt { get; set; }
         public DateTime? ExpiresAt { get; set; }
         public bool IsRead { get; set; }

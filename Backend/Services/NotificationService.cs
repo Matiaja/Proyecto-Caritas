@@ -43,7 +43,7 @@ public class NotificationService : INotificationService
             OrderLineId = orderLineId,
             DonationRequestId = donationRequestId,
             RecipientCenterId = assignedCenterId,
-            UserId = int.Parse(userId),
+            UserId = userId,
             CreatedAt = DateTime.UtcNow,
             IsRead = false,
             Status = "Active"

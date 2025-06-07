@@ -5,6 +5,7 @@ import { AuthService } from '../../auth/auth.service';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { GlobalStateService } from '../../services/global/global-state.service';
+import { NotificationService } from '../../services/notification/notification.service';
 
 @Component({
   selector: 'app-login',
@@ -14,7 +15,10 @@ import { GlobalStateService } from '../../services/global/global-state.service';
   styleUrl: './login.component.css',
 })
 export class LoginComponent {
-  constructor(private globalStateService: GlobalStateService) {}
+  constructor(
+    private globalStateService: GlobalStateService,
+    private notificationService: NotificationService
+  ) {}
 
   authService = inject(AuthService);
   router = inject(Router);
@@ -32,9 +36,10 @@ export class LoginComponent {
         if (data && data.token) {
           this.globalStateService.setCenterId(data.centerId);
           this.globalStateService.setUserId(data.userId);
-          console.log(this.globalStateService.getCurrentCenterId());
-          console.log(this.globalStateService.getCurrentUserId());
+
           localStorage.setItem('authUser', JSON.stringify(data)); // Almacena el token
+          this.notificationService.initializeConnection(); // Inicializar conexión SignalR
+
           this.router.navigate(['/home']);
           this.errorMessage = null; // Reset error message on successful login
         }

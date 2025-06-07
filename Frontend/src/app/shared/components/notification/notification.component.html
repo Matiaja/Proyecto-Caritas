@@ -1,25 +1,37 @@
-<div class="nav-item dropdown">
-    <button class="nav-link" type="button" data-bs-toggle="dropdown" data-bs-auto-close="true" (click)="toggleDropdown()">
+<div class="nav-item dropdown notification-container">
+    <button class="nav-link" type="button" aria-label="Ver notificaciones" data-bs-toggle="dropdown" (click)="toggleDropdown()">
         <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24">
             <path fill="white"
                 d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2m6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1z" />
         </svg>
-        <span *ngIf="unreadCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+        <span *ngIf="unreadCount > 0"
+            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
             {{ unreadCount }}
         </span>
     </button>
-    <ul class="dropdown-menu">
-        <div *ngFor="let notif of notifications">
-            <li>
-                <div class="dropdown-item" (click)="handleNotification(notif)">
-                    <div class="toast-header">
-                        <strong class="me-auto">{{ notif.title }}</strong>
-                        <small>{{ notif.createdAt | date:'short' }}</small>
-                    </div>
-                    <div class="toast-body">
-                        {{ notif.message }}
-                    </div>
+
+    <ul class="dropdown-menu notification-dropdown p-0 mt-2" id="notificationDropdown">
+        <div *ngFor="let notif of notifications" class="notification-item">
+            <li class="px-4 py-3">
+                <div class="toast-header mb-2">
+                    <strong class="me-auto">{{ notif.title }}</strong>
+                    <small class="notification-time">{{ notif.createdAt | date:'short' }}</small>
                 </div>
+                <div class="toast-body notification-message mb-1">
+                    {{ notif.message }}
+                </div>
+                <div class="notification-actions">
+                    <ng-container *ngFor="let action of getActionsForType(notif.type); let i = index">
+                            <button class="action-btn btn btn-outline-primary btn-sm"
+                                (click)="handleAction(notif, action.action)"
+                            >
+                                {{action.label}}
+                            </button>
+                    </ng-container>
+                </div>
+            </li>
+            <li>
+                <hr class="dropdown-divider m-0">
             </li>
         </div>
     </ul>

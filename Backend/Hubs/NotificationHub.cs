@@ -13,8 +13,6 @@ namespace ProyectoCaritas.Hubs
             var centerId = Context.User?.FindFirst("CenterId")?.Value;
             var isAdmin = Context.User?.IsInRole("Admin") ?? false;
 
-            System.Console.WriteLine($"\n>\nUser connected: {userId}, Center: {centerId}, Admin: {isAdmin}\n>\n");
-
             // Grupo por usuario individual (para notificaciones personales)
             if (userId != null)
             {
