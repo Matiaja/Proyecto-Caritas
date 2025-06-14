@@ -35,6 +35,12 @@ public class NotificationService : INotificationService
             throw new ArgumentException("Donation request not found.");
         }
 
+        // Verify donation request is in the order line
+        if (donationRequest.OrderLineId != orderLineId)
+        {
+            throw new ArgumentException("Donation request does not belong to the specified order line.");
+        }
+
         var notification = new Notification
         {
             Title = "Nueva asignación",
@@ -53,13 +59,90 @@ public class NotificationService : INotificationService
         await _context.SaveChangesAsync();
 
         // Notify the assigned center via SignalR
-        await _hubContext.Clients.Group($"center-{assignedCenterId}")
-            .SendAsync("ReceiveNotification", notification);
+        await SendSignalRNotifications(new List<Notification> { notification });
     }
 
-    public async Task CreateAcceptanceNotification(int orderLineId, int requestingCenterId)
+    public async Task<List<Notification>> CreateAcceptanceNotification(int orderLineId, int donationRequestId, string userId)
     {
-        // Implement this method
+        var notifications = new List<Notification>();
+
+        var orderLine = await _context.OrderLines
+            .Include(ol => ol.Product)
+            .Include(ol => ol.Request)
+                .ThenInclude(r => r.RequestingCenter)
+            .FirstOrDefaultAsync(ol => ol.Id == orderLineId);
+
+        var donationRequest = await _context.DonationRequests
+            .Include(dr => dr.AssignedCenter)
+            .FirstOrDefaultAsync(dr => dr.Id == donationRequestId);
+
+        // Notificación para el centro donante (próximo paso: enviar)
+        var donorNotification = new Notification
+        {
+            Title = "Próximo paso: Envío",
+            Message = $"Por favor marca como enviado cuando despaches los {donationRequest?.Quantity} {orderLine?.Product?.Name} al centro \"{orderLine?.Request?.RequestingCenter?.Name}\".",
+            Type = NotificationType.Acceptance,
+            OrderLineId = orderLineId,
+            DonationRequestId = donationRequestId,
+            RecipientCenterId = donationRequest?.AssignedCenterId,
+            UserId = userId,
+            CreatedAt = DateTime.UtcNow,
+            IsRead = false,
+            Status = "Active"
+        };
+        notifications.Add(donorNotification);
+
+        // Notificación para el centro solicitante (aceptación)
+        var requestingNotification = new Notification
+        {
+            Title = "Donación aceptada",
+            Message = $"El centro \"{donationRequest?.AssignedCenter?.Name}\" está preparando la donación de {donationRequest?.Quantity}"
+                + $" de los {orderLine?.Quantity} {orderLine?.Product?.Name} solicitados.",
+            Type = NotificationType.System,
+            OrderLineId = orderLineId,
+            DonationRequestId = donationRequestId,
+            RecipientCenterId = orderLine?.Request?.RequestingCenterId,
+            UserId = userId,
+            CreatedAt = DateTime.UtcNow,
+            IsRead = false,
+            Status = "Active"
+        };
+        notifications.Add(requestingNotification);
+
+        // Notificación para admin (aceptación)
+        var adminNotification = new Notification
+        {
+            Title = $"Donación aceptada",
+            Message = $"Solicitud #{orderLine?.RequestId} - Pedido #{orderLineId}: el centro \"{donationRequest?.AssignedCenter?.Name}\" ha aceptado proveer {donationRequest?.Quantity} {orderLine?.Product?.Name}"
+                + $" al centro \"{orderLine?.Request?.RequestingCenter?.Name}\".",
+            Type = NotificationType.System,
+            OrderLineId = orderLineId,
+            DonationRequestId = donationRequestId,
+            RecipientCenterId = null, // Admin notifications don't need a recipient center
+            UserId = userId,
+            CreatedAt = DateTime.UtcNow,
+            IsRead = false,
+            Status = "Active"
+        };
+        notifications.Add(adminNotification);
+
+        _context.Notifications.AddRange(donorNotification, requestingNotification, adminNotification);
+        await _context.SaveChangesAsync();
+
+        return notifications;
+    }
+
+    public async Task SendSignalRNotifications(List<Notification> notifications)
+    {
+        foreach (var notification in notifications)
+        {
+            var targetGroup = notification.RecipientCenterId != null
+                ? $"center-{notification.RecipientCenterId}"
+                : "admins";
+
+            await _hubContext.Clients.Group(targetGroup)
+                .SendAsync("ReceiveNotification", notification);
+        }
     }
 
     public async Task CreateShippingNotification(int orderLineId, int? recipientCenterId, DateTime estimatedArrival)

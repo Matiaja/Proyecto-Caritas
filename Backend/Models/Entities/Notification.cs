@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace ProyectoCaritas.Models.Entities
 {
@@ -7,10 +8,13 @@ namespace ProyectoCaritas.Models.Entities
         public int Id { get; set; }
         public required string Title { get; set; }
         public required string Message { get; set; }
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public NotificationType Type { get; set; } // "Assignment", "Shipment", "Reception", "Other"
         public int OrderLineId { get; set; } // Order line que esta relacionada
         public int DonationRequestId { get; set; } // Donacion que esta relacionada
-        public int RecipientCenterId { get; set; } // Para notificaciones de asignación y envío a centros
+        public int? RecipientCenterId { get; set; } // Para notificaciones de asignación y envío a centros
+        public string? RecipientUserId { get; set; }
         public string? UserId { get; set; } // Usuario que generó la notificación
         public DateTime CreatedAt { get; set; }
         public DateTime? ExpiresAt { get; set; }

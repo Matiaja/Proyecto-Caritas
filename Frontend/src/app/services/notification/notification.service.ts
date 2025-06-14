@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 import { AuthService } from '../../auth/auth.service';
 
@@ -53,6 +53,7 @@ export class NotificationService implements OnDestroy {
 
   private registerHandlers() {
     this.hubConnection.on('ReceiveNotification', (notification: any) => {
+      console.log('Notificación recibida:', notification);
       const currentNotifications = this.notificationsSubject.value;
       if (!currentNotifications.some(n => n.id === notification.id)) {
         this.notificationsSubject.next([notification, ...currentNotifications]);
@@ -71,6 +72,20 @@ export class NotificationService implements OnDestroy {
   public loadInitialNotifications() {
     this.http.get<any[]>(this.baseUrl + 'notifications')
       .subscribe(notifs => this.notificationsSubject.next(notifs));
+  }
+
+  public removeNotification(notificationId: number) {
+    const current = this.notificationsSubject.value;
+    const updated = current.filter(n => n.id !== notificationId);
+    this.notificationsSubject.next(updated);
+  }
+
+  public acceptAssignment(notification: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}notifications/accept`, {
+      orderLineId: notification.orderLineId,
+      donationRequestId: notification.donationRequestId,
+      idNotification: notification.id
+    });
   }
 
   public markAsRead(notificationId: number) {
