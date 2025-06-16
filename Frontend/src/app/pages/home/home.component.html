@@ -1,17 +1,103 @@
 <div class="charts-container" [class.mobile]="isMobile">
-  <div *ngIf="isAdmin" class="mb-3" style="margin-bottom: 16px;">
-    <label for="centerSelect" style="font-weight: bold; color: #36337f;">Centro:</label>
-    <select id="centerSelect" [(ngModel)]="selectedCenterId" (change)="onCenterChange()">
-      <option *ngFor="let center of centers" [value]="center.id">{{ center.name }}</option>
-    </select>
+  <!-- Loading Indicator - Mostrar desde el inicio -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="d-flex flex-column align-items-center">
+      <div class="spinner-border text-primary mb-3" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <p class="text-muted">Cargando datos de los gráficos...</p>
+    </div>
   </div>
-  <iframe
-    width="100%"
-    height="600"
-    [src]="lookerUrl | safeUrl"
-    frameborder="0"
-    style="border:0"
-    allowfullscreen
-    sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox">
-  </iframe>
+
+  <!-- Content - Solo mostrar cuando no esté cargando -->
+  <div *ngIf="!loading">
+    <!-- Center Selection for Admin -->
+    <div *ngIf="isAdmin" class="mb-3 center-selection">
+      <label for="centerSelect" class="form-label">Seleccionar Centro:</label>
+      <select id="centerSelect" class="form-select" [(ngModel)]="selectedCenterId" (change)="onCenterChange()">
+        <option value="">Todos los Centros</option>
+        <option *ngFor="let center of centers" [value]="center.id">{{ center.name }}</option>
+      </select>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="filters-section">
+      <div class="row g-3">
+        <div class="col-md-3 col-6">
+          <label class="form-label">Categoría:</label>
+          <select class="form-select" [(ngModel)]="selectedCategory" (change)="applyFilters()">
+            <option value="">Todas las categorías</option>
+            <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
+          </select>
+        </div>
+        
+        <div class="col-md-3 col-6">
+          <label class="form-label">Producto:</label>
+          <select class="form-select" [(ngModel)]="selectedProduct" (change)="applyFilters()">
+            <option value="">Todos los productos</option>
+            <option *ngFor="let product of products" [value]="product.productId">{{ product.productName }}</option>
+          </select>
+        </div>
+        
+        <div class="col-md-3 col-6">
+          <label class="form-label">Fecha desde:</label>
+          <input type="date" class="form-control" [(ngModel)]="dateFrom" (change)="applyFilters()">
+        </div>
+        
+        <div class="col-md-3 col-6">
+          <label class="form-label">Fecha hasta:</label>
+          <input type="date" class="form-control" [(ngModel)]="dateTo" (change)="applyFilters()">
+        </div>
+      </div>
+      
+      <div class="row mt-2">
+        <div class="col-12 text-end">
+          <button class="btn btn-outline-secondary btn-sm" (click)="clearFilters()">
+            <i class="bi bi-x-circle"></i> Limpiar filtros
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Grid -->
+    <div *ngIf="!error" class="charts-grid">
+      <!-- Stock by Category Chart -->
+      <div class="chart-container">
+        <h3>Stock por Categoría</h3>
+        <div class="chart-wrapper">
+          <canvas #categoryChart></canvas>
+        </div>
+      </div>
+
+      <!-- Stock by Type Chart -->
+      <div class="chart-container">
+        <h3>Stock por Tipo</h3>
+        <div class="chart-wrapper">
+          <canvas #typeChart></canvas>
+        </div>
+      </div>
+
+      <!-- Stock by Month Chart -->
+      <div class="chart-container">
+        <h3>Stock por Mes</h3>
+        <div class="chart-wrapper">
+          <canvas #monthChart></canvas>
+        </div>
+      </div>
+
+      <!-- Top Products Chart -->
+      <div class="chart-container">
+        <h3>Top 10 Productos</h3>
+        <div class="chart-wrapper">
+          <canvas #productsChart></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="error" class="alert alert-danger" role="alert">
+      <i class="bi bi-exclamation-triangle"></i>
+      {{ error }}
+    </div>
+  </div>
 </div>

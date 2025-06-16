@@ -21,6 +21,10 @@ export class CategoryService {
     });
   }
 
+  getAllCategories(): Observable<any[]> {
+    return this.http.get<any[]>(this.baseUrl);
+  }
+  
   getCategory(id: number): Observable<any> {
     const token = localStorage.getItem('authUser');
     const headers = token ? new HttpHeaders().set('Authorization', `Bearer ${token}`) : undefined;

@@ -409,6 +409,22 @@ namespace ProyectoCaritas.Controllers
         }
 
 
+        // GET: api/Stocks/center-stocks
+        [HttpGet("center-stocks")]
+        public async Task<ActionResult<List<GetStockDTO>>> GetStocksByCenter([FromHeader] string centerId)
+        {
+            if (!int.TryParse(centerId, out int centerIdInt))
+                return BadRequest(new { message = "Invalid centerId" });
+
+            var stocks = await _context.Stocks
+                .Where(s => s.CenterId == centerIdInt)
+                .Include(s => s.Product)
+                .Select(s => StockToDto(s))
+                .ToListAsync();
+
+            return Ok(stocks);
+        }
+
         private bool StockExists(int id)
         {
             return _context.Stocks.Any(s => s.Id == id);
