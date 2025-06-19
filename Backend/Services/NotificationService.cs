@@ -145,13 +145,117 @@ public class NotificationService : INotificationService
         }
     }
 
-    public async Task CreateShippingNotification(int orderLineId, int? recipientCenterId, DateTime estimatedArrival)
+    public async Task<List<Notification>> CreateShippingNotification(int orderLineId, int donationRequestId, string userId)
     {
-        // Implement this method
+        var notifications = new List<Notification>();
+
+        var orderLine = await _context.OrderLines
+            .Include(ol => ol.Product)
+            .Include(ol => ol.Request)
+                .ThenInclude(r => r.RequestingCenter)
+            .FirstOrDefaultAsync(ol => ol.Id == orderLineId);
+
+        var donationRequest = await _context.DonationRequests
+            .Include(dr => dr.AssignedCenter)
+            .FirstOrDefaultAsync(dr => dr.Id == donationRequestId);
+
+        // Notificación para centro solicitante (con acción de recibido)
+        var requestingCenterNotification = new Notification
+        {
+            Title = "Donación en camino...",
+            Message = $"El centro \"{donationRequest?.AssignedCenter?.Name}\" ha enviado {donationRequest?.Quantity} " +
+                     $"{orderLine?.Product?.Name}. Por favor confirma la recepción cuando llegue presionando el botón.",
+            Type = NotificationType.Shipping,
+            OrderLineId = orderLineId,
+            DonationRequestId = donationRequestId,
+            RecipientCenterId = orderLine?.Request?.RequestingCenterId,
+            UserId = userId,
+            CreatedAt = DateTime.UtcNow,
+            IsRead = false,
+            Status = "Active"
+        };
+        notifications.Add(requestingCenterNotification);
+
+        // Notificación informativa para admin
+        var adminNotification = new Notification
+        {
+            Title = "Donación enviada",
+            Message = $"Solicitud #{orderLine?.RequestId} - Pedido #{orderLineId}. " +
+                     $"La donación de {donationRequest?.Quantity} {orderLine?.Product?.Name} ha sido marcada como enviada por " +
+                     $"el centro \"{donationRequest?.AssignedCenter?.Name}\" hacia " +
+                     $"el centro \"{orderLine?.Request?.RequestingCenter?.Name}\".",
+            Type = NotificationType.System,
+            OrderLineId = orderLineId,
+            DonationRequestId = donationRequestId,
+            RecipientCenterId = null, // Admin notifications don't need a recipient center
+            UserId = userId,
+            CreatedAt = DateTime.UtcNow,
+            IsRead = false,
+            Status = "Active"
+        };
+        notifications.Add(adminNotification);
+
+        _context.Notifications.AddRange(requestingCenterNotification, adminNotification);
+        await _context.SaveChangesAsync();
+
+        return notifications;
     }
 
-    public async Task CreateReceptionNotification(int orderLineId, int requestingCenterId, string reason)
+    public async Task<List<Notification>> CreateReceptionNotification(int orderLineId, int donationRequestId, string userId, bool generateDonorNotification = true)
     {
-        // Implement this method
+        var notifications = new List<Notification>();
+
+        var orderLine = await _context.OrderLines
+            .Include(ol => ol.Product)
+            .Include(ol => ol.Request)
+                .ThenInclude(r => r.RequestingCenter)
+            .FirstOrDefaultAsync(ol => ol.Id == orderLineId);
+
+        var donationRequest = await _context.DonationRequests
+            .Include(dr => dr.AssignedCenter)
+            .FirstOrDefaultAsync(dr => dr.Id == donationRequestId);
+
+        if (generateDonorNotification)
+        {
+            // Notificación para centro donante
+            var donorNotification = new Notification
+            {
+                Title = "Donación recibida",
+                Message = $"El centro \"{orderLine?.Request?.RequestingCenter?.Name}\" ha confirmado " +
+                        $"la recepción de {donationRequest?.Quantity} {orderLine?.Product?.Name}.",
+                Type = NotificationType.Receipt,
+                OrderLineId = orderLineId,
+                DonationRequestId = donationRequestId,
+                RecipientCenterId = donationRequest?.AssignedCenterId,
+                UserId = userId,
+                CreatedAt = DateTime.UtcNow,
+                IsRead = false,
+                Status = "Active"
+            };
+            notifications.Add(donorNotification);
+        }
+
+        // Notificación para admin
+        var adminNotification = new Notification
+        {
+            Title = "Donación completada",
+            Message = $"El centro \"{orderLine?.Request?.RequestingCenter?.Name}\" ha confirmado " +
+                     $"la recepción de {donationRequest?.Quantity} {orderLine?.Product?.Name} " +
+                     $"del centro \"{donationRequest?.AssignedCenter?.Name}\".",
+            Type = NotificationType.System,
+            OrderLineId = orderLineId,
+            DonationRequestId = donationRequestId,
+            RecipientCenterId = null, // Admin notifications don't need a recipient center
+            UserId = userId,
+            CreatedAt = DateTime.UtcNow,
+            IsRead = false,
+            Status = "Active"
+        };
+        notifications.Add(adminNotification);
+
+        _context.Notifications.AddRange(notifications);
+        await _context.SaveChangesAsync();
+
+        return notifications;
     }
 }

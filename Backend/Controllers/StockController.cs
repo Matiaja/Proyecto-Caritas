@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using ProyectoCaritas.Data;
 using ProyectoCaritas.Models.DTOs;
 using ProyectoCaritas.Models.Entities;
+using ProyectoCaritas.Services;
 
 namespace ProyectoCaritas.Controllers
 {
@@ -14,10 +15,12 @@ namespace ProyectoCaritas.Controllers
     public class StocksController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IStockService _stockService;
 
-        public StocksController(ApplicationDbContext context)
+        public StocksController(ApplicationDbContext context, IStockService stockService)
         {
             _context = context;
+            _stockService = stockService;
         }
 
         // GET: api/Stocks
@@ -69,17 +72,6 @@ namespace ProyectoCaritas.Controllers
             if (user == null)
                 return Unauthorized();
 
-            var center = await _context.Centers.FindAsync(StockDTO.CenterId);
-            if (center == null)
-            {
-                return BadRequest(new
-                {
-                    Status = "400",
-                    Error = "Bad Request",
-                    Message = "Center not found."
-                });
-            }
-
             if (user.CenterId != StockDTO.CenterId)
             {
                 return BadRequest(new
@@ -90,57 +82,40 @@ namespace ProyectoCaritas.Controllers
                 });
             }
 
-            if (!StockDTO.ProductId.HasValue)
+            try
             {
-                return BadRequest(new { message = "ProductId is required." });
-            }
 
-            var product = await _context.Products.FindAsync(StockDTO.ProductId);
-            if (product == null)
+                var stock = await _stockService.AddStock(StockDTO);
+
+                return CreatedAtAction(nameof(GetStockById), new { id = stock.Id }, StockToDto(stock));
+            }
+            catch (ArgumentException ex)
             {
                 return BadRequest(new
                 {
                     Status = "400",
                     Error = "Bad Request",
-                    Message = "Product not found."
+                    Message = ex.Message
                 });
             }
-
-            var result = await ValidateQuantity(StockDTO.CenterId, (int)StockDTO.ProductId, StockDTO.Quantity, StockDTO.Type);
-
-            if (result is BadRequestObjectResult badRequest)
+            catch (InvalidOperationException ex)
             {
-                return BadRequest(badRequest.Value);
-            }
-
-            if (result is OkObjectResult okResult)
-            {
-                var totalQuantity = (int)((dynamic)okResult.Value).totalStock;
-
-                if (totalQuantity >= 0)
+                return BadRequest(new
                 {
-
-                    var stock = new Stock
-                    {
-                        CenterId = StockDTO.CenterId,
-                        ProductId = StockDTO.ProductId,
-                        Date = StockDTO.Date,
-                        ExpirationDate = StockDTO.ExpirationDate,
-                        Description = StockDTO.Description,
-                        Quantity = StockDTO.Quantity,
-                        Weight = StockDTO.Weight,
-                        Type = StockDTO.Type,
-                        Center = center
-                    };
-
-                    _context.Stocks.Add(stock);
-                    await _context.SaveChangesAsync();
-
-                    return CreatedAtAction(nameof(GetStockById), new { id = stock.Id }, StockToDto(stock));
-                }
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = ex.Message
+                });
             }
-
-            return BadRequest(new { message = "Invalid Quantity" });
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Status = "500",
+                    Error = "Internal Server Error",
+                    Message = "An unexpected error occurred: " + ex.Message
+                });
+            }
         }
 
         // PUT: api/Stocks/{id}
@@ -516,24 +491,24 @@ namespace ProyectoCaritas.Controllers
         }
 
         private static GetStockDTO StockToDto(Stock stock) =>
-            new GetStockDTO
+        new GetStockDTO
+        {
+            Id = stock.Id,
+            CenterId = stock.CenterId,
+            ProductId = stock.ProductId,
+            Date = stock.Date,
+            ExpirationDate = stock.ExpirationDate,
+            Description = stock.Description,
+            Quantity = stock.Quantity,
+            Weight = stock.Weight,
+            Type = stock.Type,
+            Product = stock.Product != null ? new GetProductDTO
             {
-                Id = stock.Id,
-                CenterId = stock.CenterId,
-                ProductId = stock.ProductId,
-                Date = stock.Date,
-                ExpirationDate = stock.ExpirationDate,
-                Description = stock.Description,
-                Quantity = stock.Quantity,
-                Weight = stock.Weight,
-                Type = stock.Type,
-                Product = stock.Product != null ? new GetProductDTO
-                {
-                    Name = stock.Product.Name,
-                    Code = stock.Product.Code,
-                    CategoryId = stock.Product.CategoryId,
-                } : null
-                //Status = stock.Status
-            };
+                Name = stock.Product.Name,
+                Code = stock.Product.Code,
+                CategoryId = stock.Product.CategoryId,
+            } : null
+            //Status = stock.Status
+        };
     }
 }

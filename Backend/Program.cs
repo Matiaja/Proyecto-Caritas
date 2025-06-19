@@ -10,6 +10,7 @@ using System.Text;
 using System.Security.Claims;
 using System.Text.Json.Serialization;
 using ProyectoCaritas.Hubs;
+using ProyectoCaritas.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,6 +69,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     ));
 builder.Services.AddScoped<OrderLineService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IStockService, StockService>();
 builder.Services.AddHttpClient();
 // Configurar Identity
 builder.Services.AddIdentity<User, IdentityRole>(

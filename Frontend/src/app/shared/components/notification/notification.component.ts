@@ -51,7 +51,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
       'accept': () => this.acceptAssignment(notification),
       'reject': () => this.rejectAssignment(notification),
       'mark_as_shipped': () => this.markAsShipped(notification),
-      // 'confirm_receipt': () => this.confirmReceipt(notification),
+      'confirm_receipt': () => this.confirmReceipt(notification),
       // 'reassign': () => this.reassignNotification(notification)
     };
 
@@ -69,6 +69,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Error al aceptar:', err);
+        // Restaurar las notificaciones originales en caso de error
         this.notifications = originalNotifications;
         this.unreadCount = originalNotifications.filter((n: any) => !n.isRead).length;
         this.toastrService.error('Error al aceptar la asignación');
@@ -82,8 +83,41 @@ export class NotificationComponent implements OnInit, OnDestroy {
   }
   
   markAsShipped(notification: any) {
-    // Lógica para enviar
-    console.log('Enviando:', notification);
+    const originalNotifications = [...this.notifications];
+    
+    notification.isRead = true; // Marcar como leída inmediatamente
+    this.notificationService.markAsShipped(notification).subscribe({
+      next: () => {
+        this.toastrService.success('Se notificará al solicitante que el pedido está en camino.', 'Donación enviada!');
+      },
+      error: (err) => {
+        console.error('Error al marcar como enviado:', err);
+        notification.isRead = false; // Restaurar el estado de lectura
+        // Restaurar las notificaciones originales en caso de error
+        this.notifications = originalNotifications;
+        this.unreadCount = originalNotifications.filter((n: any) => !n.isRead).length;
+        this.toastrService.error('Error al marcar el pedido como enviado');
+      }
+    })
+  }
+
+  confirmReceipt(notification: any) {
+    const originalNotifications = [...this.notifications];
+    
+    notification.isRead = true; // Marcar como leída inmediatamente
+    this.notificationService.confirmReceipt(notification).subscribe({
+      next: () => {
+        this.toastrService.success('Se notificará al donante que el pedido ha sido recibido.', 'Solicitud recibida!');
+      },
+      error: (err) => {
+        console.error('Error al confirmar recepción:', err);
+        notification.isRead = false; // Restaurar el estado de lectura
+        // Restaurar las notificaciones originales en caso de error
+        this.notifications = originalNotifications;
+        this.unreadCount = originalNotifications.filter((n: any) => !n.isRead).length;
+        this.toastrService.error('Error al confirmar la recepción del pedido');
+      }
+    })
   }
 
   shouldShowActions(notification: any): boolean {

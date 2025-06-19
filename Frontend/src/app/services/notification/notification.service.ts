@@ -88,6 +88,22 @@ export class NotificationService implements OnDestroy {
     });
   }
 
+  markAsShipped(notification: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}notifications/ship`, {
+      orderLineId: notification.orderLineId,
+      donationRequestId: notification.donationRequestId,
+      idNotification: notification.id
+    });
+  }
+
+  confirmReceipt(notification: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}notifications/confirm`, {
+      orderLineId: notification.orderLineId,
+      donationRequestId: notification.donationRequestId,
+      idNotification: notification.id
+    });
+  }
+
   public markAsRead(notificationId: number) {
     return this.http.put(this.baseUrl + `notifications/${notificationId}/read`, {});
   }

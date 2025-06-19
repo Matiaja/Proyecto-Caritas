@@ -4,7 +4,7 @@ public interface INotificationService
 {
     Task CreateAssignmentNotification(int orderLineId, int donationRequestId, int donorCenterId, string userId);
     Task<List<Notification>> CreateAcceptanceNotification(int orderLineId, int donationRequestId, string userId);
-    Task CreateShippingNotification(int orderLineId, int? recipientCenterId, DateTime estimatedArrival);
-    Task CreateReceptionNotification(int orderLineId, int requestingCenterId, string reason);
+    Task<List<Notification>> CreateShippingNotification(int orderLineId, int donationRequestId, string userId);
+    Task<List<Notification>> CreateReceptionNotification(int orderLineId, int donationRequestId, string userId, bool generateDonorNotification);
     Task SendSignalRNotifications(List<Notification> notifications);
 }
