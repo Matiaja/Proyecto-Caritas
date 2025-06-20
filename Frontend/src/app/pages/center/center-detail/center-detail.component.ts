@@ -40,7 +40,6 @@ export class CenterDetailComponent implements OnInit {
     this.centerService.getCenterById(centerId).subscribe({
       next: (center: CenterModel) => {
         this.center = center;
-        console.log(this.center);
       },
       error: (err) => {
         console.log(err);

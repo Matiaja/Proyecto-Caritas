@@ -27,7 +27,6 @@ export class UserService {
       .get<any[]>(this.baseUrl + '/all-user-no-admin')
       .pipe(
         tap((users) => {
-          console.log('Usuarios recibidos:', users);
           this.usersSubject.next(users);
         }),
         catchError((error) => {

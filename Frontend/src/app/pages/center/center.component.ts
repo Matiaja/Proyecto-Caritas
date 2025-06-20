@@ -38,7 +38,6 @@ export class CenterComponent implements OnInit {
     this.centerService.getCenters().subscribe({
       next: (centers: CenterModel[]) => {
         this.centers = centers;
-        console.log(this.centers);
       },
       error: (err) => {
         console.log(err);

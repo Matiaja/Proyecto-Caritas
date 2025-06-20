@@ -39,7 +39,6 @@ export class RequestComponent implements OnInit {
           }),
           centerName: req.requestingCenter?.name,
         }));
-        console.log(this.requests);
       },
       error: (err) => {
         console.log(err);

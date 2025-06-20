@@ -46,7 +46,6 @@ export class ProductService {
   }
 
   searchProducts(searchTerm: string): Observable<Product[]> {
-    console.log('Searching:', searchTerm);
     return this.http.get<Product[]>(`${this.baseUrl}/search?query=${searchTerm}`).pipe(
       catchError((error) => {
         console.error('Error searching products:', error);

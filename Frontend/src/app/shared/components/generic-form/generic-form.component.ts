@@ -101,7 +101,6 @@ export class GenericFormComponent implements OnChanges {
 
   onSearchChange(event: Event, value: string) {
     const searchTerm = (event.target as HTMLInputElement).value;
-    console.log('Searching:', searchTerm);
     if (!searchTerm) {
       this.suggestions[value] = [];
       return;
@@ -121,7 +120,6 @@ export class GenericFormComponent implements OnChanges {
   }
 
   selectSearchResult(field: string, value: any) {
-    console.log('Selected:', value);
     this.form.get(field)?.setValue({ id: value.value, name: value.label });
     this.suggestions[field] = [];
   }

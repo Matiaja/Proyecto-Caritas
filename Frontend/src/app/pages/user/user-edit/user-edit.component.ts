@@ -73,14 +73,12 @@ export class UserEditComponent implements OnInit {
   ngOnInit(): void {
     const userId = this.globalStateService.getCurrentUserId();
     this.userId = userId || '';
-    console.log('User ID:', this.userId);
     this.loadUserData();
   }
 
   loadUserData(): void {
     this.userService.getUserById(this.userId).subscribe((user) => {
       this.userData = user;
-      console.log(this.userData);
       this.formConfig = {
         title: 'Editar Usuario',
         fields: [
@@ -133,11 +131,9 @@ export class UserEditComponent implements OnInit {
       CenterId: this.userData.centerId,
       Role: this.userData.role,
     };
-    console.log('User data:', user);
     this.userService.updateUser(user, this.userId).subscribe(
       (response) => {
         this.toastr.success('Usuario actualizado exitosamente', 'Exito');
-        console.log('User updated successfully:', response);
         this.router.navigate(['/users/edit']);
       },
       (error) => {

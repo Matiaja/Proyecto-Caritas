@@ -94,7 +94,6 @@ export class CenterEditComponent implements OnInit {
   loadCenterData(): void {
     this.centerService.getCenter(this.centerId).subscribe((center) => {
       this.centerData = center;
-      console.log(this.centerData);
 
       this.formConfig = {
         title: 'Editar Centro',

@@ -14,7 +14,7 @@
         <div class="message-bubble" [class.user]="msg.role === 'user'" [class.assistant]="msg.role === 'assistant'">
           <strong *ngIf="msg.role === 'user'">Tú:</strong>
           <strong *ngIf="msg.role === 'assistant'">Asistente:</strong>
-          <div class="message-content" [innerHTML]="parseMarkdownToHtml(msg.content)"></div>
+          <div class="message-content" [innerHTML]="msg.htmlContent"></div>
         </div>
       </div>
     </ng-container>

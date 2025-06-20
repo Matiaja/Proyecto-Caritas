@@ -75,7 +75,6 @@ export class ProductAddComponent implements OnInit {
   }
 
   onSubmit(formData: any): void {
-    console.log(formData);
     const payload = {
       name: formData.name,
       categoryId: formData.category,

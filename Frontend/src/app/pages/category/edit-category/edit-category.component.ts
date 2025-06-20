@@ -54,7 +54,6 @@ export class EditCategoryComponent implements OnInit {
   loadCategoryData(): void {
     this.categoryService.getCategory(this.categoryId).subscribe((category) => {
       this.categoryData = category;
-      console.log(this.categoryData);
 
       this.formConfig = {
         title: 'Editar Categoría',

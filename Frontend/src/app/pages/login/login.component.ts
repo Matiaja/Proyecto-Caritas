@@ -26,14 +26,11 @@ export class LoginComponent {
   });
 
   onSubmit() {
-    console.log('Form Submitted!', this.loginForm.value);
     this.authService.login(this.loginForm.value).subscribe({
       next: (data: any) => {
         if (data && data.token) {
           this.globalStateService.setCenterId(data.centerId);
           this.globalStateService.setUserId(data.userId);
-          console.log(this.globalStateService.getCurrentCenterId());
-          console.log(this.globalStateService.getCurrentUserId());
           localStorage.setItem('authUser', JSON.stringify(data)); // Almacena el token
           this.router.navigate(['/home']);
           this.errorMessage = null; // Reset error message on successful login

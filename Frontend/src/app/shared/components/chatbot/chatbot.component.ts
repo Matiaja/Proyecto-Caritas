@@ -18,7 +18,7 @@ export class ChatbotComponent {
   hasGreeted = false;
   baseUrl = environment.baseUrl + 'chat/send';
 
-  messages: { role: 'user' | 'assistant' | 'system', content: string }[] = [
+  messages: { role: 'user' | 'assistant' | 'system', content: string, htmlContent?: SafeHtml }[] = [
     { 
       role: 'system', 
       content: 'Actuás como un soporte técnico amable y claro para Cáritas, explicando cómo usar el sistema de gestión de inventario.' 
@@ -34,7 +34,7 @@ export class ChatbotComponent {
     if (!this.userInput.trim()) return;
 
     const userMessage = this.userInput.trim();
-    this.messages.push({ role: 'user', content: userMessage });
+    this.messages.push({ role: 'user', content: userMessage, htmlContent: this.parseMarkdownToHtml(userMessage) });
     this.userInput = '';
     this.isLoading = true;
 
@@ -61,7 +61,8 @@ export class ChatbotComponent {
       if (response) {
         this.messages.push({ 
           role: 'assistant', 
-          content: response.message 
+          content: response.message,
+          htmlContent: this.parseMarkdownToHtml(response.message)
         });
       } else {
         throw new Error('La respuesta del servidor está vacía');
@@ -107,7 +108,8 @@ export class ChatbotComponent {
 
     this.messages.push({ 
       role: 'assistant', 
-      content: errorMessage 
+      content: errorMessage,
+      htmlContent: this.parseMarkdownToHtml(errorMessage)
     });
   }
 
@@ -117,7 +119,8 @@ export class ChatbotComponent {
     if (this.show && !this.hasGreeted) {
       this.messages.push({
         role: 'assistant',
-        content: '¡Hola! Soy Botín de Cáritas, tu asistente para el sistema de gestión de inventario. ¿En qué puedo ayudarte hoy?'
+        content: '¡Hola! Soy Botín de Cáritas, tu asistente para el sistema de gestión de inventario. ¿En qué puedo ayudarte hoy?',
+        htmlContent: this.parseMarkdownToHtml('¡Hola! Soy Botín de Cáritas, tu asistente para el sistema de gestión de inventario. ¿En qué puedo ayudarte hoy?')
       });
       this.hasGreeted = true;
     }

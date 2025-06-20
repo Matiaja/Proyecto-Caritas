@@ -19,7 +19,6 @@ export class StockService {
   getStocks() {
     this.http.get<any[]>(this.baseUrl).subscribe((stocks) => {
       this.stockSubject.next(stocks);
-      console.log(stocks);
     });
   }
 

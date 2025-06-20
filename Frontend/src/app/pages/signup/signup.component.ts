@@ -41,10 +41,8 @@ export class SignupComponent {
         ...this.signupForm.value,
         role: 'User',
       };
-      console.log('Form Submitted!', formData);
       this.authService.signup(formData).subscribe({
         next: (data: any) => {
-          console.log('Data: ', data);
           this.router.navigate(['/login']);
         },
         error: (error: any) => console.log('Error: ', error),

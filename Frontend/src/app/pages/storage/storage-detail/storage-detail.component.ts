@@ -64,7 +64,6 @@ export class StorageDetailComponent implements OnInit {
     }
     this.stockService.getProductWithStockById(productId, this.centerId).subscribe(
       (response) => {
-        console.log(response);
         this.stock = response;
       },
       (error) => {

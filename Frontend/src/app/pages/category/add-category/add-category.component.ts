@@ -42,7 +42,6 @@ export class AddCategoryComponent {
   ) {}
 
   onSubmit(formData: any): void {
-    console.log(formData);
     this.categoryService.createCategory(formData).subscribe(() => {
       this.toastr.success('Categoría creada con éxito', 'Exito');
       this.router.navigate(['/categories']);

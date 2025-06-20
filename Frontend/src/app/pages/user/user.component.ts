@@ -45,14 +45,6 @@ export class UserComponent implements OnInit {
 
   ngOnInit() {
     this.loadCenters();
-    // this.userService.users$.subscribe(users => {
-    //   this.users = users.map(user => ({
-    //     ...user,
-    //     centerName: user.centerName ? user.centerName : "Usuario sin centro"
-    //   }));
-    // });
-    // this.userService.getUsersNoAdmin();
-    // console.log(this.users);
     this.loadUsers();
   }
 

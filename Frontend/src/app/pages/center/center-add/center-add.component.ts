@@ -81,7 +81,6 @@ export class CenterAddComponent {
   ) {}
 
   onSubmit(formData: any): void {
-    console.log('Datos del formulario:', formData);
     const payload = {
       name: formData.name,
       location: formData.location,
