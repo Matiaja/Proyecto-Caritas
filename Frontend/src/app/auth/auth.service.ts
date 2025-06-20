@@ -82,6 +82,15 @@ export class AuthService {
     return null;
   }
 
+  getUserCenterId(): string | null {
+    const token = localStorage.getItem('authUser');
+    if (token) {
+      const decoded: any = jwtDecode(token);
+      return decoded.CenterId || null;
+    }
+    return null;
+  }
+
   isAdmin(): boolean {
     const role = this.getUserRole();
     return role === 'Admin';

@@ -1,17 +1,18 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { OrderLine } from '../../models/orderLine.model';
 import { Observable } from 'rxjs';
+import { DonationRequest } from '../../models/donationRequest.model';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
-export class OrderLineService {
+export class DonationRequestService {
+
   baseUrl = environment.baseUrl;
   constructor(private http: HttpClient) {}
 
-  getOrderLineById(orderLineId: number): Observable<OrderLine> {
-    return this.http.get<OrderLine>(this.baseUrl + 'orderLines/' + orderLineId);
+  addDonationRequest(dr: DonationRequest): Observable<DonationRequest> {
+    return this.http.post<DonationRequest>(this.baseUrl + 'donationRequests', dr);
   }
 }

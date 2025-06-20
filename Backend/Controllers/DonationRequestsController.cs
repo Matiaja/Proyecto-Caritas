@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProyectoCaritas.Data;
@@ -20,6 +22,7 @@ namespace ProyectoCaritas.Controllers
 
         // GET: api/DonationRequests
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<GetDonationRequestDTO>>> GetAllDonationRequests()
         {
             return await _context.DonationRequests
@@ -30,6 +33,7 @@ namespace ProyectoCaritas.Controllers
 
         // GET: api/DonationRequests/{id}
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<GetDonationRequestDTO>> GetDonationRequestById(int id)
         {
             var donationRequest = await _context.DonationRequests
@@ -51,6 +55,7 @@ namespace ProyectoCaritas.Controllers
 
         // POST: api/DonationRequests
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<DonationRequestDTO>> CreateDonationRequest(DonationRequestDTO addDonationRequestDto)
         {
             // validate if the DonationRequest was sended
@@ -65,7 +70,7 @@ namespace ProyectoCaritas.Controllers
             }
 
             // validate if the Center was sended
-            if (addDonationRequestDto.AssignedCenterId.ToString() == null || addDonationRequestDto.AssignedCenterId.ToString() == "0")
+            if (addDonationRequestDto.AssignedCenterId <= 0 || addDonationRequestDto.AssignedCenterId.ToString() == null)
             {
                 return BadRequest(new
                 {
@@ -88,6 +93,25 @@ namespace ProyectoCaritas.Controllers
                 });
             }
 
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return Unauthorized();
+
+            var user = await _context.Users.Include(u => u.Center).FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+                return Unauthorized();
+
+            // validate if the user is assigned to the center
+            if (!User.IsInRole("Admin") && user.CenterId != addDonationRequestDto.AssignedCenterId)
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "User is not assigned to the center assigned."
+                });
+            }
+
             // validate if the OrderLine exists
             var orderLine = await _context.OrderLines
                 .Include(ol => ol.Product)
@@ -101,6 +125,16 @@ namespace ProyectoCaritas.Controllers
                     Status = "400",
                     Error = "Bad Request",
                     Message = $"Order Line with ID {addDonationRequestDto.OrderLineId} not found."
+                });
+            }
+            // validate if quantity is greater than 0
+            if (addDonationRequestDto.Quantity <= 0)
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "Quantity must be greater than 0."
                 });
             }
 
@@ -142,7 +176,7 @@ namespace ProyectoCaritas.Controllers
                 OrderLineId = addDonationRequestDto.OrderLineId,
                 AssignedCenterId = addDonationRequestDto.AssignedCenterId,
                 Quantity = addDonationRequestDto.Quantity,
-                Status = "Pendiente"
+                Status = "Asignada"
             };
             _context.DonationRequests.Add(donationRequest);
             await _context.SaveChangesAsync();
@@ -245,7 +279,6 @@ namespace ProyectoCaritas.Controllers
                 {
                     Id = donationRequest.OrderLine.Id,
                     RequestId = donationRequest.OrderLine.RequestId,
-                    DonationRequestId = donationRequest.OrderLine.DonationRequestId,
                     Quantity = donationRequest.OrderLine.Quantity,
                     Description = donationRequest.OrderLine.Description,
                     ProductId = donationRequest.OrderLine.ProductId

@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ProyectoCaritas.Data;
@@ -14,30 +17,79 @@ namespace ProyectoCaritas.Controllers
         private readonly ApplicationDbContext _context;
         private readonly OrderLineService _orderLineService;
 
-        public RequestsController(ApplicationDbContext context, OrderLineService orderLineService)
+        private readonly UserManager<User> _userManager;
+
+
+        public RequestsController(ApplicationDbContext context, UserManager<User> userManager, OrderLineService orderLineService)
         {
             _context = context;
+            _userManager = userManager;
             _orderLineService = orderLineService;
         }
 
         // GET: api/Requests
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<RequestDTO>>> GetAllRequests()
         {
-            return await _context.Requests
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+
+            // Si el token no tiene ID, devuelve un error 401
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(new { message = "Invalid token." });
+            }
+
+            // Si es admin, devuelve todas las requests
+            if (role == "Admin")
+            {
+                return await _context.Requests
+                    .Include(r => r.RequestingCenter)
+                    .Include(r => r.OrderLines)
+                    .OrderByDescending(r => r.RequestDate)
+                    .Select(r => RequestToDTO(r))
+                    .ToListAsync();
+            }
+
+            // Si no es admin, buscar el centro del usuario
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found." });
+            }
+
+            // Filtrar las requests por centro del usuario
+            var userRequests = await _context.Requests
                 .Include(r => r.RequestingCenter)
                 .Include(r => r.OrderLines)
+                .Where(r => r.RequestingCenterId == user.CenterId)
+                .OrderByDescending(r => r.RequestDate)
                 .Select(r => RequestToDTO(r))
                 .ToListAsync();
+
+            return Ok(userRequests); ;
         }
 
         // GET: api/Requests/{id}
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<RequestDTO>> GetRequestById(int id)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+
+            // Si el token no tiene ID, devuelve un error 401
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(new { message = "Invalid token." });
+            }
+
             var request = await _context.Requests
                 .Include(r => r.RequestingCenter)
                 .Include(r => r.OrderLines)
+                    .ThenInclude(ol => ol.DonationRequests)
                 .FirstOrDefaultAsync(r => r.Id == id);
 
             if (request == null)
@@ -50,23 +102,55 @@ namespace ProyectoCaritas.Controllers
                 });
             }
 
+            // Si es user, valida si la request es del centro del usuario
+            if (role != "Admin")
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return NotFound(new
+                    {
+                        Status = "404",
+                        Message = "User not found."
+                    });
+                }
+
+                if (request.RequestingCenterId != user.CenterId)
+                {
+                    return new ObjectResult(new
+                    {
+                        Status = 403,
+                        Message = "You do not have permission to access this request."
+                    })
+                    {
+                        StatusCode = StatusCodes.Status403Forbidden
+                    };
+                }
+            }
+
             return RequestToDTO(request);
         }
 
         // POST: api/Requests
         [HttpPost]
-        public async Task<ActionResult<RequestDTO>> AddRequest(RequestDTO requestDTO)
+        [Authorize]
+        public async Task<ActionResult<RequestDTO>> AddRequest(AddRequestDTO requestDTO)
         {
-            //validaciones correspondientes
-            if (requestDTO.RequestingCenterId < 0 || string.IsNullOrEmpty(requestDTO.UrgencyLevel) || requestDTO.RequestDate == default)
+            if (!ModelState.IsValid)
             {
-                return BadRequest(new
-                {
-                    Status = "400",
-                    Error = "Bad Request",
-                    Message = "Invalid data. Ensure all required fields are provided."
-                });
+                return BadRequest(ModelState);
             }
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+
+            // Si el token no tiene ID, devuelve un error 401
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(role))
+            {
+                return Unauthorized(new { message = "Invalid token." });
+            }
+
+            // Validar si el CenterId proporcionado existe en la base de datos
             var requestingCenter = await _context.Centers.FindAsync(requestDTO.RequestingCenterId);
             if (requestingCenter == null)
             {
@@ -83,8 +167,33 @@ namespace ProyectoCaritas.Controllers
                 {
                     Status = "400",
                     Error = "Bad Request",
-                    Message = "Request have not orderline."
+                    Message = "Request has not orderline."
                 });
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound(new
+                {
+                    Status = "404",
+                    Message = "User not found."
+                });
+            }
+            // si el usuario NO es admin, validar que solo pueda usar su centro para solicitar
+            if (role != "Admin")
+            {
+                if (user.CenterId != requestDTO.RequestingCenterId)
+                {
+                    return new ObjectResult(new
+                    {
+                        Status = 403,
+                        Message = "You do not have permission to make a request from this center."
+                    })
+                    {
+                        StatusCode = StatusCodes.Status403Forbidden
+                    };
+                }
             }
 
             var request = new Request
@@ -92,7 +201,6 @@ namespace ProyectoCaritas.Controllers
                 RequestingCenterId = requestDTO.RequestingCenterId,
                 UrgencyLevel = requestDTO.UrgencyLevel,
                 RequestDate = requestDTO.RequestDate,
-                RequestingCenter = requestingCenter,
             };
 
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -138,7 +246,7 @@ namespace ProyectoCaritas.Controllers
 
         // PUT: api/Requests/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateRequest(int id, UpdateRequestDTO updateRequestDTO)
+        public async Task<IActionResult> UpdateRequest(int id, AddRequestDTO updateRequestDTO)
         {
             //validaciones correspondientes
             if (updateRequestDTO.RequestingCenterId < 0 || string.IsNullOrEmpty(updateRequestDTO.UrgencyLevel) || updateRequestDTO.RequestDate == default)
@@ -236,15 +344,22 @@ namespace ProyectoCaritas.Controllers
                Id = request.Id,
                RequestingCenterId = request.RequestingCenterId,
                UrgencyLevel = request.UrgencyLevel,
+               Status = request.Status,
                RequestDate = request.RequestDate,
                OrderLines = request.OrderLines?.Select(ol => new OrderLineDTO
                {
                    Id = ol.Id,
                    RequestId = ol.RequestId,
-                   DonationRequestId = ol.DonationRequestId,
                    Quantity = ol.Quantity,
                    Description = ol.Description,
-                   ProductId = ol.ProductId
+                   ProductId = ol.ProductId,
+                   DonationRequests = ol.DonationRequests?.Select(dr => new GetDonationRequestDTO
+                   {
+                       Id = dr.Id,
+                       AssignedCenterId = dr.AssignedCenterId,
+                       Quantity = dr.Quantity,
+                       Status = dr.Status
+                   }).ToList()
                }).ToList() ?? new List<OrderLineDTO>(),
                RequestingCenter = request.RequestingCenter != null ? new GetCenterDTO
                {

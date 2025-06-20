@@ -22,6 +22,7 @@ import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { Product } from '../../../models/product.model';
 import { RequestService } from '../../../services/request/request.service';
 import { ToastrService } from 'ngx-toastr';
+import { AuthService } from '../../../auth/auth.service';
 
 @Component({
   selector: 'app-request-add',
@@ -56,6 +57,7 @@ export class RequestAddComponent implements OnInit {
     requestingCenterId: 0,
     urgencyLevel: '',
     requestDate: '',
+    status: 'Pendiente',
     orderLines: [],
   } as RequestModel;
   productSuggestions: any[] = [];
@@ -121,6 +123,7 @@ export class RequestAddComponent implements OnInit {
     private fb: FormBuilder,
     private productService: ProductService,
     private requestService: RequestService,
+    private authService: AuthService,
     private location: Location,
     private toastr: ToastrService
   ) {}
@@ -151,10 +154,21 @@ export class RequestAddComponent implements OnInit {
     // Load centers from API
     this.centerService.getCenters().subscribe({
       next: (centers) => {
-        this.centers = centers.map((center) => ({
-          value: center.id,
-          label: center.name,
-        }));
+        const userRole = this.authService.getUserRole();
+        const userCenterId = this.authService.getUserCenterId();
+        if (userRole === 'Admin') {
+          this.centers = centers.map((center) => ({
+              value: center.id,
+              label: center.name,
+            }));
+        } else {
+          // Si es usuario común, filtra por su centro
+          const userCenter = centers.find(c => c.id === Number(userCenterId));
+          this.centers = userCenter
+            ? [{ value: userCenter.id, label: userCenter.name }]
+            : [];
+        }
+        // Asigna las opciones al primer campo del formulario
         this.formConfig.fields[0].options = this.centers;
       },
       error: (error) => {

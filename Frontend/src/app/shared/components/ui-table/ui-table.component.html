@@ -1,5 +1,6 @@
 <div class="d-flex justify-content-center mt-5">
   <div class="card container w-100 w-md-75 mx-auto p-md-3 shadow-sm">
+    @if (showFilterButton) {
     <div>
       <button
         class="btn btn-link text-primary p-0 border-0 d-flex align-items-center mb-2"
@@ -9,7 +10,7 @@
         <i class="bi bi-chevron-down transition-icon" [class.rotate-icon]="filtersVisible"></i>
       </button>
     </div>
-
+    }
     @if (!isMobileView) {
       <!-- Filtros -->
       <div *ngIf="showProductsFilters" class="filters-container" [class.visible]="filtersVisible">
@@ -17,7 +18,7 @@
           <label>Categoría:</label>
           <select class="form-select w-auto" [(ngModel)]="selectedCategory" (change)="filterData()">
             <option [ngValue]="null">Todas</option>
-            <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
+            <option *ngFor="let opc of statusOptions" [value]="opc">{{ opc }}</option>
           </select>
 
           <label>Ordenar por:</label>
@@ -46,16 +47,13 @@
 
       <div *ngIf="showCommonFilters" class="filters-container" [class.visible]="filtersVisible">
         <div class="card-body d-flex flex-wrap gap-2 align-items-center">
-          <label *ngIf="showCenterSelect">Centros:</label>
-          <select
-            *ngIf="showCenterSelect"
-            class="form-select w-auto"
-            [(ngModel)]="selectedCenter"
-            (change)="filterData()"
-          >
-            <option [ngValue]="null">Todos</option>
-            <option *ngFor="let cen of centers" [value]="cen.id">{{ cen.name }}</option>
-          </select>
+          @if (showStatusFilter) {
+            <span>Estado:</span>
+            <select class="form-select w-auto" [(ngModel)]="selectedStatus" (change)="filterData()">
+              <option [ngValue]="null">Todos</option>
+              <option *ngFor="let status of statusOptions" [value]="status">{{ status }}</option>
+            </select>
+          }
           <label>Ordenar por:</label>
           <select class="form-select w-auto" [(ngModel)]="selectedSortBy" (change)="filterData()">
             <option [ngValue]="null">Sin orden</option>
@@ -116,6 +114,13 @@
 
       <div *ngIf="showCommonFilters" class="filters-container" [class.visible]="filtersVisible">
         <div class="card-body">
+          @if (showStatusFilter) {
+            <span>Estado:</span>
+            <select class="form-select w-auto" [(ngModel)]="selectedStatus" (change)="filterData()">
+              <option [ngValue]="null">Todos</option>
+              <option *ngFor="let status of statusOptions" [value]="status">{{ status }}</option>
+            </select>
+          }
           <label *ngIf="showCenterSelect">Centros:</label>
           <select
             *ngIf="showCenterSelect"

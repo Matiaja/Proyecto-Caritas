@@ -22,6 +22,7 @@ namespace ProyectoCaritas.Controllers
 
         // GET: api/Categories
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<GetCategoryDTO>>> GetAllCategories()
         {
             return await _context.Categories
@@ -32,6 +33,7 @@ namespace ProyectoCaritas.Controllers
 
         // GET: api/Categories/{id}
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<GetCategoryDTO>> GetCategoryById(int id)
         {
             var category = await _context.Categories
@@ -123,6 +125,7 @@ namespace ProyectoCaritas.Controllers
         }
 
         [HttpGet("filter")]
+        [Authorize]
         public async Task<ActionResult<List<GetCategoryDTO>>> GetCategoriesByFilter(
             [FromQuery] string? sortBy = null,
             [FromQuery] string? order = "asc")

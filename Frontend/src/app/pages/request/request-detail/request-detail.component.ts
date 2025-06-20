@@ -19,6 +19,7 @@ export class RequestDetailComponent implements OnInit {
     requestingCenterId: 0,
     urgencyLevel: '',
     requestDate: '',
+    status: '',
     requestingCenter: {
       id: 0,
       name: '',
@@ -69,7 +70,7 @@ export class RequestDetailComponent implements OnInit {
     this.orderLines = this.request.orderLines.map((line) => {
       const orderLine = {
         ...line,
-        isAssigned: line.donationRequestId !== null ? 'Sí' : 'No',
+        isAssigned: 'No',
         productName: '',
       };
       this.productService.getProductById(line.productId).subscribe({
@@ -89,13 +90,11 @@ export class RequestDetailComponent implements OnInit {
   }
 
   assign(row: any): void {
-    this.router.navigate(['/requests', this.request.id, 'assign'], {
-      queryParams: { orderLineId: row.id, productId: row.productId },
-    });
+    this.router.navigate(['/requests', this.request.id, 'assign', row.id]);
   }
 
   onSelectOrderLine(ol: any) {
-    console.log('Select order line', ol);
+    this.router.navigate(['/orderline', ol.id]);
   }
 
   goBack() {

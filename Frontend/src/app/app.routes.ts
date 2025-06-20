@@ -29,6 +29,7 @@ import { UserEditComponent } from './pages/user/user-edit/user-edit.component';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
 import { roleGuard } from './guards/role.guard';
 import { UnauthorizedComponent } from './pages/unauthorized/unauthorized.component';
+import { OrderlineComponent } from './pages/orderline/orderline/orderline.component';
 
 export const routes: Routes = [
   {
@@ -64,8 +65,13 @@ export const routes: Routes = [
       { path: '', component: RequestComponent },
       { path: 'add', component: RequestAddComponent },
       { path: ':id', component: RequestDetailComponent },
-      { path: ':id/assign', component: RequestAssignComponent },
+      { path: ':id/assign/:idorderline', component: RequestAssignComponent },
     ],
+  },
+  {
+    path: 'orderline/:id',
+    component: OrderlineComponent,
+    canActivate: [authGuard],
   },
   {
     path: 'center/:id',

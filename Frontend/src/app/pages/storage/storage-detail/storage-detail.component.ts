@@ -46,14 +46,17 @@ export class StorageDetailComponent implements OnInit {
     private router: Router,
     private location: Location,
     private globalStateService: GlobalStateService
-  ) {
-    this.centerId = this.globalStateService.getCurrentCenterId();
-  }
+  ) {}
 
   ngOnInit(): void {
     this.route.params.subscribe((params) => {
       const productId = params['id'];
-      this.loadProductStockDetails(productId);
+      this.route.queryParams.subscribe((queryParams) => {
+        const queryCenterId = queryParams['centerId'];
+        this.centerId = queryCenterId ? +queryCenterId : this.globalStateService.getCurrentCenterId();
+        
+        this.loadProductStockDetails(productId);
+      });
     });
   }
 

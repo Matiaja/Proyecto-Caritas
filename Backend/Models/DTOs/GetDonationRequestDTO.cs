@@ -12,5 +12,6 @@ namespace ProyectoCaritas.Models.DTOs
         public DateTime? ReceptionDate { get; set; }
         public required string Status { get; set; }
         public OrderLineDTO? OrderLine { get; set; }
+        public GetCenterDTO? AssignedCenter { get; set; }
     }
 }

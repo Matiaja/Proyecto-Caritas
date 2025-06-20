@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,7 @@ namespace ProyectoCaritas.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<OrderLineDTO>> AddOrderLine(OrderLineDTO orderLineDTO)
         {
             // Validaciones
@@ -68,10 +70,10 @@ namespace ProyectoCaritas.Controllers
             var orderLine = new OrderLine
             {
                 RequestId = orderLineDTO.RequestId,
-                DonationRequestId = orderLineDTO.DonationRequestId,
                 Quantity = orderLineDTO.Quantity,
                 Description = orderLineDTO.Description,
-                Product = product
+                Product = product,
+                Status = orderLineDTO.Status ?? "",
             };
 
             context.OrderLines.Add(orderLine);
@@ -124,7 +126,6 @@ namespace ProyectoCaritas.Controllers
             orderLine.Description = orderLineDTO.Description;
             orderLine.Product = product;
             orderLine.RequestId = orderLineDTO.RequestId;
-            orderLine.DonationRequestId = orderLineDTO.DonationRequestId;
 
             await context.SaveChangesAsync();
 
@@ -134,7 +135,14 @@ namespace ProyectoCaritas.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<OrderLineDTO>> GetOrderLineById(int id)
         {
-            var orderLine = await context.OrderLines.FindAsync(id);
+            var orderLine = await context.OrderLines
+                .Include(ol => ol.Request!)
+                    .ThenInclude(r => r.RequestingCenter)
+                .Include(ol => ol.Product)
+                .Include(ol => ol.DonationRequests!)
+                    .ThenInclude(dr => dr.AssignedCenter)
+                .FirstOrDefaultAsync(ol => ol.Id == id);
+
             if (orderLine == null)
             {
                 return NotFound(new
@@ -174,10 +182,46 @@ namespace ProyectoCaritas.Controllers
             {
                 Id = orderLine.Id,
                 RequestId = orderLine.RequestId,
-                DonationRequestId = orderLine.DonationRequestId,
                 Quantity = orderLine.Quantity,
                 Description = orderLine.Description,
-                ProductId = orderLine.ProductId
+                ProductId = orderLine.ProductId,
+                Product = orderLine.Product != null ? new ProductDTO
+                {
+                    Id = orderLine.Product.Id,
+                    Name = orderLine.Product.Name,
+                    CategoryId = orderLine.Product.CategoryId
+                } : null,
+                Request = orderLine.Request != null ? new RequestBasicDTO
+                {
+                    Id = orderLine.Request.Id,
+                    RequestDate = orderLine.Request.RequestDate,
+                    UrgencyLevel = orderLine.Request.UrgencyLevel,
+                    RequestingCenterId = orderLine.Request.RequestingCenterId,
+                    RequestingCenter = orderLine.Request.RequestingCenter != null ? new GetCenterDTO
+                    {
+                        Id = orderLine.Request.RequestingCenter.Id,
+                        Name = orderLine.Request.RequestingCenter.Name,
+                        Location = orderLine.Request.RequestingCenter.Location,
+                        Manager = orderLine.Request.RequestingCenter.Manager,
+                        Phone = orderLine.Request.RequestingCenter.Phone
+                    } : null
+                } : null,
+                DonationRequests = orderLine.DonationRequests?.Select(dr => new GetDonationRequestDTO
+                {
+                    Id = dr.Id,
+                    AssignedCenterId = dr.AssignedCenterId,
+                    AssignedCenter = dr.AssignedCenter != null ? new GetCenterDTO
+                    {
+                        Id = dr.AssignedCenter.Id,
+                        Name = dr.AssignedCenter.Name,
+                        Location = dr.AssignedCenter.Location,
+                        Manager = dr.AssignedCenter.Manager,
+                        Phone = dr.AssignedCenter.Phone
+                    } : null,
+                    OrderLineId = dr.OrderLineId,
+                    Quantity = dr.Quantity,
+                    Status = dr.Status
+                }).ToList()
             };
         }
     }
