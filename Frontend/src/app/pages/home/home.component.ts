@@ -1,497 +1,376 @@
-import { Component, OnDestroy, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
-import { ResponsiveService } from '../../services/responsive/responsive.service';
-import { GlobalStateService } from '../../services/global/global-state.service';
-import { Subscription } from 'rxjs';
-import { AuthService } from '../../auth/auth.service';
-import { CenterService } from '../../services/center/center.service';
-import { CategoryService } from '../../services/category/category.service';
-import { StockReportService, ChartData } from '../../services/stock-report/stock-report.service';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Chart, registerables } from 'chart.js';
+import { StockReportService, ProductStockSummary } from '../../services/stock-report/stock-report.service';
+import { CategoryService } from '../../services/category/category.service';
+import { ProductService } from '../../services/product/product.service';
+import { CenterService } from '../../services/center/center.service';
+import { AuthService } from '../../auth/auth.service';
+import { ChartData, ChartOptions } from 'chart.js';
+import { NgChartsModule } from 'ng2-charts';
+import { forkJoin } from 'rxjs';
 
-Chart.register(...registerables);
+interface Category {
+  id: number;
+  name: string;
+}
+
+interface Product {
+  id: number;
+  name: string;
+}
+
+interface Center {
+  id: number;
+  name: string;
+}
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NgChartsModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
-export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
-  @ViewChild('categoryChart') categoryChart!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('typeChart') typeChart!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('monthChart') monthChart!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('productsChart') productsChart!: ElementRef<HTMLCanvasElement>;
-
-  isMobile: boolean = false;
-  private resizeSub!: Subscription;
+export class HomeComponent implements OnInit {
+  stockData: ProductStockSummary[] = [];
+  categories: Category[] = [];
+  products: Product[] = [];
+  centers: Center[] = [];
+  isLoading = false;
   isAdmin = false;
-  centers: any[] = [];
-  categories: any[] = [];
-  products: any[] = [];
-  selectedCenterId: number | string = '';
-  selectedCategory: string = '';
-  selectedProduct: string = '';
-  dateFrom: string = '';
-  dateTo: string = '';
-  loading = false;
-  error = '';
 
-  private charts: { [key: string]: Chart } = {};
-  private allChartData: ChartData | null = null;
+  // Filtros
+  centerId?: number;
+  categoryId?: number;
+  productId?: number;
+  fromDate?: string;
+  toDate?: string;
+
+  // Chart Data
+  pieChartData: ChartData<'pie'> = { labels: [], datasets: [] };
+  barChartData: ChartData<'bar'> = { labels: [], datasets: [] };
+  lineChartData: ChartData<'line'> = { labels: [], datasets: [] };
+  doughnutChartData: ChartData<'doughnut'> = { labels: [], datasets: [] };
+
+  // Chart Options
+  pieChartOptions: ChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          boxWidth: 12,
+          font: { size: 11 }
+        }
+      }
+    }
+  };
+
+  barChartOptions: ChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: { font: { size: 10 } }
+      },
+      x: {
+        ticks: { 
+          maxRotation: 45,
+          font: { size: 10 }
+        }
+      }
+    }
+  };
+
+  lineChartOptions: ChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+        labels: { font: { size: 11 } }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: { font: { size: 10 } }
+      },
+      x: {
+        ticks: { font: { size: 10 } }
+      }
+    }
+  };
+
+  doughnutChartOptions: ChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          boxWidth: 12,
+          font: { size: 11 }
+        }
+      }
+    }
+  };
 
   constructor(
-    private responsiveService: ResponsiveService,
-    private globalStateService: GlobalStateService,
-    private authService: AuthService,
-    private centerService: CenterService,
+    private stockReportService: StockReportService,
     private categoryService: CategoryService,
-    private stockReportService: StockReportService
+    private productService: ProductService,
+    private centerService: CenterService,
+    private authService: AuthService
   ) {}
 
-  ngOnInit() {
-    this.loading = true; // Iniciar loading desde el principio
-    
-    this.resizeSub = this.responsiveService.isMobile$.subscribe((isMobile) => {
-      this.isMobile = isMobile;
-    });
-
-    this.isAdmin = this.authService.isAdmin();
+  ngOnInit(): void {
+    this.checkAdminRole();
     this.loadInitialData();
   }
 
-  ngAfterViewInit() {
-    setTimeout(() => {
-      if (this.selectedCenterId) {
-        this.loadChartData();
-      }
-    }, 100);
+  checkAdminRole(): void {
+    this.isAdmin = this.authService.isAdmin();
   }
 
-  loadInitialData() {
-    // Load categories
-    this.categoryService.getAllCategories().subscribe({
-      next: (categories) => {
-        this.categories = categories;
-      },
-      error: (error) => console.error('Error loading categories:', error)
-    });
+  loadInitialData(): void {
+    this.isLoading = true;
+    
+    const requests = [
+      this.categoryService.getAllCategories(),
+      this.productService.getProducts()
+    ];
 
     if (this.isAdmin) {
-      this.loadCenters();
-    } else {
-      const userCenterId = this.authService.getUserCenterId?.() ?? this.globalStateService.getCurrentCenterId();
-      if (userCenterId) {
-        this.selectedCenterId = userCenterId;
-        this.loadProducts();
-      }
+      requests.push(this.centerService.getCenters());
     }
-  }
 
-  loadCenters() {
-    this.centerService.getCenters().subscribe({
-      next: (centers) => {
-        this.centers = centers;
-        if (centers.length > 0 && !this.selectedCenterId) {
-          if (centers[0].id !== undefined) {
-            this.selectedCenterId = centers[0].id;
-            this.loadProducts();
-            this.loadChartData();
-          }
+    forkJoin(requests).subscribe({
+      next: (responses) => {
+        this.categories = responses[0].map((cat: any) => ({ id: cat.id, name: cat.name }));
+        this.products = responses[1].map((prod: any) => ({ id: prod.id, name: prod.name }));
+        
+        if (this.isAdmin && responses[2]) {
+          this.centers = responses[2].map((center: any) => ({ id: center.id, name: center.name }));
+        } else if (this.isAdmin) {
+          // If centers failed to load, set empty array and continue
+          this.centers = [];
+          console.warn('Centers could not be loaded, but continuing with dashboard');
         }
+        
+        this.loadData();
       },
       error: (error) => {
-        console.error('Error loading centers:', error);
-        this.error = 'Error al cargar los centros';
-      }
-    });
-  }
-
-  loadProducts() {
-    if (!this.selectedCenterId) return;
-
-    this.stockReportService.getProductsByCenter(Number(this.selectedCenterId)).subscribe({
-      next: (products) => {
-        this.products = products;
-      },
-      error: (error) => console.error('Error loading products:', error)
-    });
-  }
-
-  onCenterChange() {
-    if (this.selectedCenterId) {
-      this.clearFilters();
-      this.loadProducts();
-      this.loadChartData();
-    }
-  }
-
-  applyFilters() {
-    if (!this.allChartData) return;
-
-    this.loading = true;
-    
-    setTimeout(() => {
-      const filteredData = this.filterChartData(this.allChartData!);
-      this.createCharts(filteredData);
-      this.loading = false;
-    }, 300);
-  }
-
-  clearFilters() {
-    this.selectedCategory = '';
-    this.selectedProduct = '';
-    this.dateFrom = '';
-    this.dateTo = '';
-    
-    if (this.allChartData) {
-      this.createCharts(this.allChartData);
-    }
-  }
-
-  filterChartData(data: ChartData): ChartData {
-    let filteredData = { ...data };
-
-    // Filter by category - aplicar a todos los gráficos relacionados con categorías
-    if (this.selectedCategory) {
-      const categoryName = this.categories.find(c => c.id == this.selectedCategory)?.name;
-      if (categoryName) {
-        // Filtrar stock por categoría
-        filteredData.stockByCategory = data.stockByCategory.filter(item => 
-          item.categoryName === categoryName
-        );
+        console.error('Error loading initial data:', error);
         
-        // Filtrar productos top que pertenezcan a la categoría seleccionada
-        // Necesitamos obtener los productos de esa categoría desde this.products
-        const productsInCategory = this.products.filter(p => {
-          // Buscar la categoría del producto
-          return this.categories.find(c => c.id == this.selectedCategory)?.name === categoryName;
+        // Try to load categories and products individually
+        this.categoryService.getAllCategories().subscribe({
+          next: (categories) => {
+            this.categories = categories.map((cat: any) => ({ id: cat.id, name: cat.name }));
+          },
+          error: (err) => console.error('Error loading categories:', err)
         });
-        
-        if (productsInCategory.length > 0) {
-          const productNamesInCategory = productsInCategory.map(p => p.productName);
-          filteredData.topProducts = data.topProducts.filter(item => 
-            productNamesInCategory.includes(item.productName)
-          );
-        } else {
-          filteredData.topProducts = [];
+
+        this.productService.getProducts().subscribe({
+          next: (products) => {
+            this.products = products.map((prod: any) => ({ id: prod.id, name: prod.name }));
+          },
+          error: (err) => console.error('Error loading products:', err)
+        });
+
+        if (this.isAdmin) {
+          // Try to load centers separately
+          this.centerService.getCenters().subscribe({
+            next: (centers) => {
+              this.centers = centers.map((center: any) => ({ id: center.id, name: center.name }));
+            },
+            error: (err) => {
+              console.error('Error loading centers:', err);
+              this.centers = [];
+            }
+          });
         }
+
+        // Continue with loading stock data even if some services failed
+        this.loadData();
       }
-    }
-
-    // Filter by product - aplicar a todos los gráficos relacionados con productos
-    if (this.selectedProduct) {
-      const selectedProductData = this.products.find(p => p.productId == this.selectedProduct);
-      if (selectedProductData) {
-        // Filtrar solo el producto seleccionado en top products
-        filteredData.topProducts = data.topProducts.filter(item => 
-          item.productName === selectedProductData.productName
-        );
-        
-        // Filtrar categoría del producto seleccionado
-        const productCategoryId = selectedProductData.categoryId;
-        if (productCategoryId) {
-          const categoryName = this.categories.find(c => c.id === productCategoryId)?.name;
-          if (categoryName) {
-            filteredData.stockByCategory = data.stockByCategory.filter(item => 
-              item.categoryName === categoryName
-            );
-          }
-        }
-      }
-    }
-
-    // Filter by date range - aplicar a gráficos con datos temporales
-    if (this.dateFrom || this.dateTo) {
-      filteredData.stockByMonth = data.stockByMonth.filter(item => {
-        const itemDate = new Date(item.month + '-01');
-        const fromDate = this.dateFrom ? new Date(this.dateFrom) : new Date('1900-01-01');
-        const toDate = this.dateTo ? new Date(this.dateTo) : new Date('2100-12-31');
-        
-        return itemDate >= fromDate && itemDate <= toDate;
-      });
-    }
-
-    return filteredData;
+    });
   }
 
-  loadChartData() {
-    if (!this.selectedCenterId) {
-      this.error = 'No hay centro seleccionado';
-      return;
-    }
-
-    this.loading = true;
-    this.error = '';
-
-    const centerId = Number(this.selectedCenterId);
-
-    this.stockReportService.getChartData(centerId).subscribe({
+  loadData(): void {
+    this.isLoading = true;
+    
+    // Clear undefined values to ensure proper filtering
+    const cleanCenterId = this.centerId === undefined ? undefined : this.centerId;
+    const cleanCategoryId = this.categoryId === undefined ? undefined : this.categoryId;
+    const cleanProductId = this.productId === undefined ? undefined : this.productId;
+    const cleanFromDate = this.fromDate === undefined || this.fromDate === '' ? undefined : this.fromDate;
+    const cleanToDate = this.toDate === undefined || this.toDate === '' ? undefined : this.toDate;
+    
+    this.stockReportService.getStockReport(
+      cleanCenterId,
+      cleanCategoryId, 
+      cleanProductId,
+      cleanFromDate, 
+      cleanToDate
+    ).subscribe({
       next: (data) => {
-        this.allChartData = data;
-        this.createCharts(data);
-        this.loading = false;
+        this.stockData = data;
+        this.generateCharts();
+        this.isLoading = false;
       },
       error: (error) => {
-        console.error('Error loading chart data:', error);
-        this.error = 'Error al cargar los datos de los gráficos';
-        this.loading = false;
+        console.error('Error loading data:', error);
+        this.isLoading = false;
       }
     });
   }
 
-  createCharts(data: ChartData) {
-    // Verificar que tenemos los canvas elements
-    if (!this.categoryChart || !this.typeChart || !this.monthChart || !this.productsChart) {
-      setTimeout(() => this.createCharts(data), 100);
-      return;
+  onCenterChange(): void {
+    // Explicitly handle center filter change
+    if (this.centerId === undefined || this.centerId === null) {
+      this.centerId = undefined;
     }
-
-    this.createCategoryChart(data.stockByCategory);
-    this.createTypeChart(data.stockByType);
-    this.createMonthChart(data.stockByMonth);
-    this.createProductsChart(data.topProducts);
+    this.loadData();
   }
 
-  createCategoryChart(data: any[]) {
-    if (this.charts['category']) {
-      this.charts['category'].destroy();
+  onCategoryChange(): void {
+    // Explicitly handle category filter change
+    if (this.categoryId === undefined || this.categoryId === null) {
+      this.categoryId = undefined;
     }
-
-    const ctx = this.categoryChart.nativeElement.getContext('2d');
-    if (!ctx) return;
-
-    this.charts['category'] = new Chart(ctx, {
-      type: 'pie',
-      data: {
-        labels: data.map(item => item.categoryName),
-        datasets: [{
-          data: data.map(item => item.totalStock),
-          backgroundColor: [
-            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
-            '#9966FF', '#FF9F40', '#FF6B8A', '#C9CBCF'
-          ]
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: {
-              font: {
-                size: this.isMobile ? 10 : 12
-              }
-            }
-          },
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                const label = context.label || '';
-                const value = context.parsed || 0;
-                return `${label}: ${value} unidades`;
-              }
-            }
-          }
-        }
-      }
-    });
+    this.loadData();
   }
 
-  createTypeChart(data: any[]) {
-    if (this.charts['type']) {
-      this.charts['type'].destroy();
+  onProductChange(): void {
+    // Explicitly handle product filter change
+    if (this.productId === undefined || this.productId === null) {
+      this.productId = undefined;
     }
-
-    const ctx = this.typeChart.nativeElement.getContext('2d');
-    if (!ctx) return;
-
-    this.charts['type'] = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: data.map(item => item.stockType),
-        datasets: [{
-          data: data.map(item => item.totalStock),
-          backgroundColor: ['#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0']
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: {
-              font: {
-                size: this.isMobile ? 10 : 12
-              }
-            }
-          },
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                const label = context.label || '';
-                const value = context.parsed || 0;
-                return `${label}: ${value} unidades`;
-              }
-            }
-          }
-        }
-      }
-    });
+    this.loadData();
   }
 
-  createMonthChart(data: any[]) {
-    if (this.charts['month']) {
-      this.charts['month'].destroy();
+  onDateChange(): void {
+    // Handle date changes
+    if (this.fromDate === '') {
+      this.fromDate = undefined;
     }
-
-    const ctx = this.monthChart.nativeElement.getContext('2d');
-    if (!ctx) return;
-
-    this.charts['month'] = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: data.map(item => {
-          const [year, month] = item.month.split('-');
-          return `${month}/${year}`;
-        }),
-        datasets: [{
-          label: 'Stock Total',
-          data: data.map(item => item.totalStock),
-          borderColor: '#36A2EB',
-          backgroundColor: 'rgba(54, 162, 235, 0.1)',
-          fill: true,
-          tension: 0.4
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: {
-            beginAtZero: true,
-            title: {
-              display: !this.isMobile,
-              text: 'Cantidad'
-            },
-            ticks: {
-              font: {
-                size: this.isMobile ? 10 : 12
-              }
-            }
-          },
-          x: {
-            title: {
-              display: !this.isMobile,
-              text: 'Mes'
-            },
-            ticks: {
-              font: {
-                size: this.isMobile ? 10 : 12
-              },
-              maxRotation: this.isMobile ? 45 : 0
-            }
-          }
-        },
-        plugins: {
-          legend: {
-            display: !this.isMobile
-          },
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                const value = context.parsed.y || 0;
-                return `Stock: ${value} unidades`;
-              }
-            }
-          }
-        }
-      }
-    });
+    if (this.toDate === '') {
+      this.toDate = undefined;
+    }
+    this.loadData();
   }
 
-  createProductsChart(data: any[]) {
-    if (this.charts['products']) {
-      this.charts['products'].destroy();
-    }
-
-    const ctx = this.productsChart.nativeElement.getContext('2d');
-    if (!ctx) return;
-
-    this.charts['products'] = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: data.map(item => this.isMobile ? 
-          item.productName.substring(0, 15) + (item.productName.length > 15 ? '...' : '') : 
-          item.productName
-        ),
-        datasets: [{
-          label: 'Cantidad',
-          data: data.map(item => item.totalStock),
-          backgroundColor: '#4BC0C0'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: {
-            beginAtZero: true,
-            title: {
-              display: !this.isMobile,
-              text: 'Cantidad'
-            },
-            ticks: {
-              font: {
-                size: this.isMobile ? 10 : 12
-              }
-            }
-          },
-          x: {
-            ticks: {
-              maxRotation: this.isMobile ? 90 : 45,
-              minRotation: this.isMobile ? 45 : 0,
-              font: {
-                size: this.isMobile ? 9 : 11
-              }
-            },
-            title: {
-              display: !this.isMobile,
-              text: 'Productos'
-            }
-          }
-        },
-        plugins: {
-          legend: {
-            display: !this.isMobile
-          },
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                const value = context.parsed.y || 0;
-                return `Stock: ${value} unidades`;
-              }
-            }
-          }
-        }
-      }
-    });
-  }
-
-  ngOnDestroy() {
-    if (this.resizeSub) {
-      this.resizeSub.unsubscribe();
-    }
+  extractFiltersData(): void {
+    // Extract unique categories
+    const categoryMap = new Map<number, string>();
+    const productMap = new Map<number, string>();
     
-    // Destroy all charts
-    Object.values(this.charts).forEach(chart => {
-      if (chart) {
-        chart.destroy();
-      }
+    this.stockData.forEach(item => {
+      categoryMap.set(item.categoryId, item.categoryName);
+      productMap.set(item.productId, item.productName);
     });
+
+    this.categories = Array.from(categoryMap.entries()).map(([id, name]) => ({ id, name }));
+    this.products = Array.from(productMap.entries()).map(([id, name]) => ({ id, name }));
+  }
+
+  generateCharts(): void {
+    this.generateCategoryChart();
+    this.generateTopProductsChart();
+    this.generateStockOverTimeChart();
+    this.generateIngresoEgresoChart();
+  }
+
+  generateCategoryChart(): void {
+    const grouped = this.groupSum(this.stockData, item => item.categoryName);
+    const labels = Object.keys(grouped);
+    const data = Object.values(grouped);
+    
+    this.pieChartData = {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: [
+          '#36337f', '#5a67d8', '#63b3ed', '#68d391', '#f6e05e',
+          '#fc8181', '#d69e2e', '#9f7aea', '#4fd1c7', '#f093fb'
+        ],
+        borderWidth: 2,
+        borderColor: '#ffffff'
+      }]
+    };
+  }
+
+  generateTopProductsChart(): void {
+    const grouped = this.groupSum(this.stockData, item => item.productName);
+    const top = Object.entries(grouped)
+      .filter(([_, value]) => value > 0)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10);
+    
+    this.barChartData = {
+      labels: top.map(x => x[0]),
+      datasets: [{
+        data: top.map(x => x[1]),
+        label: 'Stock Total',
+        backgroundColor: '#36337f',
+        borderColor: '#36337f',
+        borderWidth: 1
+      }]
+    };
+  }
+
+  generateStockOverTimeChart(): void {
+    const grouped = this.groupByDate(this.stockData);
+    const sorted = Object.entries(grouped).sort((a, b) => a[0].localeCompare(b[0]));
+    
+    this.lineChartData = {
+      labels: sorted.map(x => new Date(x[0]).toLocaleDateString()),
+      datasets: [{
+        data: sorted.map(x => x[1]),
+        label: 'Stock Total',
+        borderColor: '#36337f',
+        backgroundColor: 'rgba(54, 51, 127, 0.1)',
+        fill: true,
+        tension: 0.4
+      }]
+    };
+  }
+
+  generateIngresoEgresoChart(): void {
+    const totalIngresos = this.stockData.reduce((sum, item) => sum + item.totalIngresos, 0);
+    const totalEgresos = this.stockData.reduce((sum, item) => sum + item.totalEgresos, 0);
+    
+    this.doughnutChartData = {
+      labels: ['Ingresos', 'Egresos'],
+      datasets: [{
+        data: [totalIngresos, totalEgresos],
+        backgroundColor: ['#68d391', '#fc8181'],
+        borderColor: ['#38a169', '#e53e3e'],
+        borderWidth: 2
+      }]
+    };
+  }
+
+  private groupSum(arr: ProductStockSummary[], keyFn: (item: ProductStockSummary) => string): Record<string, number> {
+    return arr.reduce((acc, item) => {
+      const key = keyFn(item);
+      acc[key] = (acc[key] || 0) + Math.max(0, item.totalStock); // Only positive stock
+      return acc;
+    }, {} as Record<string, number>);
+  }
+
+  private groupByDate(arr: ProductStockSummary[]): Record<string, number> {
+    return arr.reduce((acc, item) => {
+      const date = item.lastMovementDate.split('T')[0];
+      acc[date] = (acc[date] || 0) + Math.max(0, item.totalStock); // Only positive stock
+      return acc;
+    }, {} as Record<string, number>);
   }
 }

@@ -2,6 +2,16 @@
   padding: 20px;
   max-width: 1400px;
   margin: 0 auto;
+  background-color: #f8f9fc;
+  min-height: 100vh;
+}
+
+h2 {
+  color: #36337f;
+  margin-bottom: 30px;
+  font-weight: bold;
+  text-align: center;
+  font-size: 2rem;
 }
 
 .center-selection {
@@ -25,62 +35,75 @@
 
 .filters-section {
   background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(54, 51, 127, 0.1);
-  margin-bottom: 20px;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(54, 51, 127, 0.08);
+  margin-bottom: 30px;
+  border: 1px solid rgba(54, 51, 127, 0.1);
 }
 
 .filters-section label {
   font-weight: 600;
   color: #36337f;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
   font-size: 0.9rem;
 }
 
 .filters-section .form-select,
 .filters-section .form-control {
-  border: 1px solid #e0e4e7;
-  border-radius: 8px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
   font-size: 0.9rem;
-  padding: 0.5rem 0.75rem;
+  padding: 0.6rem 1rem;
+  transition: all 0.3s ease;
 }
 
 .filters-section .form-select:focus,
 .filters-section .form-control:focus {
   border-color: #36337f;
-  box-shadow: 0 0 0 0.2rem rgba(54, 51, 127, 0.25);
+  box-shadow: 0 0 0 0.25rem rgba(54, 51, 127, 0.15);
+  outline: none;
 }
 
 .charts-grid {
   display: grid;
-  gap: 20px;
+  gap: 25px;
   grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: auto auto auto;
 }
 
 .chart-container {
-  background-color: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(54, 51, 127, 0.1);
-  min-height: 400px;
+  background: linear-gradient(145deg, #ffffff 0%, #f8f9fc 100%);
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(54, 51, 127, 0.12);
+  min-height: 450px;
   display: flex;
   flex-direction: column;
+  border: 1px solid rgba(54, 51, 127, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.chart-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(54, 51, 127, 0.18);
 }
 
 .chart-container h3 {
   color: #36337f;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   font-weight: bold;
   text-align: center;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   flex-shrink: 0;
+  padding-bottom: 10px;
+  border-bottom: 2px solid rgba(54, 51, 127, 0.1);
 }
 
 .chart-wrapper {
   position: relative;
   flex: 1;
-  min-height: 300px;
+  min-height: 350px;
 }
 
 .chart-wrapper canvas {
@@ -97,53 +120,87 @@
   align-items: center;
   min-height: 400px;
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(54, 51, 127, 0.1);
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(54, 51, 127, 0.08);
+  gap: 15px;
 }
 
 .loading-container p {
   margin: 0;
-  font-size: 1rem;
+  font-size: 1.1rem;
+  color: #36337f;
+  font-weight: 500;
 }
 
 .spinner-border {
   width: 3rem;
   height: 3rem;
+  color: #36337f;
+}
+
+.alert {
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+}
+
+.alert-warning {
+  color: #856404;
+  background-color: #fff3cd;
+  border-color: #ffeaa7;
+}
+
+.alert i {
+  margin-right: 8px;
 }
 
 /* Mobile Responsive */
 @media (max-width: 992px) {
   .charts-grid {
     grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto;
   }
   
-  .filters-section .row .col-md-3 {
-    margin-bottom: 10px;
+  .chart-container:nth-child(1),
+  .chart-container:nth-child(2),
+  .chart-container:nth-child(3),
+  .chart-container:nth-child(4) {
+    grid-column: 1;
   }
+  
+  .chart-container:nth-child(1) { grid-row: 1; }
+  .chart-container:nth-child(2) { grid-row: 2; }
+  .chart-container:nth-child(3) { grid-row: 3; }
+  .chart-container:nth-child(4) { grid-row: 4; }
 }
 
 @media (max-width: 768px) {
   .charts-container {
-    padding: 10px;
+    padding: 15px;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
   }
   
   .chart-container {
-    padding: 15px;
-    min-height: 350px;
+    padding: 20px;
+    min-height: 380px;
   }
   
   .chart-container h3 {
-    font-size: 1rem;
-    margin-bottom: 10px;
+    font-size: 1.1rem;
+    margin-bottom: 15px;
   }
   
   .chart-wrapper {
-    min-height: 250px;
+    min-height: 280px;
   }
   
-  .center-selection,
   .filters-section {
-    padding: 15px;
+    padding: 20px;
   }
   
   .filters-section label {
@@ -153,21 +210,30 @@
   .filters-section .form-select,
   .filters-section .form-control {
     font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
   }
 }
 
 @media (max-width: 576px) {
   .charts-container {
-    padding: 5px;
+    padding: 10px;
+  }
+  
+  h2 {
+    font-size: 1.3rem;
   }
   
   .chart-container {
-    padding: 10px;
-    min-height: 300px;
+    padding: 15px;
+    min-height: 320px;
   }
   
   .chart-wrapper {
-    min-height: 200px;
+    min-height: 220px;
+  }
+  
+  .filters-section {
+    padding: 15px;
   }
   
   .filters-section .col-6 {
@@ -175,7 +241,36 @@
   }
 }
 
-h2 {
+/* Custom animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chart-container {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.filters-section {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.loading-container p {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #36337f;
+  font-weight: 500;
+}
+
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
   color: #36337f;
   margin-bottom: 20px;
   font-weight: bold;

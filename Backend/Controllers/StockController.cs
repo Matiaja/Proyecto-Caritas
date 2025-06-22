@@ -526,6 +526,82 @@ namespace ProyectoCaritas.Controllers
             return Ok(stocks);
         }
 
+        [Authorize]
+        [HttpGet("filtered-stock")]
+        public async Task<ActionResult<List<ProductStockSummaryDTO>>> GetFilteredStock(
+            [FromQuery] int? centerId = null,
+            [FromQuery] int? categoryId = null,
+            [FromQuery] int? productId = null,
+            [FromQuery] DateTime? dateFrom = null,
+            [FromQuery] DateTime? dateTo = null)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return Unauthorized();
+
+            var user = await _context.Users.Include(u => u.Center).FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null) return Unauthorized();
+
+            IQueryable<Stock> query = _context.Stocks
+                .Include(s => s.Product)
+                .ThenInclude(p => p.Category)
+                .Include(s => s.Center);
+
+            // Rol no Admin: forzar su propio centro
+            if (!User.IsInRole("Admin"))
+            {
+                if (!user.CenterId.HasValue)
+                    return BadRequest(new { message = "User does not belong to any center." });
+
+                query = query.Where(s => s.CenterId == user.CenterId);
+            }
+            else if (centerId.HasValue)
+            {
+                query = query.Where(s => s.CenterId == centerId.Value);
+            }
+
+            if (categoryId.HasValue)
+                query = query.Where(s => s.Product.CategoryId == categoryId.Value);
+
+            if (productId.HasValue)
+                query = query.Where(s => s.ProductId == productId.Value);
+
+            if (dateFrom.HasValue)
+                query = query.Where(s => s.Date >= dateFrom.Value);
+
+            if (dateTo.HasValue)
+                query = query.Where(s => s.Date <= dateTo.Value);
+
+            var result = await query
+                .GroupBy(s => new { 
+                    s.ProductId, 
+                    s.Product.Name, 
+                    s.Product.Code,
+                    s.Product.CategoryId,
+                    CategoryName = s.Product.Category.Name,
+                    s.CenterId,
+                    CenterName = s.Center.Name
+                })
+                .Select(g => new ProductStockSummaryDTO
+                {
+                    ProductId = (int)g.Key.ProductId,
+                    ProductName = g.Key.Name,
+                    ProductCode = g.Key.Code,
+                    CategoryId = g.Key.CategoryId,
+                    CategoryName = g.Key.CategoryName,
+                    CenterId = g.Key.CenterId,
+                    CenterName = g.Key.CenterName,
+                    TotalStock = g.Sum(s => s.Type == "Ingreso" ? s.Quantity : -s.Quantity),
+                    TotalIngresos = g.Where(s => s.Type == "Ingreso").Sum(s => s.Quantity),
+                    TotalEgresos = g.Where(s => s.Type == "Egreso").Sum(s => s.Quantity),
+                    LastMovementDate = g.Max(s => s.Date),
+                    MovementCount = g.Count()
+                })
+                .ToListAsync();
+
+            return Ok(result);
+        }
+
+
         private bool StockExists(int id)
         {
             return _context.Stocks.Any(s => s.Id == id);

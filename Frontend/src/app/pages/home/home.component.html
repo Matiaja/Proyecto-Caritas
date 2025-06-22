@@ -1,103 +1,108 @@
-<div class="charts-container" [class.mobile]="isMobile">
-  <!-- Loading Indicator - Mostrar desde el inicio -->
-  <div *ngIf="loading" class="loading-container">
-    <div class="d-flex flex-column align-items-center">
-      <div class="spinner-border text-primary mb-3" role="status">
-        <span class="visually-hidden">Cargando...</span>
+<div class="charts-container">
+  <h2>Dashboard de Stock</h2>
+  
+  <!-- Warning for admin if centers failed to load -->
+  <div *ngIf="isAdmin && centers.length === 0" class="alert alert-warning" role="alert">
+    <i class="fas fa-exclamation-triangle"></i>
+    <strong>Advertencia:</strong> No se pudieron cargar los centros. Los datos mostrados corresponden a su centro asignado.
+  </div>
+  
+  <!-- Filtros -->
+  <div class="filters-section">
+    <div class="row">
+      <!-- Centro (Solo Admin) -->
+      <div *ngIf="isAdmin" class="col-md-3 col-6 mb-3">
+        <label for="centerFilter" class="form-label">Centro</label>
+        <select id="centerFilter" [(ngModel)]="centerId" (change)="onCenterChange()" class="form-select" [disabled]="centers.length === 0">
+          <option [ngValue]="undefined">{{centers.length === 0 ? 'Centros no disponibles' : 'Todos los centros'}}</option>
+          <option *ngFor="let center of centers" [ngValue]="center.id">{{center.name}}</option>
+        </select>
       </div>
-      <p class="text-muted">Cargando datos de los gráficos...</p>
+      
+      <div class="col-md-3 col-6 mb-3">
+        <label for="categoryFilter" class="form-label">Categoría</label>
+        <select id="categoryFilter" [(ngModel)]="categoryId" (change)="onCategoryChange()" class="form-select">
+          <option [ngValue]="undefined">Todas las categorías</option>
+          <option *ngFor="let category of categories" [ngValue]="category.id">{{category.name}}</option>
+        </select>
+      </div>
+      
+      <div class="col-md-3 col-6 mb-3">
+        <label for="productFilter" class="form-label">Producto</label>
+        <select id="productFilter" [(ngModel)]="productId" (change)="onProductChange()" class="form-select">
+          <option [ngValue]="undefined">Todos los productos</option>
+          <option *ngFor="let product of products" [ngValue]="product.id">{{product.name}}</option>
+        </select>
+      </div>
+      
+      <div class="col-md-3 col-6 mb-3">
+        <label for="fromDate" class="form-label">Desde</label>
+        <input type="date" id="fromDate" [(ngModel)]="fromDate" (change)="onDateChange()" class="form-control">
+      </div>
+      
+      <div class="col-md-3 col-6 mb-3">
+        <label for="toDate" class="form-label">Hasta</label>
+        <input type="date" id="toDate" [(ngModel)]="toDate" (change)="onDateChange()" class="form-control">
+      </div>
     </div>
   </div>
 
-  <!-- Content - Solo mostrar cuando no esté cargando -->
-  <div *ngIf="!loading">
-    <!-- Center Selection for Admin -->
-    <div *ngIf="isAdmin" class="mb-3 center-selection">
-      <label for="centerSelect" class="form-label">Seleccionar Centro:</label>
-      <select id="centerSelect" class="form-select" [(ngModel)]="selectedCenterId" (change)="onCenterChange()">
-        <option value="">Todos los Centros</option>
-        <option *ngFor="let center of centers" [value]="center.id">{{ center.name }}</option>
-      </select>
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
     </div>
+    <p class="ms-3">Cargando datos...</p>
+  </div>
 
-    <!-- Filters Section -->
-    <div class="filters-section">
-      <div class="row g-3">
-        <div class="col-md-3 col-6">
-          <label class="form-label">Categoría:</label>
-          <select class="form-select" [(ngModel)]="selectedCategory" (change)="applyFilters()">
-            <option value="">Todas las categorías</option>
-            <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
-          </select>
-        </div>
-        
-        <div class="col-md-3 col-6">
-          <label class="form-label">Producto:</label>
-          <select class="form-select" [(ngModel)]="selectedProduct" (change)="applyFilters()">
-            <option value="">Todos los productos</option>
-            <option *ngFor="let product of products" [value]="product.productId">{{ product.productName }}</option>
-          </select>
-        </div>
-        
-        <div class="col-md-3 col-6">
-          <label class="form-label">Fecha desde:</label>
-          <input type="date" class="form-control" [(ngModel)]="dateFrom" (change)="applyFilters()">
-        </div>
-        
-        <div class="col-md-3 col-6">
-          <label class="form-label">Fecha hasta:</label>
-          <input type="date" class="form-control" [(ngModel)]="dateTo" (change)="applyFilters()">
-        </div>
-      </div>
-      
-      <div class="row mt-2">
-        <div class="col-12 text-end">
-          <button class="btn btn-outline-secondary btn-sm" (click)="clearFilters()">
-            <i class="bi bi-x-circle"></i> Limpiar filtros
-          </button>
-        </div>
+  <!-- Charts Grid -->
+  <div *ngIf="!isLoading" class="charts-grid">
+    <!-- Stock por Categoría (Pie Chart) -->
+    <div class="chart-container">
+      <h3>Stock por Categoría</h3>
+      <div class="chart-wrapper">
+        <canvas baseChart 
+                [data]="pieChartData" 
+                [type]="'pie'"
+                [options]="pieChartOptions">
+        </canvas>
       </div>
     </div>
 
-    <!-- Charts Grid -->
-    <div *ngIf="!error" class="charts-grid">
-      <!-- Stock by Category Chart -->
-      <div class="chart-container">
-        <h3>Stock por Categoría</h3>
-        <div class="chart-wrapper">
-          <canvas #categoryChart></canvas>
-        </div>
-      </div>
-
-      <!-- Stock by Type Chart -->
-      <div class="chart-container">
-        <h3>Stock por Tipo</h3>
-        <div class="chart-wrapper">
-          <canvas #typeChart></canvas>
-        </div>
-      </div>
-
-      <!-- Stock by Month Chart -->
-      <div class="chart-container">
-        <h3>Stock por Mes</h3>
-        <div class="chart-wrapper">
-          <canvas #monthChart></canvas>
-        </div>
-      </div>
-
-      <!-- Top Products Chart -->
-      <div class="chart-container">
-        <h3>Top 10 Productos</h3>
-        <div class="chart-wrapper">
-          <canvas #productsChart></canvas>
-        </div>
+    <!-- Top 10 Productos (Bar Chart) -->
+    <div class="chart-container">
+      <h3>Top 10 Productos con Mayor Stock</h3>
+      <div class="chart-wrapper">
+        <canvas baseChart 
+                [data]="barChartData" 
+                [type]="'bar'"
+                [options]="barChartOptions">
+        </canvas>
       </div>
     </div>
 
-    <!-- Error Message -->
-    <div *ngIf="error" class="alert alert-danger" role="alert">
-      <i class="bi bi-exclamation-triangle"></i>
-      {{ error }}
+    <!-- Evolución del Stock por Fecha (Line Chart) -->
+    <div class="chart-container">
+      <h3>Evolución del Stock por Fecha</h3>
+      <div class="chart-wrapper">
+        <canvas baseChart 
+                [data]="lineChartData" 
+                [type]="'line'"
+                [options]="lineChartOptions">
+        </canvas>
+      </div>
+    </div>
+
+    <!-- Ingresos vs Egresos (Doughnut Chart) -->
+    <div class="chart-container">
+      <h3>Ingresos vs Egresos</h3>
+      <div class="chart-wrapper">
+        <canvas baseChart 
+                [data]="doughnutChartData" 
+                [type]="'doughnut'"
+                [options]="doughnutChartOptions">
+        </canvas>
+      </div>
     </div>
   </div>
 </div>
