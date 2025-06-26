@@ -290,7 +290,7 @@ namespace ProyectoCaritas.Controllers
         // POST api/notifications/receive
         [HttpPost("receive")]
         [Authorize]
-        public async Task<IActionResult> ConfirmReceipt([FromBody] DataConfirmReceiptDTO dto)
+        public async Task<ActionResult<DonationNotificationDTO>> ConfirmReceipt([FromBody] DataConfirmReceiptDTO dto)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
@@ -314,7 +314,9 @@ namespace ProyectoCaritas.Controllers
             if (notification == null) return NotFound("Notification not found.");
 
             // Validar existencia de la solicitud de donación
-            var donationRequest = await _context.DonationRequests.FindAsync(dto.DonationRequestId);
+            var donationRequest = await _context.DonationRequests
+                .Include(dr => dr.AssignedCenter)
+                .FirstOrDefaultAsync(dr => dr.Id == dto.DonationRequestId);
             if (donationRequest == null) return NotFound("DonationRequest not found.");
 
             // Verificar que la solicitud de donación está pendiente de envío (Status "Aceptada")
@@ -329,6 +331,7 @@ namespace ProyectoCaritas.Controllers
 
             // Verificar que order line ID es válido
             var orderLine = await _context.OrderLines
+                .Include(ol => ol.Product)
                 .Include(ol => ol.Request)
                     .ThenInclude(r => r.RequestingCenter)
                 .FirstOrDefaultAsync(ol => ol.Id == dto.OrderLineId);
@@ -387,7 +390,7 @@ namespace ProyectoCaritas.Controllers
                 {
                     CenterId = (int)requestingCenterId,
                     ProductId = orderLine?.ProductId,
-                    Date = DateTime.UtcNow,
+                    Date = DateOnly.FromDateTime(DateTime.UtcNow),
                     Type = "Ingreso",
                     Description = orderLine?.Description,
                     Quantity = donationRequest.Quantity,
@@ -397,7 +400,7 @@ namespace ProyectoCaritas.Controllers
                 {
                     CenterId = donationRequest.AssignedCenterId,
                     ProductId = orderLine?.ProductId,
-                    Date = DateTime.UtcNow,
+                    Date = DateOnly.FromDateTime(DateTime.UtcNow),
                     Type = "Egreso",
                     Description = "Donación enviada a " + orderLine?.Request?.RequestingCenter?.Name,
                     Quantity = donationRequest.Quantity,
@@ -426,7 +429,7 @@ namespace ProyectoCaritas.Controllers
                     Console.WriteLine("Error al enviar notificaciones via SignalR: " + ex.Message);
                 }
 
-                return Ok();
+                return Ok(ToDonationNotificationDto(donationRequest, orderLine));
             }
             catch (ArgumentException ex)
             {
@@ -489,5 +492,17 @@ namespace ProyectoCaritas.Controllers
             return NoContent();
         }
 
+        private static DonationNotificationDTO ToDonationNotificationDto(DonationRequest donationRequest, OrderLine orderLine)
+        {
+            return new DonationNotificationDTO
+            {
+                DonationRequestId = donationRequest.Id,
+                Status = donationRequest.Status,
+                Quantity = donationRequest.Quantity,
+                ProductName = orderLine.Product?.Name ?? "-",
+                DonorCenterName = donationRequest.AssignedCenter?.Name ?? "-",
+                RequestingCenterName = orderLine.Request?.RequestingCenter?.Name ?? "-"
+            };
+        }
     }
 }

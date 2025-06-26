@@ -27,6 +27,7 @@ export class StorageComponent implements OnInit {
 
   title = 'Almacén';
   showSelectButton = true;
+  showAddButton = true;
   displayedColumns = ['productName', 'productCode', 'stockQuantity'];
   stocks: any[] = [];
   mobileHeaders: { [key: string]: string } = {
@@ -107,6 +108,11 @@ export class StorageComponent implements OnInit {
 
   loadStock() {
     if (this.centerId) {
+      if(this.centerId !== this.selectedCenter) {
+        this.showAddButton = false;
+      } else {
+        this.showAddButton = true;
+      }
       if(!this.groupByCenter) {
         this.showSelectButton = false;
       } else {

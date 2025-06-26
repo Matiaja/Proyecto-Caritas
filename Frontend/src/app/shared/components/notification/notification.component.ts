@@ -30,6 +30,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
     this.notificationService.notifications$
       .pipe(takeUntil(this.destroy$))
       .subscribe(notifs => {
+        console.log('Notificaciones recibidas:', notifs);
         this.notifications = notifs;
         this.unreadCount = notifs.filter((n: any) => !n.isRead).length;
     });
@@ -106,8 +107,8 @@ export class NotificationComponent implements OnInit, OnDestroy {
     
     notification.isRead = true; // Marcar como leída inmediatamente
     this.notificationService.confirmReceipt(notification).subscribe({
-      next: () => {
-        this.toastrService.success('Se notificará al donante que el pedido ha sido recibido.', 'Solicitud recibida!');
+      next: (donation: any) => {
+        this.toastrService.success(`Recepción de ${donation.quantity} ${donation.productName} confirmada.`, '¡Solicitud recibida!');
       },
       error: (err) => {
         console.error('Error al confirmar recepción:', err);

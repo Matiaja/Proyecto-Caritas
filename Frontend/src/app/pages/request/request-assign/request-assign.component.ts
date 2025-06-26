@@ -13,6 +13,7 @@ import { ToastrService } from 'ngx-toastr';
 import { DonationRequestService } from '../../../services/donationRequest/donation-request.service';
 import { DonationRequest } from '../../../models/donationRequest.model';
 import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
+import { ResponsiveService } from '../../../services/responsive/responsive.service';
 
 @Component({
   selector: 'app-request-assign',
@@ -22,6 +23,9 @@ import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/brea
   styleUrl: './request-assign.component.css',
 })
 export class RequestAssignComponent implements OnInit {
+
+  isMobile = false;
+
   constructor(
     private route: ActivatedRoute,
     private productService: ProductService,
@@ -31,7 +35,13 @@ export class RequestAssignComponent implements OnInit {
     private location: Location,
     private toastr: ToastrService,
     private router: Router,
-  ) {}
+    private responsiveService: ResponsiveService
+  ) {
+    // Subscribe to responsive service to check if the device is mobile
+    this.responsiveService.isMobile$.subscribe((isMobile) => {
+      this.isMobile = isMobile;
+    });
+  }
 
   // parametros
   productId: number | null = null;
@@ -56,11 +66,17 @@ export class RequestAssignComponent implements OnInit {
   // variables de tabla
   title = '';
   columnHeaders: Record<string, string> = {
-    productName: 'Producto',
     centerName: 'Centro',
+    productName: 'Producto',
     stockQuantity: 'Cantidad',
   };
-  displayedColumns = ['productName', 'centerName', 'stockQuantity'];
+  mobileHeaders: Record<string, string> = {
+    centerName: 'Centro',
+    productName: 'Producto',
+    stockQuantity: 'Cantidad',
+  };
+  displayedColumns = ['centerName', 'productName', 'stockQuantity'];
+  mobileColumns = ['centerName', 'productName', 'stockQuantity'];
   stocks: any[] = [];
 
   ngOnInit(): void {

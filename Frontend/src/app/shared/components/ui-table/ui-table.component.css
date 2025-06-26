@@ -21,6 +21,7 @@
 
 .btn-group .btn-outline-primary svg {
   fill: #36337f;
+  vertical-align: middle;
 }
 
 .btn-group .btn-outline-primary:hover svg {
@@ -68,10 +69,8 @@
 .mobile-action-btn {
   padding: 0.25rem 0.4rem !important;
   min-width: auto !important;
-  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  flex-direction: column;
+  flex: none;
 }
 
 .mobile-btn-icon {
@@ -86,30 +85,36 @@
   display: block;
 }
 
+.mobile-header,
+.mobile-cell {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 5px;
+}
+
 @media (max-width: 575.98px) {
   .mobile-table {
     font-size: 0.85rem;
   }
 
   .mobile-header {
-    font-size: 0.85rem;
-    padding: 0.5rem;
-    white-space: nowrap;
-    overflow: visible;
-    text-overflow: clip;
-    max-width: 0;
+    font-size: 0.75rem;
     font-weight: 600 !important;
-    background-color: #f8f9fa;
-    position: sticky;
     top: 0;
-  }
-
-  .mobile-header,
-  .mobile-cell {
-    padding: 0.3rem;
+    white-space: normal;
   }
 
   .mobile-cell {
     font-size: 0.7rem;
+    --webkit-line-clamp: 3;
+    --webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.2rem;
+    max-height: 3.6rem;
   }
 }

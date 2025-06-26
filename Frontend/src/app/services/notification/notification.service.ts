@@ -97,7 +97,7 @@ export class NotificationService implements OnDestroy {
   }
 
   confirmReceipt(notification: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}notifications/confirm`, {
+    return this.http.post(`${this.baseUrl}notifications/receive`, {
       orderLineId: notification.orderLineId,
       donationRequestId: notification.donationRequestId,
       idNotification: notification.id

@@ -1,8 +1,11 @@
 <ui-table
   [title]="title"
   [displayedColumns]="displayedColumns"
+  [mobileColumns]="mobileColumns"
   [dataSource]="requests"
+  [htmlColumns]="['requestDate']"
   [columnHeaders]="columnHeaders"
+  [mobileHeaders]="mobileHeaders"
   [showCommonFilters]="true"
   [sortOptions]="sortOptions"
   [showStatusFilter]="true"

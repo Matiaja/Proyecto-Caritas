@@ -5,6 +5,7 @@ import { RequestModel } from '../../../models/request.model';
 import { ProductService } from '../../../services/product/product.service';
 import { UiTableComponent } from '../../../shared/components/ui-table/ui-table.component';
 import { CommonModule, Location } from '@angular/common';
+import { ResponsiveService } from '../../../services/responsive/responsive.service';
 
 @Component({
   selector: 'app-request-detail',
@@ -29,22 +30,36 @@ export class RequestDetailComponent implements OnInit {
 
   title = 'Lista de pedidos';
   columnHeaders: Record<string, string> = {
-    id: 'ID',
+    id: 'Cod.',
     productName: 'Producto',
     quantity: 'Cantidad',
     description: 'Descripción',
     isAssigned: 'Asignado',
   };
+  mobileHeaders: Record<string, string> = {
+    id: 'Cod.',
+    productName: 'Producto',
+    quantity: 'Cant.',
+    isAssigned: 'Estado',
+  };
   displayedColumns = ['id', 'productName', 'quantity', 'description', 'isAssigned'];
+  mobileColumns = ['id', 'productName', 'quantity', 'isAssigned'];
   orderLines: any[] = [];
+
+  isMobile = false;
 
   constructor(
     private requestService: RequestService,
     private productService: ProductService,
     private route: ActivatedRoute,
     private router: Router,
-    private location: Location
-  ) {}
+    private location: Location,
+    private responsiveService: ResponsiveService
+  ) {
+    this.responsiveService.isMobile$.subscribe((isMobile) => {
+      this.isMobile = isMobile;
+    });
+  }
 
   ngOnInit(): void {
     this.route.params.subscribe((params) => {
@@ -57,7 +72,6 @@ export class RequestDetailComponent implements OnInit {
     this.requestService.getRequestById(reqId).subscribe({
       next: (req: RequestModel) => {
         this.request = req;
-        console.log(this.request);
         this.loadOrderLines();
       },
       error: (err) => {
@@ -98,7 +112,7 @@ export class RequestDetailComponent implements OnInit {
   }
 
   goBack() {
-    this.location.back();
+    this.router.navigate(['/requests']);
   }
 
   onAddElement = null;

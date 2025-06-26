@@ -11,6 +11,7 @@ using System.Security.Claims;
 using System.Text.Json.Serialization;
 using ProyectoCaritas.Hubs;
 using ProyectoCaritas.Services;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,8 @@ builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        options.JsonSerializerOptions.Converters.Add(new DateTimeUtcConverter());
+
     });
 builder.Services.AddSignalR();
 

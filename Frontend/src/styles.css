@@ -20,3 +20,7 @@
   transform: translateX(-50%);
   z-index: 9999;
 }
+
+.ngx-pagination {
+  padding-left: 0 !important;
+}

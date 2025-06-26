@@ -2,11 +2,21 @@
   background-color: #fafafa;
   padding: 16px;
 
+  @media (max-width: 600px) {
+    padding: 5px;
+  }
+
   .mat-step-header {
     background-color: #dfdaff;
     color: #333;
     border-radius: 4px;
     padding: 5px 10px 5px 10px;
+
+    @media (max-width: 600px) {
+      padding: 3px 6px;
+      font-size: 14px;
+      border-radius: 8px;
+    }
   }
 
   .mat-step-header:hover,
@@ -47,4 +57,10 @@
 .list-group-item-action:hover {
   background-color: #f8f9fa;
   cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .mat-horizontal-content-container {
+    padding: 0px 5px !important;
+  }
 }

@@ -1,0 +1,48 @@
+.btn-assign {
+    border-color: #36337f;
+    color: #36337f;
+}
+
+.btn-assign:hover {
+    background-color: #36337f;
+    color: #ffffff;
+    border-color: #36337f;
+}
+
+.btn-assign svg {
+    fill: #36337f;
+}
+
+.btn-assign:hover svg {
+    fill: #ffffff;
+}
+
+.mobile-action-btn {
+    padding: 0.25rem 0.4rem !important;
+    min-width: auto !important;
+    align-items: center;
+    flex: none;
+}
+
+.text-mobile {
+    font-size: 0.7rem;
+}
+
+.input-mobile {
+    width: 38px;
+}
+
+.input-normal {
+    width: 60px;
+}
+
+
+/* Ocultar flechas del input number */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type=number] {
+    -moz-appearance: textfield;
+}

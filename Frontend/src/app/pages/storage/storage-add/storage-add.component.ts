@@ -103,12 +103,14 @@ export class StorageAddComponent {
       productId: data.productSearch?.id,
       type: data.type,
       date: data.date,
-      expirationDate: data.expirationDate,
+      expirationDate: data.expirationDate !== "" ? data.expirationDate : null,
       description: data.description ? data.description : '',
       quantity: data.quantity,
       weight: data.weight ? data.weight : 0,
       centerId: centerId,
     };
+
+    console.log('Payload to create stock:', payload);
 
     this.stockService.createStock(payload).subscribe(() => {
       this.toastr.success('Stock creado con éxito', 'Exito');

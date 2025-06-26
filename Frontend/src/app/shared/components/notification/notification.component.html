@@ -17,7 +17,7 @@
             <li class="px-4 py-3">
                 <div class="toast-header mb-2">
                     <strong class="me-auto">{{ notif.title }}</strong>
-                    <small class="notification-time">{{ notif.createdAt | date:'short' }}</small>
+                    <small class="notification-time">{{ notif.createdAt | date:'dd/MM/yyyy HH:mm' }}</small>
                 </div>
                 <div class="toast-body notification-message mb-1">
                     {{ notif.message }}

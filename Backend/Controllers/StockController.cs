@@ -61,7 +61,7 @@ namespace ProyectoCaritas.Controllers
         // POST: api/Stocks
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult<StockDTO>> AddStock(StockDTO StockDTO)
+        public async Task<ActionResult<StockDTO>> AddStock([FromBody] StockDTO StockDTO)
         {
             // Validaciones
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
