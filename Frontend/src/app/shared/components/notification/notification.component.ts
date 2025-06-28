@@ -64,6 +64,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
     const originalNotifications = [...this.notifications];
     
     notification.isRead = true; // Marcar como leída inmediatamente
+    this.unreadCount--;
     this.notificationService.acceptAssignment(notification).subscribe({
       next: () => {
         this.toastrService.success('Asignación aceptada correctamente');
@@ -71,6 +72,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
       error: (err) => {
         console.error('Error al aceptar:', err);
         // Restaurar las notificaciones originales en caso de error
+        notification.isRead = false; 
         this.notifications = originalNotifications;
         this.unreadCount = originalNotifications.filter((n: any) => !n.isRead).length;
         this.toastrService.error('Error al aceptar la asignación');
@@ -87,6 +89,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
     const originalNotifications = [...this.notifications];
     
     notification.isRead = true; // Marcar como leída inmediatamente
+    this.unreadCount--;
     this.notificationService.markAsShipped(notification).subscribe({
       next: () => {
         this.toastrService.success('Se notificará al solicitante que el pedido está en camino.', 'Donación enviada!');
@@ -106,9 +109,10 @@ export class NotificationComponent implements OnInit, OnDestroy {
     const originalNotifications = [...this.notifications];
     
     notification.isRead = true; // Marcar como leída inmediatamente
+    this.unreadCount--;
     this.notificationService.confirmReceipt(notification).subscribe({
       next: (donation: any) => {
-        this.toastrService.success(`Recepción de ${donation.quantity} ${donation.productName} confirmada.`, '¡Solicitud recibida!');
+        this.toastrService.success(`Recepción de ${donation.quantity} ${this.formatProductName(donation.productName, donation.quantity)} confirmada.`, '¡Solicitud recibida!');
       },
       error: (err) => {
         console.error('Error al confirmar recepción:', err);
@@ -151,4 +155,27 @@ export class NotificationComponent implements OnInit, OnDestroy {
     // navegar al detalle de la orderLine o similar si querés
   }
 
+  formatProductName(productName: string, quantity: number): string {
+    const product = productName.toLowerCase();
+
+    if (quantity > 1)
+    {
+        // Casos simples
+        if (product.endsWith("z"))
+            return product.substring(0, product.length - 1) + "ces";
+        if (product.endsWith("s") || product.endsWith("x"))
+            return product;
+        if (product.endsWith("ón"))
+            return product.substring(0, product.length - 2) + "ones";
+        if (product.endsWith("a") || product.endsWith("e") || product.endsWith("i") || product.endsWith("o") || product.endsWith("u"))
+            return product + "s";
+
+        return product + "es";
+    }
+    else
+    {
+        return product;
+    }
+  }
 }
+
