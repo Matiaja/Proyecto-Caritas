@@ -200,7 +200,7 @@ namespace ProyectoCaritas.Controllers
             {
                 RequestingCenterId = requestDTO.RequestingCenterId,
                 UrgencyLevel = requestDTO.UrgencyLevel,
-                RequestDate = requestDTO.RequestDate,
+                RequestDate = DateTime.UtcNow,
             };
 
             using var transaction = await _context.Database.BeginTransactionAsync();

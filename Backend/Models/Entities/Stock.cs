@@ -5,8 +5,8 @@
         public int Id { get; set; }
         public required int CenterId { get; set; } // Un Stock pertenece a solo a un Centro.
         public int? ProductId { get; set; } // Un Stock tiene cero o un Producto.
-        public DateTime Date { get; set; }
-        public DateTime? ExpirationDate { get; set; }
+        public DateOnly Date { get; set; }
+        public DateOnly? ExpirationDate { get; set; }
         public string? Description { get; set; }
         public int Quantity { get; set; }
         public double? Weight { get; set; }

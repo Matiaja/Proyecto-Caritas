@@ -72,6 +72,12 @@ export class RequestAddComponent implements OnInit {
     description: 'Descripcion',
   };
   displayedColumns = ['productName', 'quantity', 'description'];
+  mobileHeaders: Record<string, string> = {
+    productName: 'Producto',
+    quantity: 'Cant.',
+    description: 'Descripcion',
+  };
+  mobileColumns = ['productName', 'quantity', 'description'];
   onAddRequest() {}
   onEditRequest() {}
   onSelectRequest() {}
@@ -129,6 +135,7 @@ export class RequestAddComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    console.log(new Date().toISOString());
     this.formGroup1 = new FormGroup({});
     this.formGroup2 = this.fb.group({
       product: [null, Validators.required],
@@ -259,7 +266,6 @@ export class RequestAddComponent implements OnInit {
 
     const requestDTO = {
       ...this.formGroup1.value,
-      requestDate: new Date().toISOString(),
       orderLines: this.orderLines,
     };
     // console.log(this.request);

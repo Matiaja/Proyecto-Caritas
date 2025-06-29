@@ -14,10 +14,12 @@ namespace ProyectoCaritas.Controllers
     public class DonationRequestsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly INotificationService _notificationService;
 
-        public DonationRequestsController(ApplicationDbContext context)
+        public DonationRequestsController(ApplicationDbContext context, INotificationService notificationService)
         {
             _context = context;
+            _notificationService = notificationService;
         }
 
         // GET: api/DonationRequests
@@ -180,6 +182,14 @@ namespace ProyectoCaritas.Controllers
             };
             _context.DonationRequests.Add(donationRequest);
             await _context.SaveChangesAsync();
+
+            await _notificationService.CreateAssignmentNotification(
+                addDonationRequestDto.OrderLineId,
+                donationRequest.Id,
+                addDonationRequestDto.AssignedCenterId,
+                userId
+            );
+
             return CreatedAtAction(nameof(GetDonationRequestById), new { id = donationRequest.Id }, DonationRequestToDto(donationRequest));
 
         }

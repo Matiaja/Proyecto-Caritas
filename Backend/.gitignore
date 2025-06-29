@@ -21,3 +21,7 @@ obj/
 
 # Ignorar archivos de logs
 *.log
+
+# ignorar appsetting.json
+appsetting.json
+appsetting.Development.json

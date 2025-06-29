@@ -22,8 +22,8 @@ export class RequestComponent implements OnInit {
   };
   displayedColumns = ['requestDate', 'centerName', 'status', 'urgencyLevel'];
   mobileHeaders: Record<string, string> = {
-    requestDate: 'Fecha de solicitud',
-    centerName: 'Centro/Parroquia',
+    requestDate: 'Fecha',
+    centerName: 'Centro',
     urgencyLevel: 'Urgencia',
   };
   mobileColumns = ['requestDate', 'centerName', 'urgencyLevel'];
@@ -90,6 +90,9 @@ export class RequestComponent implements OnInit {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric',
+          }) + '<br>' + new Date(req.requestDate).toLocaleTimeString('es-ES', {
+            hour: '2-digit',
+            minute: '2-digit',
           }),
           centerName: req.requestingCenter?.name,
         }));

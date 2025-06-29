@@ -29,14 +29,6 @@ export class AuthService {
       );
   }
 
-  // login(data: any) {
-  //   return this.httpClient.post(`${this.baseUrl}/login`, data).pipe(
-  //     tap((res: any) => {
-  //       localStorage.setItem('authUser', JSON.stringify(res));
-  //     })
-  //   );
-  // }
-
   logout() {
     localStorage.removeItem('authUser');
   }

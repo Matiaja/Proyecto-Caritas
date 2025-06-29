@@ -1,9 +1,9 @@
-<div class="d-flex justify-content-center mt-5">
-  <div class="card container w-100 w-md-75 mx-auto p-md-3 shadow-sm">
+<div class="d-flex justify-content-center mt-2 mb-1 mt-sm-5 mb-sm-3">
+  <div class="card container w-100 w-md-75 mx-auto shadow" [ngClass]="showFilterButton ? 'py-3 px-3' : 'p-0 border border-0'">
     @if (showFilterButton) {
     <div>
       <button
-        class="btn btn-link text-primary p-0 border-0 d-flex align-items-center mb-2"
+        class="btn btn-link text-primary p-0 border-0 d-flex align-items-center mb-3 ms-3"
         (click)="toggleFilters()"
       >
         <span class="me-2">{{ filtersVisible ? 'Ocultar filtros' : 'Mostrar filtros' }}</span>
@@ -157,8 +157,8 @@
     }
 
     <!-- Tabla -->
-    <div class="card container w-100 w-md-75 mx-auto p-md-3 shadow-sm">
-      <div class="card-header d-flex justify-content-between align-items-center">
+    <div class="card w-100 w-md-75 mx-auto p-md-3 shadow-sm" [ngClass]="showFilterButton ? 'container' : 'px-2 py-0'">
+      <div class="card-header d-flex justify-content-between align-items-center" style="padding: 10px 8px;">
         <h5 class="mb-0">{{ title }}</h5>
         @if (showAddButton) {
           <button *ngIf="canAdd" class="btn btn-primary btn-sm button-add" (click)="onAddElement()">
@@ -168,22 +168,28 @@
       </div>
 
       @if (isMobileView) {
-        <div class="mobile-table-container">
-          <table mat-table [dataSource]="filteredDataSource" class="mobile-table">
+        <div class="mobile-table-container overflow-x-auto">
+          <table mat-table [dataSource]="filteredDataSource |
+            paginate: { id: paginationId, itemsPerPage: itemsPerPage, currentPage: p }"
+          class="mobile-table">
             <!-- Columnas -->
             <ng-container *ngFor="let column of mobileColumns" [matColumnDef]="column">
               <th mat-header-cell *matHeaderCellDef class="mobile-header">
                 {{ mobileHeaders[column] || column | titlecase }}
               </th>
               <td mat-cell *matCellDef="let element" class="mobile-cell">
-                {{ element[column] }}
+                @if (htmlColumns.includes(column)) {
+                  <span [innerHTML]="element[column]"></span>
+                }
+                @else {
+                  {{ element[column] }}
+                }
               </td>
             </ng-container>
 
             <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef class="border-bottom"></th>
+              <th *matHeaderCellDef class="mobile-header border-bottom"></th>
               <td
-                mat-cell
                 *matCellDef="let element"
                 style="text-align: right"
                 class="border-bottom"
@@ -204,7 +210,7 @@
                           d="M12 9a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3a3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5a5 5 0 0 1 5-5a5 5 0 0 1 5 5a5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5"
                         />
                       </svg>
-                      <span class="mobile-btn-text">Ver</span>
+                      <span class="mobile-btn-text"></span>
                     </button>
                   }
                   @if (showEditButton) {
@@ -223,7 +229,7 @@
                           d="M9 15v-4.25L19.625.125L23.8 4.4L13.25 15zm10.6-9.2l1.425-1.4l-1.4-1.4L18.2 4.4zM3 21V3h10.925L7 9.925V17h7.05L21 10.05V21z"
                         />
                       </svg>
-                      <span class="mobile-btn-text">Editar</span>
+                      <span class="mobile-btn-text"></span>
                     </button>
                   }
                   @if (showDeleteButton) {
@@ -245,7 +251,7 @@
                           d="M9 17h2V8H9zm4 0h2V8h-2zm-8 4V6H4V4h5V3h6v1h5v2h-1v15z"
                         />
                       </svg>
-                      <span class="mobile-btn-text">Eliminar</span>
+                      <span class="mobile-btn-text"></span>
                     </button>
                   }
                   @if (customActions) {
@@ -275,11 +281,16 @@
             class="table table-hover table-borderless"
           >
             <ng-container *ngFor="let column of displayedColumns" [matColumnDef]="column">
-              <th mat-header-cell *matHeaderCellDef class="border-bottom fixed-width-column">
+              <th mat-header-cell *matHeaderCellDef class="border-bottom">
                 {{ columnHeaders[column] || column | titlecase }}
               </th>
-              <td mat-cell *matCellDef="let element" class="border-bottom fixed-width-column">
-                {{ element[column] }}
+              <td mat-cell *matCellDef="let element" class="border-bottom align-middle">
+                @if (htmlColumns.includes(column)) {
+                  <span [innerHTML]="element[column]"></span>
+                }
+                @else {
+                  {{ element[column] }}
+                }
               </td>
             </ng-container>
 
@@ -365,7 +376,7 @@
           </table>
         </div>
       }
-      <div class="d-flex justify-content-end mt-3">
+      <div class="d-flex justify-content-center justify-content-md-end mt-3">
         <pagination-controls
           id="tablePagination"
           (pageChange)="onPageChange($event)"

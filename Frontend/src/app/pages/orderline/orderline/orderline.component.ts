@@ -27,7 +27,13 @@ export class OrderlineComponent  implements OnInit {
     centerName: 'Centro',
     quantity: 'Cantidad',
   };
+  mobileHeaders: Record<string, string> = {
+    status: 'Estado',
+    centerName: 'Centro',
+    quantity: 'Cantidad',
+  };
   displayedColumns = ['status', 'centerName', 'quantity'];
+  mobileColumns = ['status', 'centerName', 'quantity'];
   donationsData: any[] = [];
 
   constructor(

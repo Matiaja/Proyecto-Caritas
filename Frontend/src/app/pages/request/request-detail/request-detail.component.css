@@ -1,0 +1,25 @@
+.btn-assign {
+    border-color: #36337f;
+    color: #36337f;
+}
+
+.btn-assign:hover {
+    background-color: #36337f;
+    color: #ffffff;
+    border-color: #36337f;
+}
+
+.btn-assign svg {
+    fill: #36337f;
+}
+
+.btn-assign:hover svg {
+    fill: #ffffff;
+}
+
+.mobile-action-btn {
+    padding: 0.25rem 0.4rem !important;
+    min-width: auto !important;
+    align-items: center;
+    flex: none; 
+}
