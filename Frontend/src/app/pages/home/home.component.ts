@@ -358,6 +358,15 @@ export class HomeComponent implements OnInit {
     };
   }
 
+  clearAllFilters(): void {
+    this.centerId = undefined;
+    this.categoryId = undefined;
+    this.productId = undefined;
+    this.fromDate = undefined;
+    this.toDate = undefined;
+    this.loadData();
+  }
+
   private groupSum(arr: ProductStockSummary[], keyFn: (item: ProductStockSummary) => string): Record<string, number> {
     return arr.reduce((acc, item) => {
       const key = keyFn(item);

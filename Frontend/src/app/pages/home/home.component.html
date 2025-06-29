@@ -45,6 +45,15 @@
         <input type="date" id="toDate" [(ngModel)]="toDate" (change)="onDateChange()" class="form-control">
       </div>
     </div>
+    
+    <!-- Clear Filters Button -->
+    <div class="row mt-2">
+      <div class="col-12 text-end">
+        <button class="btn btn-outline-secondary btn-sm" (click)="clearAllFilters()">
+          <i class="fas fa-times"></i> Limpiar filtros
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Loading State -->
@@ -55,8 +64,20 @@
     <p class="ms-3">Cargando datos...</p>
   </div>
 
+  <!-- No Data Message -->
+  <div *ngIf="!isLoading && stockData.length === 0" class="no-data-container">
+    <div class="no-data-content">
+      <i class="fas fa-chart-pie fa-3x text-muted mb-3"></i>
+      <h4 class="text-muted">No hay datos disponibles</h4>
+      <p class="text-muted">No se encontraron registros para los filtros aplicados.</p>
+      <button class="btn btn-primary mt-2" (click)="clearAllFilters()">
+        <i class="fas fa-refresh"></i> Limpiar filtros
+      </button>
+    </div>
+  </div>
+
   <!-- Charts Grid -->
-  <div *ngIf="!isLoading" class="charts-grid">
+  <div *ngIf="!isLoading && stockData.length > 0" class="charts-grid">
     <!-- Stock por Categoría (Pie Chart) -->
     <div class="chart-container">
       <h3>Stock por Categoría</h3>
