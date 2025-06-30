@@ -390,7 +390,7 @@ namespace ProyectoCaritas.Controllers
                 {
                     CenterId = (int)requestingCenterId,
                     ProductId = orderLine?.ProductId,
-                    Date = DateOnly.FromDateTime(DateTime.UtcNow),
+                    Date = DateTime.UtcNow,
                     Type = "Ingreso",
                     Description = orderLine?.Description,
                     Quantity = donationRequest.Quantity,
@@ -400,7 +400,7 @@ namespace ProyectoCaritas.Controllers
                 {
                     CenterId = donationRequest.AssignedCenterId,
                     ProductId = orderLine?.ProductId,
-                    Date = DateOnly.FromDateTime(DateTime.UtcNow),
+                    Date = DateTime.UtcNow,
                     Type = "Egreso",
                     Description = "Donación enviada a " + orderLine?.Request?.RequestingCenter?.Name,
                     Quantity = donationRequest.Quantity,
