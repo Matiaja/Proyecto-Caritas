@@ -541,15 +541,16 @@ namespace ProyectoCaritas.Controllers
                 query = query.Where(s => s.ProductId == productId.Value);
 
             if (dateFrom.HasValue)
-                query = query.Where(s => s.Date >= dateFrom.Value);
+                query = query.Where(s => s.Date >= DateOnly.FromDateTime(dateFrom.Value));
 
             if (dateTo.HasValue)
-                query = query.Where(s => s.Date <= dateTo.Value);
+                query = query.Where(s => s.Date <= DateOnly.FromDateTime(dateTo.Value));
 
             var result = await query
-                .GroupBy(s => new { 
-                    s.ProductId, 
-                    s.Product.Name, 
+                .GroupBy(s => new
+                {
+                    s.ProductId,
+                    s.Product.Name,
                     s.Product.Code,
                     s.Product.CategoryId,
                     CategoryName = s.Product.Category.Name,

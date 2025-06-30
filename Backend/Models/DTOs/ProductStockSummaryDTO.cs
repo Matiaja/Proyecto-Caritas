@@ -12,7 +12,7 @@ namespace ProyectoCaritas.Models.DTOs
         public int TotalStock { get; set; }
         public int TotalIngresos { get; set; }
         public int TotalEgresos { get; set; }
-        public DateTime LastMovementDate { get; set; }
+        public DateOnly LastMovementDate { get; set; }
         public int MovementCount { get; set; }
     }
 }
