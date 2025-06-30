@@ -25,3 +25,4 @@ obj/
 # ignorar appsetting.json
 ./appsettings.json
 ./appsettings.Development.json
+appsettings.json
