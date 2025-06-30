@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, HostListener, } from '@angular/core';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
 import { NotificationComponent } from "../../shared/components/notification/notification.component";
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
@@ -11,11 +12,21 @@ import { NotificationComponent } from "../../shared/components/notification/noti
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
 })
-export class NavbarComponent {
+export class NavbarComponent  {
   constructor(
     private router: Router,
     private authService: AuthService
-  ) {}
+  ) {
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.collapseNavbar();
+    });
+  
+    // Escuchar clics en el documento para colapsar el navbar
+    document.addEventListener('click', (event) => this.collapseNavbar(event));
+  
+  }
 
   isVisible = true; // Controla si el navbar es visible
   lastScrollPosition = 0; // Almacena la última posición del scroll
@@ -50,5 +61,18 @@ export class NavbarComponent {
 
   onUpdateProfile() {
     this.router.navigate(['/profile']);
+  }
+
+  collapseNavbar(event?: Event) {
+    const clickedElement = event?.target as HTMLElement;
+    if (clickedElement?.closest('.dropdown-toggle')) {
+      return; // No hagas nada si es el dropdown
+    }
+  
+    // Cierra el navbar cambiando las clases
+    const navbar = document.getElementById('navbarNav');
+    if (navbar?.classList.contains('show')) {
+      navbar.classList.remove('show');
+    }
   }
 }
