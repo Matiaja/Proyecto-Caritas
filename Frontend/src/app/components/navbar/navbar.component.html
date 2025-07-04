@@ -1,27 +1,95 @@
-<nav class="navbar navbar-expand-lg navbar-light" [class.hidden]="!isVisible">
-  <div class="container-fluid">
-    <a class="navbar-brand" routerLink="/home">
-      <img
-        src="assets/png-transparent-caritas.png"
-        width="50"
-        height="50"
-        alt="Descripción de la imagen"
-      />
-    </a>
-    <button
-      class="btn btn-primary"
-      type="button"
-      (click)="editUser()"
-      style="background-color: transparent; border: none"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24">
-        <path
-          fill="currentColor"
-          d="M12 4a4 4 0 0 1 4 4a4 4 0 0 1-4 4a4 4 0 0 1-4-4a4 4 0 0 1 4-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4"
+<!-- Opciones de menú -->
+<ng-template #navLinks>
+  <ul class="navbar-nav ms-auto">
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/home" routerLinkActive="active">Inicio</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/requests" routerLinkActive="active">Solicitudes</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/storage" routerLinkActive="active">Almacenamiento</a>
+    </li>
+    @if (checkUserRole('Admin')) {
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        Configuración
+      </a>
+      <ul class="dropdown-menu dropdown-menubar">
+        <li><a class="dropdown-item dropdown-itembar" routerLink="/users" routerLinkActive="active">Usuarios</a></li>
+        <li><a class="dropdown-item dropdown-itembar" routerLink="/centers" routerLinkActive="active">Centros</a></li>
+        <li>
+          <a class="dropdown-item dropdown-itembar" routerLink="/products" routerLinkActive="active">Productos</a>
+        </li>
+        <li>
+          <a class="dropdown-item dropdown-itembar" routerLink="/categories" routerLinkActive="active">Categorias</a>
+        </li>
+      </ul>
+    </li>
+    } @else {
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/products" routerLinkActive="active">Productos</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/categories" routerLinkActive="active">Categorias</a>
+    </li>
+    }
+    <li class="nav-item d-flex d-lg-none">
+      <button role="button" class="nav-link logout-link" (click)="logout()">Cerrar sesión</button>
+    </li>
+  </ul>
+</ng-template>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light py-lg-0" [class.hidden]="!isVisible">
+  <div class="container-fluid d-flex justify-content-between align-items-center">
+    <!-- Sección izquierda: logo + menú en escritorio -->
+    <div class="d-flex align-items-center">
+      <!-- Logo  -->
+      <a class="navbar-brand" routerLink="/home">
+        <img
+          src="assets/png-transparent-caritas.png"
+          width="40"
+          height="40"
+          alt="Descripción de la imagen"
         />
-      </svg>
-    </button>
-    <app-notification></app-notification>
+      </a>
+
+      <!-- Menú de navegación (visible en desktop) -->
+      <div class="d-none d-lg-flex m-lg-3">
+        <ng-container *ngTemplateOutlet="navLinks"></ng-container>
+      </div>
+    </div>
+
+    <div class="d-flex align-items-center mx-auto mx-lg-0">
+
+      <!-- Icono de notificaciones -->
+      <app-notification class="me-4 me-lg-3"></app-notification>
+
+      <!-- Icono de perfil de usuario -->
+      <div class="dropdown-center dropdown-lg">
+        <button
+          class="btn btn-primary"
+          data-bs-toggle="dropdown"
+          type="button"
+          style="background-color: transparent; border: none"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24">
+            <path
+            fill="currentColor"
+            d="M12 4a4 4 0 0 1 4 4a4 4 0 0 1-4 4a4 4 0 0 1-4-4a4 4 0 0 1 4-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4"
+            />
+          </svg>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-lg-end">
+          <li><a class="dropdown-item" routerLink="/users/edit">Mis datos</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><button role="button" class="dropdown-item" (click)="logout()">Cerrar sesión</button></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Toggle del menú (solo mobile) -->
     <button
       class="navbar-toggler"
       type="button"
@@ -33,69 +101,10 @@
     >
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      @if (checkUserRole('Admin')) {
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/home" routerLinkActive="active">Inicio</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/requests" routerLinkActive="active">Solicitudes</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/storage" routerLinkActive="active">Almacenamiento</a>
-          </li>
-          <li class="nav-item dropdown">
-            <a
-              class="nav-link dropdown-toggle"
-              href="#"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              Configuración
-            </a>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" routerLink="/users" routerLinkActive="active">Usuarios</a></li>
-              <li><a class="dropdown-item" routerLink="/centers" routerLinkActive="active">Centros</a></li>
-              <li>
-                <a class="dropdown-item" routerLink="/products" routerLinkActive="active"
-                  >Productos</a
-                >
-              </li>
-              <li>
-                <a class="dropdown-item" routerLink="/categories" routerLinkActive="active"
-                  >Categorias</a
-                >
-              </li>
-            </ul>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link logout-link" role="button" (click)="logout()">Cerrar sesión</a>
-          </li>
-        </ul>
-      } @else {
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/home" routerLinkActive="active">Inicio</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/requests" routerLinkActive="active">Solicitudes</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/storage" routerLinkActive="active">Almacenamiento</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/products" routerLinkActive="active">Productos</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/categories" routerLinkActive="active">Categorias</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link logout-link" role="button" (click)="logout()">Cerrar sesión</a>
-          </li>
-        </ul>
-      }
+
+    <!-- Menú colapsable (solo mobile) -->
+    <div class="collapse navbar-collapse mt-2" id="navbarNav">
+      <ng-container *ngTemplateOutlet="navLinks"></ng-container>
     </div>
   </div>
 </nav>

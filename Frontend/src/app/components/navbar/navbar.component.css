@@ -4,6 +4,17 @@
   position: sticky;
   top: 0;
   z-index: 1000;
+  padding: 0.3rem 0.5rem;
+}
+
+.navbar-nav {
+  gap: 1rem;
+}
+
+@media (min-width: 992px) {
+  .navbar-collapse {
+    display: none !important;
+  }
 }
 
 @media (max-width: 767px) {
@@ -13,20 +24,28 @@
   }
 }
 
-/* Hacerlo fijo en móviles */
-@media (max-width: 767px) {
+/* Hacerlo fijo menos de lg */
+@media (max-width: 991.98px) {
   .navbar {
     width: 100%;
     top: 0;
     left: 0;
     z-index: 1000;
+    padding: 0.5rem 0.2rem;
+  }
+
+  .navbar-nav {
+    gap: 0.3rem;
+  }
+
+  /* Centrar dropdown del perfil en la navbar */
+  .navbar .dropdown-center .dropdown-menu {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    right: auto !important;
   }
 }
 
-.navbar-brand {
-  font-weight: bold;
-  color: #686a74;
-}
 
 .nav-link {
   color: #98999b;
@@ -42,9 +61,45 @@
 }
 
 .logout-link:hover {
-  color: #ff4040de;
+  color: #ff5151de;
 }
 
 .logout-link {
-  color: #ff0000;
+  color: #ff1c1c;
+}
+
+/* Ajustes para el dropdown */
+.dropdown-menubar {
+  @media (max-width: 991.98px) {
+    background-color: #4a45a7cc;
+  }
+}
+
+.dropdown-item {
+  color: #646466;
+  &.dropdown-itembar {
+    color: #646466;
+    @media (max-width: 991.98px) {
+      color: #b2b2b6;
+    }
+  }
+}
+
+.dropdown-itembar.active {
+  background-color: #cdcce2b0;
+  color: #2e2d2d;
+  font-weight: 600;
+  @media (max-width: 991.98px) {
+    background-color: #bdbaff15;
+    color: #f7f2f2;
+  }
+}
+
+.dropdown-itembar:hover, .dropdown-item:hover {
+  color: #292626;
+}
+
+.dropdown-itembar:focus,
+.dropdown-item:focus {
+  background-color: #cdcce2b0;
 }

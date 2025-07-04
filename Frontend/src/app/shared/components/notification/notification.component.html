@@ -10,7 +10,7 @@
         </span>
     </button>
 
-    <ul class="dropdown-menu notification-dropdown p-0 mt-2">
+    <ul class="dropdown-menu dropdown-menu-end notification-dropdown p-0 mt-2">
         <div *ngFor="let notif of notifications; trackBy: trackByNotificationId" 
             class="notification-item"
             [class.notification-read]="notif.isRead">
