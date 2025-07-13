@@ -1,0 +1,12 @@
+/* Reduce the width of the form container to make it less horizontally stretched */
+.card.container {
+  max-width: 600px;
+  width: 100%;
+}
+
+/* For smaller screens, allow the container to be responsive */
+@media (max-width: 768px) {
+  .card.container {
+    max-width: 100%;
+  }
+}
