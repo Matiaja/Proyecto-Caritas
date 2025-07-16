@@ -189,7 +189,7 @@ cd NOMBRE_DE_LA_CARPETA_DEL_PROYECTO
   * **Error: `500 - Table 'caritas_db.aspnetroles' doesn't exist` al registrar un usuario.**
 
       * **Causa:** Las tablas del sistema ASP.NET Core Identity no fueron creadas.
-      * **Solución:** Asegúrate de haber ejecutado los comandos `Add-Migration` y `Update-Database` como se indica en el paso 4.3.3.
+      * **Solución:** Asegúrate de haber ejecutado los comandos `Add-Migration` y `Update-Database` como se indica en el paso 4.2.3.
 
   * **Error: `401 Unauthorized` al intentar acceder a los recursos desde Swagger.**
 
