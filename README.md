@@ -8,14 +8,15 @@ El sistema se compone de una **API RESTful** desarrollada en .NET y una aplicaci
 
 -----
 
-## 2\. Características Principales
+## 2. Características Principales
 
-  * **Gestión de Usuarios y Roles:** Sistema de autenticación y autorización basado en roles (Administrador, Encargado de Centro, Donante, etc.) utilizando JWT.
-  * **Control de Stock:** Administración de inventario de productos por centro de acopio, incluyendo altas, bajas y transferencias.
-  * **Gestión de Donaciones:** Registro y seguimiento de donaciones de productos realizadas por los donantes.
-  * **Gestión de Solicitudes:** Creación y seguimiento de solicitudes de productos por parte de los centros.
-  * **Catálogo de Productos:** Administración centralizada de los productos y categorías que maneja la organización.
-  * **Notificaciones en Tiempo Real:** Sistema de notificaciones para eventos clave dentro de la aplicación.
+* **Gestión de Usuarios y Roles:** Sistema de autenticación y autorización basado en roles (Administrador, Encargado de Centro, Donante, etc.) utilizando JWT.
+* **Control de Stock:** Administración de inventario de productos por centro de acopio, incluyendo altas, bajas y transferencias.
+* **Gestión de Donaciones:** Registro y seguimiento de donaciones de productos realizadas por los donantes.
+* **Gestión de Solicitudes:** Creación y seguimiento de solicitudes de productos por parte de los centros.
+* **Catálogo de Productos:** Administración centralizada de los productos y categorías que maneja la organización.
+* **Notificaciones en Tiempo Real:** Sistema de notificaciones para eventos clave dentro de la aplicación.
+* **Asistente Virtual con IA:** Un chatbot integrado que guía a los usuarios sobre cómo utilizar el sistema, respondiendo preguntas sobre sus funcionalidades de manera conversacional y sencilla.
 
 -----
 
@@ -89,9 +90,12 @@ cd NOMBRE_DE_LA_CARPETA_DEL_PROYECTO
         "DefaultConnection": "Server=localhost;Port=3306;Database=caritas_db;User=root;Password=TU_PASSWORD_DE_MYSQL;"
       },
       "Jwt": {
-        "Key": "ESTA_ES_UNA_CLAVE_SECRETA_MUY_LARGA_Y_COMPLEJA_PARA_PROBAR",
+        "Key": "UNA_CLAVE_SECRETA_MUY_LARGA_Y_SEGURA_PARA_JWT_AQUI",
         "Issuer": "http://localhost",
         "Audience": "http://localhost"
+      },
+      "Groq": {
+        "ApiKey": "TU_API_KEY_DE_GROQ_AQUI"
       },
       "Logging": {
         "LogLevel": {
@@ -103,7 +107,11 @@ cd NOMBRE_DE_LA_CARPETA_DEL_PROYECTO
     }
     ```
 
-    > **Importante:** Reemplaza `TU_PASSWORD_DE_MYSQL` con la contraseña de tu instancia local de MySQL.
+    > **Importante:**
+    >   * Reemplaza `TU_PASSWORD_DE_MYSQL`.
+    >   * Crea una `UNA_CLAVE_SECRETA...` larga y única para tu proyecto.
+    >   * Para la `ApiKey` de **Groq**, regístrate gratis en [console.groq.com](https://console.groq.com/), ve a la sección "API Keys" y genera una nueva clave.
+
 
 3.  **Crear las tablas de Identity:** El sistema usa ASP.NET Core Identity. Sus tablas deben ser creadas mediante migraciones.
 
@@ -121,16 +129,39 @@ cd NOMBRE_DE_LA_CARPETA_DEL_PROYECTO
 
 1.  Abre una terminal en la carpeta `Frontend/`.
 
-2.  **Crear los archivos de entorno:** Dentro de la carpeta `Frontend/src/`, crea una nueva carpeta `environments`. Dentro de ella, crea el archivo `environment.development.ts` con el siguiente contenido:
+2.  **Crear los archivos de entorno:** La configuración de Angular requiere una estructura específica de archivos de entorno. Dentro de la carpeta `Frontend/src/`, crea una nueva carpeta `environments`. Dentro de ella, crea los **tres** archivos siguientes:
 
-    ```typescript
-    export const environment = {
-      production: false,
-      baseUrl: 'https://localhost:PUERTO_DEL_BACKEND/api/'
-    };
-    ```
+      * **a) `environment.ts` (Archivo Base)**
+        Este es el archivo al que apuntan todos los `import` en el código.
 
-    > **Importante:** Reemplaza `PUERTO_DEL_BACKEND` con el puerto real en el que se está ejecutando tu API (ej: `7185`).
+        ```typescript
+        export const environment = {
+          production: false,
+          baseUrl: 'http://localhost:4200/api/' // URL base por defecto
+        };
+        ```
+
+      * **b) `environment.development.ts` (Entorno de Desarrollo)**
+        Este archivo reemplaza al base cuando ejecutas `ng serve`.
+
+        ```typescript
+        export const environment = {
+          production: false,
+          baseUrl: 'https://localhost:PUERTO_DEL_BACKEND/api/'
+        };
+        ```
+
+        > **Importante:** Reemplaza `PUERTO_DEL_BACKEND` con el puerto real de tu API (ej: `7185`).
+
+      * **c) `environment.prod.ts` (Entorno de Producción)**
+        Este archivo se usará al compilar la aplicación para desplegarla.
+
+        ```typescript
+        export const environment = {
+          production: true,
+          baseUrl: 'https://URL_DE_TU_API_EN_PRODUCCION/api/'
+        };
+        ```
 
 3.  Instala las dependencias del proyecto.
 
