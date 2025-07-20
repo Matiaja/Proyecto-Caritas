@@ -622,24 +622,55 @@ namespace ProyectoCaritas.Controllers
             if (dateTo.HasValue)
                 query = query.Where(sr => sr.StockDate <= dateTo.Value);
 
-            // Ordenar por fecha
-            query = query.OrderBy(sr => sr.StockDate);
-
-            var result = await query
-                .Select(sr => new StockHistoryDTO
+            // Obtener los datos ordenados
+            var stockData = await query
+                .OrderBy(sr => sr.ProductId)
+                .ThenBy(sr => sr.StockDate)
+                .ThenBy(sr => sr.CenterId)
+                .Select(sr => new
                 {
-                    StockId = sr.StockId,
-                    StockDate = sr.StockDate,
-                    StockQuantity = sr.StockQuantity,
-                    StockType = sr.StockType,
-                    CenterId = sr.CenterId,
-                    ProductId = sr.ProductId,
-                    ProductName = sr.ProductName,
-                    CategoryId = sr.CategoryId,
-                    CategoryName = sr.CategoryName,
-                    StockAcumulado = sr.StockAcumulado
+                    sr.StockId,
+                    sr.StockDate,
+                    sr.StockQuantity,
+                    sr.StockType,
+                    sr.CenterId,
+                    sr.ProductId,
+                    sr.ProductName,
+                    sr.CategoryId,
+                    sr.CategoryName
                 })
                 .ToListAsync();
+
+            // Recalcular stock acumulado considerando múltiples centros
+            var result = new List<StockHistoryDTO>();
+            var stockAcumuladoPorProducto = new Dictionary<int, int>();
+
+            foreach (var item in stockData.OrderBy(x => x.ProductId).ThenBy(x => x.StockDate))
+            {
+                // Si es un nuevo producto, inicializar el stock acumulado
+                if (!stockAcumuladoPorProducto.ContainsKey(item.ProductId))
+                {
+                    stockAcumuladoPorProducto[item.ProductId] = 0;
+                }
+
+                // Actualizar stock acumulado según el tipo de movimiento
+                int cantidadMovimiento = item.StockType == "Ingreso" ? item.StockQuantity : -item.StockQuantity;
+                stockAcumuladoPorProducto[item.ProductId] += cantidadMovimiento;
+
+                result.Add(new StockHistoryDTO
+                {
+                    StockId = item.StockId,
+                    StockDate = item.StockDate,
+                    StockQuantity = item.StockQuantity,
+                    StockType = item.StockType,
+                    CenterId = item.CenterId,
+                    ProductId = item.ProductId,
+                    ProductName = item.ProductName,
+                    CategoryId = item.CategoryId,
+                    CategoryName = item.CategoryName,
+                    StockAcumulado = stockAcumuladoPorProducto[item.ProductId]
+                });
+            }
 
             return Ok(result);
         }
