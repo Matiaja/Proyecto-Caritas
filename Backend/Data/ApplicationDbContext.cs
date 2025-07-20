@@ -17,11 +17,16 @@ namespace ProyectoCaritas.Data
         public DbSet<Request> Requests { get; set; }
         public DbSet<Stock> Stocks { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<StockReport> StockReports { get; set; }
         // public DbSet<User> Users { get; set; } se maneja con identity, no se necesita
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            
+            // Configurar StockReport como vista
+            modelBuilder.Entity<StockReport>()
+                .ToView("stockreport");
         }
 
     }

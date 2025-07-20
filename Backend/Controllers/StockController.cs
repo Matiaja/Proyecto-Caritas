@@ -574,9 +574,75 @@ namespace ProyectoCaritas.Controllers
                 })
                 .ToListAsync();
 
+            return Ok(result);        }
+
+        // GET: api/Stocks/stock-history
+        [Authorize]
+        [HttpGet("stock-history")]
+        public async Task<ActionResult<List<StockHistoryDTO>>> GetStockHistory(
+            [FromQuery] int? centerId = null,
+            [FromQuery] int? categoryId = null,
+            [FromQuery] int? productId = null,
+            [FromQuery] DateTime? dateFrom = null,
+            [FromQuery] DateTime? dateTo = null)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return Unauthorized();
+
+            var user = await _context.Users.Include(u => u.Center).FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+                return Unauthorized();
+
+            var query = _context.StockReports.AsQueryable();
+
+            // Filtrar por centro según el rol del usuario
+            if (!User.IsInRole("Admin"))
+            {
+                if (!user.CenterId.HasValue)
+                    return BadRequest("Usuario no tiene un centro asignado.");
+                
+                query = query.Where(sr => sr.CenterId == user.CenterId.Value);
+            }
+            else if (centerId.HasValue)
+            {
+                query = query.Where(sr => sr.CenterId == centerId.Value);
+            }
+
+            // Aplicar filtros adicionales
+            if (categoryId.HasValue)
+                query = query.Where(sr => sr.CategoryId == categoryId.Value);
+
+            if (productId.HasValue)
+                query = query.Where(sr => sr.ProductId == productId.Value);
+
+            if (dateFrom.HasValue)
+                query = query.Where(sr => sr.StockDate >= dateFrom.Value);
+
+            if (dateTo.HasValue)
+                query = query.Where(sr => sr.StockDate <= dateTo.Value);
+
+            // Ordenar por fecha
+            query = query.OrderBy(sr => sr.StockDate);
+
+            var result = await query
+                .Select(sr => new StockHistoryDTO
+                {
+                    StockId = sr.StockId,
+                    StockDate = sr.StockDate,
+                    StockQuantity = sr.StockQuantity,
+                    StockType = sr.StockType,
+                    CenterId = sr.CenterId,
+                    ProductId = sr.ProductId,
+                    ProductName = sr.ProductName,
+                    CategoryId = sr.CategoryId,
+                    CategoryName = sr.CategoryName,
+                    StockAcumulado = sr.StockAcumulado
+                })
+                .ToListAsync();
+
             return Ok(result);
         }
-
 
         private bool StockExists(int id)
         {
