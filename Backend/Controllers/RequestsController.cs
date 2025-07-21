@@ -312,6 +312,58 @@ namespace ProyectoCaritas.Controllers
             return NoContent();
         }
 
+        // PUT: api/Requests/{id}/close
+        [HttpPut("{id}/close")]
+        [Authorize]
+        public async Task<IActionResult> CloseRequestManually(int id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var request = await _context.Requests
+                .Include(r => r.OrderLines)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            if (request == null)
+                return NotFound("Solicitud no encontrada.");
+
+            // Verificar si la solicitud ya está finalizada o cerrada
+            if (request.Status == "Finalizada" || request.Status == "Cerrada")
+                return BadRequest("La solicitud ya está finalizada o cerrada.");
+
+            // Verificar si el usuario es admin o si la solicitud pertenece a su centro
+            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+            if (role != "Admin" && request.RequestingCenterId != user.CenterId)
+            {
+                return Forbid("No tienes permiso para cerrar esta solicitud.");
+            }
+
+            request.Status = "Cerrada";
+            request.ClosedByUserId = userId;
+            request.ClosedDate = DateTime.UtcNow;
+            // Actualizar el estado de las líneas de pedido asociadas
+            foreach (var ol in request.OrderLines)
+            {
+                if (ol.Status != "Completa" || ol.Status != "Parcial")
+                {
+                    ol.Status = "Cancelada";
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { Message = "Solicitud cerrada manualmente.", RequestId = id });
+
+        }
+
         // DELETE: api/Requests/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRequest(int id)
@@ -353,6 +405,7 @@ namespace ProyectoCaritas.Controllers
                    Quantity = ol.Quantity,
                    Description = ol.Description,
                    ProductId = ol.ProductId,
+                   Status = ol.Status,
                    DonationRequests = ol.DonationRequests?.Select(dr => new GetDonationRequestDTO
                    {
                        Id = dr.Id,

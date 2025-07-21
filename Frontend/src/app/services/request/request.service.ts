@@ -26,4 +26,8 @@ export class RequestService {
   addRequest(request: RequestModel): Observable<RequestModel> {
     return this.http.post<RequestModel>(this.baseUrl + 'requests', request);
   }
+
+  closeRequest(requestId: number): Observable<any> {
+    return this.http.put(this.baseUrl + 'requests/' + requestId + '/close', null);
+  }
 }

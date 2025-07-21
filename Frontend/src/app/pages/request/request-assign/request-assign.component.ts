@@ -63,20 +63,22 @@ export class RequestAssignComponent implements OnInit {
   } as RequestModel;
   orderLine: OrderLine = {} as OrderLine;
   pendingQuantity = 0;
+  pendingAssignments: Record<number, number> = {};
+
   // variables de tabla
   title = '';
   columnHeaders: Record<string, string> = {
     centerName: 'Centro',
     productName: 'Producto',
-    stockQuantity: 'Cantidad',
+    availableQuantity: 'Cantidad',
   };
   mobileHeaders: Record<string, string> = {
     centerName: 'Centro',
     productName: 'Producto',
-    stockQuantity: 'Cantidad',
+    availableQuantity: 'Cantidad',
   };
-  displayedColumns = ['centerName', 'productName', 'stockQuantity'];
-  mobileColumns = ['centerName', 'productName', 'stockQuantity'];
+  displayedColumns = ['centerName', 'productName', 'availableQuantity'];
+  mobileColumns = ['centerName', 'productName', 'availableQuantity'];
   stocks: any[] = [];
 
   ngOnInit(): void {
@@ -134,10 +136,10 @@ export class RequestAssignComponent implements OnInit {
   loadStocks() {
     if (this.product && this.product.stocks && this.request && this.request.requestingCenter) {
       this.stockService.getProductInStocks(this.product.id).subscribe({
-        next: (stocks) => {
+        next: async (stocks) => {
           this.stocks = stocks.map(stock => ({
             ...stock,
-            assignQuantity: this.getMaxAssignableQuantity(stock) // Inicializar con el valor máximo
+            assignQuantity: this.getMaxAssignableQuantity(stock), // Inicializar con el valor máximo
           }));
         },
         error: (error) => {
@@ -183,7 +185,7 @@ export class RequestAssignComponent implements OnInit {
   }
 
   getMaxAssignableQuantity(row: any): number {
-    return Math.min(row.stockQuantity, this.pendingQuantity);
+    return Math.min(row.availableQuantity, this.pendingQuantity);
   }
 
   onAddElement = null;

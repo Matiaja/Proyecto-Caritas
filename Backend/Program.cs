@@ -73,6 +73,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<OrderLineService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IStockService, StockService>();
+builder.Services.AddScoped<IRequestStatusService, RequestStatusService>();
+builder.Services.AddScoped<DonationRequestService>();
 builder.Services.AddHttpClient();
 // Configurar Identity
 builder.Services.AddIdentity<User, IdentityRole>(

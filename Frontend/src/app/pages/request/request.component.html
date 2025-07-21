@@ -10,8 +10,9 @@
   [sortOptions]="sortOptions"
   [showStatusFilter]="true"
   [statusOptions]="statusOptions"
+  [customActions]="actionTemplate"
   [showAddButton]="true"
-  [showDeleteButton]="true"
+  [showDeleteButton]="false"
   [showSelectButton]="true"
   [showSearchBar]="true"
   [searchColumns]="searchColumns"
@@ -22,3 +23,16 @@
   (selectElement)="onSelectRequest($event)"
 >
 </ui-table>
+
+<ng-template #actionTemplate let-row>
+  <button class="btn btn-outline-primary btn-finish"
+    [ngClass]="isMobile ? 'btn-xs mobile-action-btn' : 'btn-sm'"
+    (click)="close(row)">
+    <svg xmlns="http://www.w3.org/2000/svg" [ngClass]="isMobile ? 'mobile-btn-icon' : ''"
+      [attr.width]="isMobile ? '24' : '24'" [attr.height]="isMobile ? '24' : '24'" viewBox="0 0 24 24">
+      <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+        d="m7 7l10 10M7 17L17 7" />
+    </svg>
+    <span *ngIf="!isMobile">Finalizar</span>
+  </button>
+</ng-template>

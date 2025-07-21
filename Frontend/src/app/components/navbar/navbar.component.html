@@ -1,27 +1,174 @@
-<nav class="navbar navbar-expand-lg navbar-light" [class.hidden]="!isVisible">
-  <div class="container-fluid">
-    <a class="navbar-brand" routerLink="/home">
-      <img
-        src="assets/png-transparent-caritas.png"
-        width="50"
-        height="50"
-        alt="Descripción de la imagen"
-      />
-    </a>
-    <button
-      class="btn btn-primary"
-      type="button"
-      (click)="editUser()"
-      style="background-color: transparent; border: none"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24">
-        <path
-          fill="currentColor"
-          d="M12 4a4 4 0 0 1 4 4a4 4 0 0 1-4 4a4 4 0 0 1-4-4a4 4 0 0 1 4-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4"
+<!-- Opciones de menú -->
+<ng-template #navLinks>
+  <ul class="navbar-nav ms-auto">
+    <li class="nav-item">
+      <a class="nav-link d-flex align-items-center gap-1" routerLink="/home" routerLinkActive="active">
+        <svg xmlns="http://www.w3.org/2000/svg" class="d-lg-none me-1" width="18" height="18" viewBox="0 0 24 24">
+          <path fill="currentColor"
+            d="M4 19v-9q0-.475.213-.9t.587-.7l6-4.5q.525-.4 1.2-.4t1.2.4l6 4.5q.375.275.588.7T20 10v9q0 .825-.588 1.413T18 21h-3q-.425 0-.712-.288T14 20v-5q0-.425-.288-.712T13 14h-2q-.425 0-.712.288T10 15v5q0 .425-.288.713T9 21H6q-.825 0-1.412-.587T4 19" />
+        </svg>
+        Inicio
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link d-flex align-items-center gap-1" routerLink="/requests" routerLinkActive="active">
+        <svg xmlns="http://www.w3.org/2000/svg" class="d-lg-none me-1" width="18" height="18" viewBox="0 0 24 24">
+          <g fill="none">
+            <path
+              d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" />
+            <path fill="currentColor"
+              d="M12.793 3.172a1 1 0 0 1 1.497 1.32l-.083.094l-.414.414H16a3 3 0 0 1 2.995 2.824L19 8v7.17A3.001 3.001 0 0 1 18 21a3 3 0 0 1-1.172-5.762L17 15.17V8a1 1 0 0 0-.883-.993L16 7h-2.207l.414.414a1 1 0 0 1-1.32 1.498l-.094-.084l-2.121-2.12a1 1 0 0 1-.084-1.321l.084-.094l2.12-2.121ZM6 3a3 3 0 0 1 1.172 5.762L7 8.83v6.342A3.001 3.001 0 0 1 6 21a3 3 0 0 1-1.172-5.762L5 15.17V8.829A3.001 3.001 0 0 1 6 3" />
+          </g>
+        </svg>
+        Solicitudes
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link d-flex align-items-center gap-1" routerLink="/storage" routerLinkActive="active">
+        <svg xmlns="http://www.w3.org/2000/svg" class="d-lg-none me-1" width="18" height="18" viewBox="0 0 24 24">
+          <path fill="currentColor" d="M3 20v-4h18v4zm2-1h2v-2H5zM3 8V4h18v4zm2-1h2V5H5zm-2 7v-4h18v4zm2-1h2v-2H5z" />
+        </svg>
+        Almacenamiento
+      </a>
+    </li>
+    @if (checkUserRole('Admin')) {
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle d-flex align-items-center gap-1" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <svg xmlns="http://www.w3.org/2000/svg" class="d-lg-none me-1" width="18" height="18" viewBox="0 0 24 24">
+          <path fill="currentColor"
+            d="m9.25 22l-.4-3.2q-.325-.125-.612-.3t-.563-.375L4.7 19.375l-2.75-4.75l2.575-1.95Q4.5 12.5 4.5 12.338v-.675q0-.163.025-.338L1.95 9.375l2.75-4.75l2.975 1.25q.275-.2.575-.375t.6-.3l.4-3.2h5.5l.4 3.2q.325.125.613.3t.562.375l2.975-1.25l2.75 4.75l-2.575 1.95q.025.175.025.338v.674q0 .163-.05.338l2.575 1.95l-2.75 4.75l-2.95-1.25q-.275.2-.575.375t-.6.3l-.4 3.2zm2.8-6.5q1.45 0 2.475-1.025T15.55 12t-1.025-2.475T12.05 8.5q-1.475 0-2.488 1.025T8.55 12t1.013 2.475T12.05 15.5" />
+        </svg>
+        Configuración
+      </a>
+      <ul class="dropdown-menu dropdown-menubar">
+        <li><a class="dropdown-item dropdown-itembar d-flex align-items-center" routerLink="/users" routerLinkActive="active">
+          <svg xmlns="http://www.w3.org/2000/svg" class="d-lg-none me-2" width="18" height="18" viewBox="0 0 24 24">
+            <path fill="currentColor"
+              d="M16 17v2H2v-2s0-4 7-4s7 4 7 4m-3.5-9.5A3.5 3.5 0 1 0 9 11a3.5 3.5 0 0 0 3.5-3.5m3.44 5.5A5.32 5.32 0 0 1 18 17v2h4v-2s0-3.63-6.06-4M15 4a3.4 3.4 0 0 0-1.93.59a5 5 0 0 1 0 5.82A3.4 3.4 0 0 0 15 11a3.5 3.5 0 0 0 0-7" />
+          </svg>
+          Usuarios
+        </a></li>
+        <li><a class="dropdown-item dropdown-itembar d-flex align-items-center" routerLink="/centers" routerLinkActive="active">
+          <svg xmlns="http://www.w3.org/2000/svg" class="d-lg-none me-2" width="18" height="18" viewBox="0 0 24 24">
+            <path fill="currentColor"
+              d="M2 22v-8l4-1.775V9l5-2.5V5H9V3h2V1h2v2h2v2h-2v1.5L18 9v3.225L22 14v8h-8v-3q0-.825-.587-1.412T12 17t-1.412.588T10 19v3zm10-8.5q.625 0 1.063-.437T13.5 12t-.437-1.062T12 10.5t-1.062.438T10.5 12t.438 1.063T12 13.5" />
+          </svg>
+          Centros
+        </a></li>
+        <li>
+          <a class="dropdown-item dropdown-itembar d-flex align-items-center" routerLink="/products" routerLinkActive="active">
+            <svg xmlns="http://www.w3.org/2000/svg" class="d-lg-none me-2" width="18" height="18" viewBox="0 0 512 512">
+              <path fill="currentColor" fill-rule="evenodd"
+                d="m256 34.347l192 110.851v221.703L256 477.752L64 366.901V145.198zm-64.001 206.918L192 391.536l42.667 24.635V265.899zM106.667 192v150.267l42.666 24.635V216.633zm233.324-59.894l-125.578 72.836L256 228.952l125.867-72.669zM256 83.614l-125.867 72.67l41.662 24.052l125.579-72.835z" />
+            </svg>
+            Productos
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-item dropdown-itembar d-flex align-items-center" routerLink="/categories" routerLinkActive="active">
+            <svg xmlns="http://www.w3.org/2000/svg" class="d-lg-none me-2" width="18" height="18" viewBox="0 0 1024 1024">
+              <path fill="currentColor" fill-rule="evenodd"
+                d="M160 144h304c8.837 0 16 7.163 16 16v304c0 8.837-7.163 16-16 16H160c-8.837 0-16-7.163-16-16V160c0-8.837 7.163-16 16-16m564.314-25.333l181.019 181.02c6.248 6.248 6.248 16.378 0 22.627l-181.02 181.019c-6.248 6.248-16.378 6.248-22.627 0l-181.019-181.02c-6.248-6.248-6.248-16.378 0-22.627l181.02-181.019c6.248-6.248 16.378-6.248 22.627 0M160 544h304c8.837 0 16 7.163 16 16v304c0 8.837-7.163 16-16 16H160c-8.837 0-16-7.163-16-16V560c0-8.837 7.163-16 16-16m400 0h304c8.837 0 16 7.163 16 16v304c0 8.837-7.163 16-16 16H560c-8.837 0-16-7.163-16-16V560c0-8.837 7.163-16 16-16" />
+            </svg>
+            Categorias
+          </a>
+        </li>
+      </ul>
+    </li>
+    } @else {
+    <li class="nav-item">
+      <a class="nav-link d-flex align-items-center gap-1" routerLink="/products" routerLinkActive="active">
+        <svg xmlns="http://www.w3.org/2000/svg" class="d-lg-none me-1" width="18" height="18" viewBox="0 0 512 512">
+          <path fill="currentColor" fill-rule="evenodd"
+            d="m256 34.347l192 110.851v221.703L256 477.752L64 366.901V145.198zm-64.001 206.918L192 391.536l42.667 24.635V265.899zM106.667 192v150.267l42.666 24.635V216.633zm233.324-59.894l-125.578 72.836L256 228.952l125.867-72.669zM256 83.614l-125.867 72.67l41.662 24.052l125.579-72.835z" />
+        </svg>
+        Productos
+      </a>        
+    </li>
+    <li class="nav-item">
+      <a class="nav-link d-flex align-items-center gap-1" routerLink="/categories" routerLinkActive="active">
+        <svg xmlns="http://www.w3.org/2000/svg" class="d-lg-none me-1" width="18" height="18" viewBox="0 0 1024 1024">
+          <path fill="currentColor" fill-rule="evenodd"
+            d="M160 144h304c8.837 0 16 7.163 16 16v304c0 8.837-7.163 16-16 16H160c-8.837 0-16-7.163-16-16V160c0-8.837 7.163-16 16-16m564.314-25.333l181.019 181.02c6.248 6.248 6.248 16.378 0 22.627l-181.02 181.019c-6.248 6.248-16.378 6.248-22.627 0l-181.019-181.02c-6.248-6.248-6.248-16.378 0-22.627l181.02-181.019c6.248-6.248 16.378-6.248 22.627 0M160 544h304c8.837 0 16 7.163 16 16v304c0 8.837-7.163 16-16 16H160c-8.837 0-16-7.163-16-16V560c0-8.837 7.163-16 16-16m400 0h304c8.837 0 16 7.163 16 16v304c0 8.837-7.163 16-16 16H560c-8.837 0-16-7.163-16-16V560c0-8.837 7.163-16 16-16" />
+        </svg>
+        Categorias
+      </a>
+    </li>
+    }
+    <li class="nav-item d-lg-none">
+      <button role="button" class="nav-link logout-link d-flex align-items-center gap-1" (click)="logout()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="d-lg-none me-1" width="18" height="18" viewBox="0 0 24 24">
+          <path fill="currentColor"
+            d="m17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5M4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4z" />
+        </svg>
+        Cerrar sesión
+      </button>
+    </li>
+  </ul>
+</ng-template>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light py-lg-0" [class.hidden]="!isVisible">
+  <div class="container-fluid d-flex justify-content-between align-items-center">
+    <!-- Sección izquierda: logo + menú en escritorio -->
+    <div class="d-flex align-items-center">
+      <!-- Logo  -->
+      <a class="navbar-brand" routerLink="/home">
+        <img
+          src="assets/png-transparent-caritas.png"
+          width="40"
+          height="40"
+          alt="Descripción de la imagen"
         />
-      </svg>
-    </button>
-    <app-notification></app-notification>
+      </a>
+
+      <!-- Menú de navegación (visible en desktop) -->
+      <div class="d-none d-lg-flex m-lg-3">
+        <ng-container *ngTemplateOutlet="navLinks"></ng-container>
+      </div>
+    </div>
+
+    <div class="d-flex align-items-center mx-auto mx-lg-0">
+
+      <!-- Icono de notificaciones -->
+      <app-notification class="me-4 me-lg-3"></app-notification>
+
+      <!-- Icono de perfil de usuario -->
+      <div class="dropdown-center dropdown-lg">
+        <button
+          class="btn btn-primary"
+          data-bs-toggle="dropdown"
+          type="button"
+          style="background-color: transparent; border: none"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24">
+            <path
+            fill="currentColor"
+            d="M12 4a4 4 0 0 1 4 4a4 4 0 0 1-4 4a4 4 0 0 1-4-4a4 4 0 0 1 4-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4"
+            />
+          </svg>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-lg-end">
+          <li><a class="dropdown-item d-flex align-items-center gap-2" routerLink="/users/edit">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+              <path fill="currentColor"
+                d="M11 9c0 1.66-1.34 3-3 3s-3-1.34-3-3s1.34-3 3-3s3 1.34 3 3m3 11H2v-2c0-2.21 2.69-4 6-4s6 1.79 6 4m8-6v2h-9v-2m9-4v2h-9V8m9-4v2h-9V4Z" />
+            </svg>
+            Mis datos
+          </a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><button role="button" class="dropdown-item d-flex align-items-center gap-2" (click)="logout()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+              <path fill="currentColor"
+                d="m17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5M4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4z" />
+            </svg>
+            Cerrar sesión
+          </button></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Toggle del menú (solo mobile) -->
     <button
       class="navbar-toggler"
       type="button"
@@ -33,69 +180,10 @@
     >
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      @if (checkUserRole('Admin')) {
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/home" routerLinkActive="active">Inicio</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/requests" routerLinkActive="active">Solicitudes</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/storage" routerLinkActive="active">Almacenamiento</a>
-          </li>
-          <li class="nav-item dropdown">
-            <a
-              class="nav-link dropdown-toggle"
-              href="#"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              Configuración
-            </a>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" routerLink="/users" routerLinkActive="active">Usuarios</a></li>
-              <li><a class="dropdown-item" routerLink="/centers" routerLinkActive="active">Centros</a></li>
-              <li>
-                <a class="dropdown-item" routerLink="/products" routerLinkActive="active"
-                  >Productos</a
-                >
-              </li>
-              <li>
-                <a class="dropdown-item" routerLink="/categories" routerLinkActive="active"
-                  >Categorias</a
-                >
-              </li>
-            </ul>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link logout-link" role="button" (click)="logout()">Cerrar sesión</a>
-          </li>
-        </ul>
-      } @else {
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/home" routerLinkActive="active">Inicio</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/requests" routerLinkActive="active">Solicitudes</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/storage" routerLinkActive="active">Almacenamiento</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/products" routerLinkActive="active">Productos</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/categories" routerLinkActive="active">Categorias</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link logout-link" role="button" (click)="logout()">Cerrar sesión</a>
-          </li>
-        </ul>
-      }
+
+    <!-- Menú colapsable (solo mobile) -->
+    <div class="collapse navbar-collapse mt-2" id="navbarNav">
+      <ng-container *ngTemplateOutlet="navLinks"></ng-container>
     </div>
   </div>
 </nav>
