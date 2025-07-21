@@ -11,32 +11,41 @@
     </button>
 
     <ul class="dropdown-menu dropdown-menu-end notification-dropdown p-0 mt-2">
-        <div *ngFor="let notif of notifications; trackBy: trackByNotificationId" 
-            class="notification-item"
-            [class.notification-read]="notif.isRead">
-            <li class="px-4 py-3">
-                <div class="toast-header mb-2">
-                    <strong class="me-auto">{{ notif.title }}</strong>
-                    <small class="notification-time">{{ notif.createdAt | date:'dd/MM/yyyy HH:mm' }}</small>
-                </div>
-                <div class="toast-body notification-message mb-1">
-                    {{ notif.message }}
-                </div>
-                @if (shouldShowActions(notif)) {
-                    <div class="notification-actions">
-                        <ng-container *ngFor="let action of getActionsForType(notif.type); let i = index">
-                                <button class="action-btn btn btn-outline-primary btn-sm"
-                                    (click)="handleAction(notif, action.action)"
-                                >
-                                    {{action.label}}
-                                </button>
-                        </ng-container>
+        @if (notifications.length != 0) {
+
+            <div *ngFor="let notif of notifications; trackBy: trackByNotificationId" 
+                class="notification-item"
+                [class.notification-read]="notif.isRead">
+                <li class="px-4 py-3">
+                    <div class="toast-header mb-2">
+                        <strong class="me-auto">{{ notif.title }}</strong>
+                        <small class="notification-time">{{ notif.createdAt | date:'dd/MM/yyyy HH:mm' }}</small>
                     </div>
-                }
+                    <div class="toast-body notification-message mb-1">
+                        {{ notif.message }}
+                    </div>
+                    @if (shouldShowActions(notif)) {
+                        <div class="notification-actions">
+                            <ng-container *ngFor="let action of getActionsForType(notif.type); let i = index">
+                                    <button class="action-btn btn btn-outline-primary btn-sm"
+                                        (click)="handleAction(notif, action.action)"
+                                    >
+                                        {{action.label}}
+                                    </button>
+                            </ng-container>
+                        </div>
+                    }
+                </li>
+                <li>
+                    <hr class="dropdown-divider m-0">
+                </li>
+            </div>
+        } 
+        @else {
+            <li class="px-4 py-3 text-center">
+                <span class="text-muted">No tienes notificaciones nuevas.</span>
             </li>
-            <li>
-                <hr class="dropdown-divider m-0">
-            </li>
-        </div>
+        }
+
     </ul>
 </div>

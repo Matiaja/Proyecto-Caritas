@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using ProyectoCaritas.Data;
 using ProyectoCaritas.Models.DTOs;
 using ProyectoCaritas.Models.Entities;
+using ProyectoCaritas.Services;
 
 namespace ProyectoCaritas.Controllers
 {
@@ -15,11 +16,13 @@ namespace ProyectoCaritas.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly INotificationService _notificationService;
+        private readonly IStockService _stockService;
 
-        public DonationRequestsController(ApplicationDbContext context, INotificationService notificationService)
+        public DonationRequestsController(ApplicationDbContext context, INotificationService notificationService, IStockService stockService)
         {
             _context = context;
             _notificationService = notificationService;
+            _stockService = stockService;
         }
 
         // GET: api/DonationRequests
@@ -136,24 +139,33 @@ namespace ProyectoCaritas.Controllers
                 {
                     Status = "400",
                     Error = "Bad Request",
-                    Message = "Quantity must be greater than 0."
+                    Message = "La cantidad debe ser mayor a 0."
                 });
             }
 
             var productId = orderLine.ProductId;
 
-            // validate stock available in center assigned
-            var stockAvailable = await _context.Stocks
-                .Where(s => s.CenterId == addDonationRequestDto.AssignedCenterId && s.ProductId == productId)
-                .SumAsync(s => s.Type == "Ingreso" ? s.Quantity : -s.Quantity);
-
-            if (stockAvailable < addDonationRequestDto.Quantity)
+            // Validar que productId no sea null
+            if (!productId.HasValue)
             {
                 return BadRequest(new
                 {
                     Status = "400",
                     Error = "Bad Request",
-                    Message = "Center do not have enought stock available."
+                    Message = "Product ID is missing or invalid."
+                });
+            }
+
+            // validate stock available in center assigned (stock - donationRequests pending)
+            var isStockAvailable = await _stockService.CanAssignDonation(addDonationRequestDto.AssignedCenterId, productId.Value, addDonationRequestDto.Quantity);
+
+            if (!isStockAvailable)
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = $"El centro no tiene suficiente stock disponible."
                 });
             }
 
@@ -168,7 +180,7 @@ namespace ProyectoCaritas.Controllers
                 {
                     Status = "400",
                     Error = "Bad Request",
-                    Message = $"The quantity exceeds the quantity of the Order Line. Remain {cantidadPendiente}."
+                    Message = $"La cantidad excede la cantidad solicitada. Se necesitan {cantidadPendiente}."
                 });
             }
 

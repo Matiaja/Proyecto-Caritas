@@ -62,6 +62,7 @@
       <input type="number" class="form-control form-control-sm" 
         [ngClass]="isMobile? 'text-mobile input-mobile' : 'input-normal'" [(ngModel)]="row.assignQuantity"
         [min]="1" [max]="getMaxAssignableQuantity(row)" />
+        <!-- <span class="text-muted" [ngClass]="isMobile? 'text-mobile' : ''">Disponible: {{ row.availableQuantity }}</span> -->
 
         <button class="btn btn-assign btn-outline-primary" [ngClass]="isMobile ? 'btn-xs mobile-action-btn' : 'btn-sm'"
           (click)="assign(row)">
