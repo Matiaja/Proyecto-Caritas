@@ -32,7 +32,7 @@ export class StorageComponent implements OnInit {
   stocks: any[] = [];
   mobileHeaders: { [key: string]: string } = {
     productName: 'Producto',
-    stockQuantity: 'Cantidad',
+    stockQuantity: 'Cant.',
   };
   mobileColumns = ['productName', 'stockQuantity'];
   searchColumns = ['productName', 'productCode'];
@@ -125,7 +125,10 @@ export class StorageComponent implements OnInit {
         this.order,
         this.groupByCenter
       );
+      console.log(this.stocks);
       this.totalItems = this.stockService.totalItems;
+
+      const showAvailable = this.selectedCenter != null || this.groupByCenter;
 
       // Ajustar columnas visibles según si se agrupa por centro
       if (this.groupByCenter && this.selectedCenter == null) {
@@ -136,10 +139,19 @@ export class StorageComponent implements OnInit {
       } else {
         this.displayedColumns = ['productName', 'productCode', 'stockQuantity'];
         this.mobileColumns = ['productName', 'stockQuantity'];
-
         // Si ya estaba agregado, lo sacamos
         delete this.columnHeaders['centerName'];
         delete this.mobileHeaders['centerName'];
+      }
+      // Solo agregamos "Disponible" si corresponde
+      if (showAvailable) {
+        this.displayedColumns.push('availableQuantity');
+        this.mobileColumns.push('availableQuantity');
+        this.columnHeaders['availableQuantity'] = 'Disponible';
+        this.mobileHeaders['availableQuantity'] = 'Disp.';
+      } else {
+        delete this.columnHeaders['availableQuantity'];
+        delete this.mobileHeaders['availableQuantity'];
       }
     }
   }

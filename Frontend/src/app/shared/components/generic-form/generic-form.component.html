@@ -40,6 +40,7 @@
             [formControlName]="field.name"
             class="form-select"
           >
+            <option value="" disabled selected>{{ field.placeholder || 'Seleccione una opción' }}</option>
             <option *ngFor="let option of field.options" [value]="option.value">
               {{ option.label }}
             </option>

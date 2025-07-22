@@ -75,7 +75,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
         notification.isRead = false; 
         this.notifications = originalNotifications;
         this.unreadCount = originalNotifications.filter((n: any) => !n.isRead).length;
-        this.toastrService.error('Error al aceptar la asignación');
+        this.toastrService.error(err.error.message ?? 'Error al aceptar la asignación');
       }
     })
   }
@@ -100,7 +100,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
         // Restaurar las notificaciones originales en caso de error
         this.notifications = originalNotifications;
         this.unreadCount = originalNotifications.filter((n: any) => !n.isRead).length;
-        this.toastrService.error('Error al marcar el pedido como enviado');
+        this.toastrService.error(err.error.message ??'Error al marcar el pedido como enviado');
       }
     })
   }
@@ -120,7 +120,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
         // Restaurar las notificaciones originales en caso de error
         this.notifications = originalNotifications;
         this.unreadCount = originalNotifications.filter((n: any) => !n.isRead).length;
-        this.toastrService.error('Error al confirmar la recepción del pedido');
+        this.toastrService.error(err.error.message ??'Error al confirmar la recepción del pedido');
       }
     })
   }

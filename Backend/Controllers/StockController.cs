@@ -228,6 +228,7 @@ namespace ProyectoCaritas.Controllers
         [HttpGet("validate-quantity")]
         public async Task<IActionResult> ValidateQuantity(int centerId, int productId, int newQuantity, string type)
         {
+            Console.WriteLine($">>>>>> Validating stock for CenterId: {centerId}, ProductId: {productId}, NewQuantity: {newQuantity}, Type: {type}");
             var stocks = await _context.Stocks
                 .Where(s => s.CenterId == centerId && s.ProductId == productId)
                 .ToListAsync();
@@ -303,16 +304,34 @@ namespace ProyectoCaritas.Controllers
                 stocksQuery = stocksQuery.Where(s => s.Product.CategoryId == categoryId.Value);
             }
 
+            // Consulta para obtener DonationRequests pendientes
+            var donationRequestsQuery = _context.DonationRequests
+                .Include(dr => dr.OrderLine)
+                .Where(dr => dr.Status == "Aceptada" || dr.Status == "Enviada");
+
             var grouped = groupByCenter
                 ? await stocksQuery
                     .GroupBy(s => new { s.ProductId, s.Product.Name, s.Product.Code, s.CenterId })
-                    .Select(g => new ProductStockDTO
+                    .Select(g => new
                     {
                         ProductId = (int)g.Key.ProductId,
                         ProductName = g.Key.Name,
                         ProductCode = g.Key.Code,
                         CenterId = g.Key.CenterId,
-                        StockQuantity = g.Sum(s => s.Type == "Ingreso" ? s.Quantity : -s.Quantity)
+                        StockQuantity = g.Sum(s => s.Type == "Ingreso" ? s.Quantity : -s.Quantity),
+                        // Calcular cantidad asignada desde DonationRequests
+                        AssignedQuantity = donationRequestsQuery
+                            .Where(dr => dr.AssignedCenterId == g.Key.CenterId && dr.OrderLine.ProductId == g.Key.ProductId)
+                            .Sum(dr => dr.Quantity)
+                    })
+                    .Select(g => new ProductStockDTO
+                    {
+                        ProductId = g.ProductId,
+                        ProductName = g.ProductName,
+                        ProductCode = g.ProductCode,
+                        CenterId = g.CenterId,
+                        StockQuantity = g.StockQuantity,
+                        AvailableQuantity = g.StockQuantity - g.AssignedQuantity < 0 ? 0 : g.StockQuantity - g.AssignedQuantity
                     })
                     .ToListAsync()
                 : await stocksQuery
@@ -326,6 +345,7 @@ namespace ProyectoCaritas.Controllers
                     })
                     .ToListAsync();
 
+            // Ordenar los resultados
             if (!string.IsNullOrEmpty(sortBy))
             {
                 switch (sortBy.ToLower())

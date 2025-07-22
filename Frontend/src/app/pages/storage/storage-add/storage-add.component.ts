@@ -32,7 +32,7 @@ export class StorageAddComponent {
         name: 'type',
         label: 'Tipo',
         type: 'select',
-        value: 'Ingreso',
+        value: '',
         placeholder: 'Seleccione el tipo',
         validators: [Validators.required],
         errorMessage: 'El tipo es requerido',
@@ -112,9 +112,20 @@ export class StorageAddComponent {
 
     console.log('Payload to create stock:', payload);
 
-    this.stockService.createStock(payload).subscribe(() => {
-      this.toastr.success('Stock creado con éxito', 'Exito');
-      this.router.navigate(['/storage']);
+    this.stockService.createStock(payload).subscribe({
+      next: () => {
+        this.toastr.success('Stock creado con éxito', 'Exito');
+        this.router.navigate(['/storage']);
+      },
+      error: (err) => {
+        console.error('Error creating stock:', err);
+        if(err.error && err.error.message) {
+          this.toastr.error(err.error.message, 'Error');
+        }
+        else {
+          this.toastr.error('Error al crear el stock', 'Error');
+        }
+      }
     });
   }
 

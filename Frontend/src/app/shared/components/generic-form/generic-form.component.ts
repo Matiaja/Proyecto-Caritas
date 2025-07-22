@@ -87,7 +87,8 @@ export class GenericFormComponent implements OnChanges {
       const centerId = this.globalStateService.getCurrentCenterId();
       const newQuantity = control.value;
 
-      return this.stockService.validateQuantity(centerId!, productId, newQuantity).pipe(
+      
+      return this.stockService.validateQuantity(centerId!, productId, newQuantity, "Egreso").pipe(
         switchMap(() => {
           return of(null);
         }),
