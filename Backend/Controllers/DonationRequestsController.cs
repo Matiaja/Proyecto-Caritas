@@ -206,6 +206,76 @@ namespace ProyectoCaritas.Controllers
 
         }
 
+        // GET: api/DonationRequests/movements
+        [HttpGet("movements")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<MovementDTO>>> GetMovements(
+            [FromQuery] DateTime? dateFrom = null,
+            [FromQuery] DateTime? dateTo = null,
+            [FromQuery] string status = null,
+            [FromQuery] int? productId = null
+        )
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return Unauthorized();
+
+            var user = await _context.Users.Include(u => u.Center).FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+                return Unauthorized();
+
+            // Validar parámetros
+            if (dateFrom.HasValue && dateTo.HasValue && dateTo < dateFrom)
+                return BadRequest(new { message = "La 'Fecha hasta' no puede ser anterior a la 'Fecha desde'." });
+
+            if (!string.IsNullOrEmpty(status) && !new[] { "En camino", "Recibida" }.Contains(status))
+                return BadRequest(new { message = "Estado inválido." });
+
+            var query = _context.DonationRequests
+                .Include(dr => dr.OrderLine)
+                    .ThenInclude(ol => ol.Product)
+                .Include(dr => dr.AssignedCenter)
+                .Include(dr => dr.OrderLine.Request)
+                    .ThenInclude(r => r.RequestingCenter)
+                .Where(dr => dr.Status == "En camino" || dr.Status == "Recibida");
+
+            // Filtros básicos
+            if (dateFrom.HasValue)
+                query = query.Where(dr => dr.AsignationDate >= dateFrom.Value);
+
+            if (dateTo.HasValue)
+                query = query.Where(dr => dr.AsignationDate <= dateTo.Value);
+
+            if (!string.IsNullOrEmpty(status))
+                query = query.Where(dr => dr.Status == status);
+
+            if (productId.HasValue)
+                query = query.Where(dr => dr.OrderLine.ProductId == productId.Value);
+
+            // Filtro por centro si no es admin
+            if (!User.IsInRole("Admin") && user.CenterId != null)
+            {
+                query = query.Where(dr => dr.AssignedCenterId == user.CenterId || // Movimientos donde es el centro donante
+                     dr.OrderLine.Request.RequestingCenterId == user.CenterId); // donde es el centro receptor
+            }
+
+            var movements = await query
+                .OrderByDescending(dr => dr.AsignationDate)
+                .Select(dr => new MovementDTO
+                {
+                    DonationRequestId = dr.Id,
+                    FromCenter = dr.AssignedCenter.Name,
+                    ToCenter = dr.OrderLine.Request.RequestingCenter.Name,
+                    ProductName = dr.OrderLine.Product.Name,
+                    Quantity = dr.Quantity,
+                    Status = dr.Status,
+                    AssignmentDate = dr.AsignationDate
+                })
+                .ToListAsync();
+
+            return Ok(movements);
+        }
+
         // PUT: api/DonationRequests/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateDonationRequest(int id, DonationRequestDTO updateDonationRequestDto)
