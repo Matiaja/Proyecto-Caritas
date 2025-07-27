@@ -175,6 +175,7 @@ namespace ProyectoCaritas.Controllers
             existingStock.Quantity = updateGetStockDTO.Quantity;
             existingStock.Weight = updateGetStockDTO.Weight;
             existingStock.Type = updateGetStockDTO.Type;
+            existingStock.Origin = updateGetStockDTO.Origin;
 
             _context.Entry(existingStock).State = EntityState.Modified;
 
@@ -692,6 +693,7 @@ namespace ProyectoCaritas.Controllers
             Quantity = stock.Quantity,
             Weight = stock.Weight,
             Type = stock.Type,
+            Origin = stock.Origin,
             Product = stock.Product != null ? new GetProductDTO
             {
                 Name = stock.Product.Name,

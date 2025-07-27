@@ -69,6 +69,15 @@ export class StorageAddComponent {
         errorMessage: '',
       },
       {
+        name: 'origin',
+        label: 'Origen',
+        type: 'text',
+        value: '',
+        placeholder: 'Ingrese el origen del stock',
+        validators: [],
+        errorMessage: '',
+      },
+      {
         name: 'quantity',
         label: 'Cantidad',
         type: 'number',
@@ -105,6 +114,7 @@ export class StorageAddComponent {
       date: data.date,
       expirationDate: data.expirationDate !== "" ? data.expirationDate : null,
       description: data.description ? data.description : '',
+      origin: data.origin ? data.origin : null, 
       quantity: data.quantity,
       weight: data.weight ? data.weight : 0,
       centerId: centerId,

@@ -57,7 +57,9 @@ namespace ProyectoCaritas.Services
                     Quantity = stockDTO.Quantity,
                     Weight = stockDTO.Weight,
                     Type = stockDTO.Type,
-                    Center = center
+                    Origin = stockDTO.Origin,
+                    Center = center,
+                    Product = product
                 };
 
                 _context.Stocks.Add(stock);
