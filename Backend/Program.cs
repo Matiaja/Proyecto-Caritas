@@ -99,7 +99,7 @@ builder.Services.AddIdentity<User, IdentityRole>(
     .AddDefaultTokenProviders();
 
 // Clave secreta para firmar el token (usa una clave segura)
-var key = Encoding.ASCII.GetBytes("SuperSecureKey1234!·$%&/()=asdfasdf");
+var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]!);
 
 // Configuración de la autenticación JWT
 builder.Services.AddAuthentication(options =>

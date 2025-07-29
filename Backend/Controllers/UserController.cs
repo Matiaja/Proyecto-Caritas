@@ -1,4 +1,5 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System.Configuration;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
@@ -20,12 +21,14 @@ namespace ProyectoCaritas.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ApplicationDbContext _context;
-        public UserController(UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager, ApplicationDbContext context)
+        private readonly IConfiguration _configuration;
+        public UserController(UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager, ApplicationDbContext context, IConfiguration configuration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
             _context = context;
+            _configuration = configuration;
         }
 
         // GET: api/User
@@ -290,7 +293,7 @@ namespace ProyectoCaritas.Controllers
             var roles = await _userManager.GetRolesAsync(user);
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes("SuperSecureKey1234!·$%&/()=asdfasdf"); // Use a secure key
+            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]!); // Use a secure key
 
             var claims = new List<Claim>
             {
