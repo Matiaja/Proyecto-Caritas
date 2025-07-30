@@ -114,7 +114,7 @@
 }
 
 .login-card button[type="submit"]:disabled {
-  background: #ccc;
+  background: #ae3336;
   cursor: not-allowed;
 }
 
