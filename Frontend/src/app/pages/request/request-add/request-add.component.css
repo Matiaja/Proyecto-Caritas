@@ -10,12 +10,13 @@
     background-color: #dfdaff;
     color: #333;
     border-radius: 4px;
-    padding: 5px 10px 5px 10px;
-
+    max-height: 40px;
+   
     @media (max-width: 600px) {
       padding: 3px 6px;
       font-size: 14px;
       border-radius: 8px;
+      max-height: 30px;
     }
   }
 
@@ -23,13 +24,19 @@
   [aria-selected='true'],
   .mat-step-header:hover:not([aria-disabled]) {
     background-color: #36337f;
-    color: white;
     border-radius: 4px;
+    .mat-step-label {
+      color: white !important;
+    }
   }
 
   .mat-step-icon {
-    background-color: #36337f;
-    color: white;
+    background-color: #36337f !important;
+    color: white !important;
+  }
+
+  .mat-step-label-active {
+    color: white !important;
   }
 
   .mdc-button,

@@ -30,6 +30,7 @@ import { NotFoundComponent } from './pages/not-found/not-found.component';
 import { roleGuard } from './guards/role.guard';
 import { UnauthorizedComponent } from './pages/unauthorized/unauthorized.component';
 import { OrderlineComponent } from './pages/orderline/orderline/orderline.component';
+import { MovementComponent } from './pages/movement/movement.component';
 
 export const routes: Routes = [
   {
@@ -60,12 +61,13 @@ export const routes: Routes = [
   },
   {
     path: 'requests',
+    data: { breadcrumb: 'Solicitudes' },
     canActivate: [authGuard],
     children: [
       { path: '', component: RequestComponent },
-      { path: 'add', component: RequestAddComponent },
-      { path: ':id', component: RequestDetailComponent },
-      { path: ':id/assign/:idorderline', component: RequestAssignComponent },
+      { path: 'add', component: RequestAddComponent, data: { breadcrumb: 'Agregar solicitudes' }, },
+      { path: ':id', component: RequestDetailComponent, data: { breadcrumb: 'Detalle solicitud' }, },
+      { path: ':id/assign/:idorderline', component: RequestAssignComponent, data: { breadcrumb: 'Asignar solicitud' } },
     ],
   },
   {
@@ -107,6 +109,12 @@ export const routes: Routes = [
         data: { breadcrumb: 'Detalle de Categoría' },
       },
     ],
+  },
+  {
+    path: 'movements',
+    component: MovementComponent,
+    data: { breadcrumb: 'Movimientos' },
+    canActivate: [authGuard]
   },
   {
     path: 'products',

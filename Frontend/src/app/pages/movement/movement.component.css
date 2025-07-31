@@ -1,0 +1,143 @@
+.transition-icon {
+    transition: transform 0.3s ease;
+}
+
+.rotate-icon {
+    transform: rotate(180deg);
+}
+
+.filters-section {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(54, 51, 127, 0.08);
+    margin-bottom: 30px;
+    border: 1px solid rgba(54, 51, 127, 0.1);
+}
+
+.btn-filter {
+    padding: 0.375rem 1rem;
+    font-size: 0.875rem;
+    border-radius: 20px;
+}
+
+/* ESTILOS PARA ANGULAR MATERIAL */
+/* Ajustes generales para los campos de formulario MDC */
+.mat-mdc-text-field-wrapper {
+    height: auto !important;
+}
+
+.mat-mdc-form-field-infix {
+    min-height: 38px !important;
+    /* Altura reducida */
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+}
+
+.mdc-text-field--outlined .mdc-notched-outline {
+    height: 38px !important;
+    /* Ajusta la altura del borde */
+}
+
+.mdc-text-field--outlined .mdc-notched-outline__notch {
+    padding-top: 6px !important;
+    /* Ajuste para la etiqueta */
+}
+
+.mat-mdc-text-field-wrapper.mdc-text-field--outlined .mat-mdc-form-field-infix {
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+}
+
+/* Ajustes para el texto dentro de los campos */
+.mat-mdc-input-element {
+    font-size: 0.875rem !important;
+    padding: 4px 0 !important;
+}
+
+/* Ajustes para las etiquetas (labels) */
+.mat-mdc-form-field-label {
+    top: 18px !important;
+    font-size: 0.875rem !important;
+}
+
+.mdc-text-field--outlined.mdc-text-field--with-leading-icon .mdc-text-field__input {
+    padding-left: 6px !important;
+}
+
+/* Ajustes para selects */
+.mat-mdc-select {
+    font-size: 0.875rem !important;
+}
+
+/* Ajustes para datepicker */
+.mat-mdc-icon-button {
+    --mdc-icon-button-state-layer-size: 34px !important;
+    width: 34px !important;
+    height: 34px !important;
+    padding: 4px !important;
+}
+
+/* Ajustes para opciones del select */
+.mat-mdc-option {
+    min-height: 34px !important;
+    font-size: 0.875rem !important;
+}
+
+/* Ajuste específico para el botón del datepicker */
+.mat-mdc-datepicker-toggle .mat-mdc-icon-button {
+    width: 30px !important;
+    height: 30px !important;
+}
+
+/* Sobreescribe las variables CSS primero */
+:root {
+    --mat-form-field-container-vertical-padding: 3px !important;
+    --mat-form-field-filled-with-label-container-padding-top: 3px !important;
+    --mat-form-field-filled-with-label-container-padding-bottom: 3px !important;
+    --mat-form-field-container-height: 38px !important;
+    --mat-form-field-outlined-label-text-populated-size: 14px !important;
+}
+
+/* Estilos específicos para el text field outlined */
+.mat-mdc-text-field-wrapper.mdc-text-field--outlined .mat-mdc-form-field-infix {
+    padding-top: var(--mat-form-field-container-vertical-padding) !important;
+    padding-bottom: var(--mat-form-field-container-vertical-padding) !important;
+    min-height: var(--mat-form-field-container-height) !important;
+}
+
+/* Ajuste fino para el notch del label */
+.mdc-text-field--outlined .mdc-notched-outline__notch {
+    padding-top: 0 !important;
+}
+
+/* Alineación vertical del contenido */
+.mat-mdc-form-field-infix {
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* Ajuste para el input text */
+.mat-mdc-input-element {
+    padding: 0 !important;
+    margin: 0 !important;
+    align-self: center !important;
+}
+
+/* Corrección para cuando tiene label */
+.mdc-text-field--outlined:not(.mdc-text-field--no-label) .mat-mdc-form-field-infix {
+    padding-top: calc(var(--mat-form-field-container-vertical-padding) + 2px) !important;
+    padding-bottom: calc(var(--mat-form-field-container-vertical-padding) - 2px) !important;
+}
+
+/* Ajuste para el espacio del icono (si lo hay) */
+.mdc-text-field--with-leading-icon .mat-mdc-form-field-infix {
+    padding-left: 4px !important;
+}
+
+/* Elimina completamente el espacio del subscript */
+.mat-mdc-form-field-subscript-wrapper {
+    display: none !important;
+    height: 0 !important;
+    min-height: 0 !important;
+}

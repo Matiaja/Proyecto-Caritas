@@ -213,7 +213,8 @@ namespace ProyectoCaritas.Controllers
             [FromQuery] DateTime? dateFrom = null,
             [FromQuery] DateTime? dateTo = null,
             [FromQuery] string status = null,
-            [FromQuery] int? productId = null
+            [FromQuery] string productName = null,
+            [FromQuery] int? centerId = null
         )
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -228,16 +229,13 @@ namespace ProyectoCaritas.Controllers
             if (dateFrom.HasValue && dateTo.HasValue && dateTo < dateFrom)
                 return BadRequest(new { message = "La 'Fecha hasta' no puede ser anterior a la 'Fecha desde'." });
 
-            if (!string.IsNullOrEmpty(status) && !new[] { "En camino", "Recibida" }.Contains(status))
-                return BadRequest(new { message = "Estado inválido." });
-
             var query = _context.DonationRequests
                 .Include(dr => dr.OrderLine)
                     .ThenInclude(ol => ol.Product)
                 .Include(dr => dr.AssignedCenter)
                 .Include(dr => dr.OrderLine.Request)
                     .ThenInclude(r => r.RequestingCenter)
-                .Where(dr => dr.Status == "En camino" || dr.Status == "Recibida");
+                .AsQueryable();
 
             // Filtros básicos
             if (dateFrom.HasValue)
@@ -249,8 +247,12 @@ namespace ProyectoCaritas.Controllers
             if (!string.IsNullOrEmpty(status))
                 query = query.Where(dr => dr.Status == status);
 
-            if (productId.HasValue)
-                query = query.Where(dr => dr.OrderLine.ProductId == productId.Value);
+            if (!string.IsNullOrEmpty(productName))
+                query = query.Where(dr => dr.OrderLine.Product.Name.Contains(productName, StringComparison.OrdinalIgnoreCase));
+
+            if (centerId.HasValue)
+                query = query.Where(dr => dr.AssignedCenterId == centerId.Value ||
+                    dr.OrderLine.Request.RequestingCenterId == centerId.Value);
 
             // Filtro por centro si no es admin
             if (!User.IsInRole("Admin") && user.CenterId != null)
