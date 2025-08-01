@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProyectoCaritas.Data;
-using ProyectoCaritas.Models.DTOs;
 using ProyectoCaritas.Models.Entities;
 using ProyectoCaritas.Services;
+using ProyectoCaritas.Models.DTOs;
 
 namespace ProyectoCaritas.Controllers
 {
@@ -43,6 +43,9 @@ namespace ProyectoCaritas.Controllers
         {
             var donationRequest = await _context.DonationRequests
                 .Include(dr => dr.OrderLine)
+                    .ThenInclude(ol => ol.Product)
+                .Include(dr => dr.AssignedCenter)
+                .Include(dr => dr.StatusHistory)
                 .FirstOrDefaultAsync(dr => dr.Id == id);
 
             if (donationRequest == null)
@@ -61,7 +64,7 @@ namespace ProyectoCaritas.Controllers
         // POST: api/DonationRequests
         [HttpPost]
         [Authorize]
-        public async Task<ActionResult<DonationRequestDTO>> CreateDonationRequest(DonationRequestDTO addDonationRequestDto)
+        public async Task<ActionResult<DonationRequestDTO>> CreateDonationRequest(AddDonationRequestDTO addDonationRequestDto)
         {
             // validate if the DonationRequest was sended
             if (addDonationRequestDto == null)
@@ -184,15 +187,30 @@ namespace ProyectoCaritas.Controllers
                 });
             }
 
+            var now = DateTime.UtcNow;
+
             // create DonationRequest
             var donationRequest = new DonationRequest
             {
                 OrderLineId = addDonationRequestDto.OrderLineId,
                 AssignedCenterId = addDonationRequestDto.AssignedCenterId,
                 Quantity = addDonationRequestDto.Quantity,
-                Status = "Asignada"
+                AssignmentDate = now,
+                Status = "Asignada",
+                LastStatusChangeDate = now
             };
+
+            // Agregar el primer registro al historial
+            var statusHistory = new DonationRequestStatusHistory
+            {
+                DonationRequest = donationRequest,
+                Status = "Asignada",
+                ChangeDate = now
+            };
+
             _context.DonationRequests.Add(donationRequest);
+            _context.DonationRequestStatusHistories.Add(statusHistory);
+
             await _context.SaveChangesAsync();
 
             await _notificationService.CreateAssignmentNotification(
@@ -239,10 +257,10 @@ namespace ProyectoCaritas.Controllers
 
             // Filtros básicos
             if (dateFrom.HasValue)
-                query = query.Where(dr => dr.AsignationDate >= dateFrom.Value);
+                query = query.Where(dr => dr.AssignmentDate >= dateFrom.Value);
 
             if (dateTo.HasValue)
-                query = query.Where(dr => dr.AsignationDate <= dateTo.Value);
+                query = query.Where(dr => dr.AssignmentDate <= dateTo.Value);
 
             if (!string.IsNullOrEmpty(status))
                 query = query.Where(dr => dr.Status == status);
@@ -262,7 +280,7 @@ namespace ProyectoCaritas.Controllers
             }
 
             var movements = await query
-                .OrderByDescending(dr => dr.AsignationDate)
+                .OrderByDescending(dr => dr.AssignmentDate)
                 .Select(dr => new MovementDTO
                 {
                     DonationRequestId = dr.Id,
@@ -271,7 +289,7 @@ namespace ProyectoCaritas.Controllers
                     ProductName = dr.OrderLine.Product.Name,
                     Quantity = dr.Quantity,
                     Status = dr.Status,
-                    AssignmentDate = dr.AsignationDate
+                    AssignmentDate = dr.AssignmentDate
                 })
                 .ToListAsync();
 
@@ -316,8 +334,6 @@ namespace ProyectoCaritas.Controllers
 
 
             donationRequest.AssignedCenterId = updateDonationRequestDto.AssignedCenterId;
-            donationRequest.ShipmentDate = updateDonationRequestDto.ShipmentDate;
-            donationRequest.ReceptionDate = updateDonationRequestDto.ReceptionDate;
             donationRequest.Status = updateDonationRequestDto.Status;
 
             try
@@ -366,17 +382,37 @@ namespace ProyectoCaritas.Controllers
                 AssignedCenterId = donationRequest.AssignedCenterId,
                 OrderLineId = donationRequest.OrderLineId,
                 Quantity = donationRequest.Quantity,
-                ShipmentDate = donationRequest.ShipmentDate ?? null,
-                ReceptionDate = donationRequest.ReceptionDate ?? null,
                 Status = donationRequest.Status,
+                AssignmentDate = donationRequest.AssignmentDate,
+                LastStatusChangeDate = donationRequest.LastStatusChangeDate,
                 OrderLine = donationRequest.OrderLine != null ? new OrderLineDTO
                 {
                     Id = donationRequest.OrderLine.Id,
                     RequestId = donationRequest.OrderLine.RequestId,
                     Quantity = donationRequest.OrderLine.Quantity,
                     Description = donationRequest.OrderLine.Description,
-                    ProductId = donationRequest.OrderLine.ProductId
-                } : null
+                    ProductId = donationRequest.OrderLine.ProductId,
+                    Product = donationRequest.OrderLine.Product != null ? new ProductDTO
+                    {
+                        Id = donationRequest.OrderLine.Product.Id,
+                        Name = donationRequest.OrderLine.Product.Name,
+                        CategoryId = donationRequest.OrderLine.Product.CategoryId,
+                    } : null
+                } : null,
+                AssignedCenter = donationRequest.AssignedCenter != null ? new GetCenterDTO
+                {
+                    Id = donationRequest.AssignedCenter.Id,
+                    Name = donationRequest.AssignedCenter.Name,
+                    Location = donationRequest.AssignedCenter.Location,
+                    Manager = donationRequest.AssignedCenter.Manager
+                } : null,
+                StatusHistory = donationRequest.StatusHistory?.Select(sh => new DonationRequestStatusHistoryDTO
+                {
+                    Id = sh.Id,
+                    DonationRequestId = sh.DonationRequestId,
+                    Status = sh.Status,
+                    ChangeDate = sh.ChangeDate
+                }).ToList()
             };
     }
 }

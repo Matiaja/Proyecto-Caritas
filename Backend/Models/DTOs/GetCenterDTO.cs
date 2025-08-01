@@ -9,7 +9,7 @@ namespace ProyectoCaritas.Models.DTOs
         public required string Location { get; set; }
         public required string Manager { get; set; }
         public int? CapacityLimit { get; set; }
-        public required string Phone { get; set; }
+        public string? Phone { get; set; }
         public string? Email { get; set; }
 
         public ICollection<GetStockDTO>? Stocks { get; set; }

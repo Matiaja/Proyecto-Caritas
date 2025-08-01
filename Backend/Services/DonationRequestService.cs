@@ -22,4 +22,24 @@ public class DonationRequestService
 
         return dr;
     }
+
+    public async Task UpdateStatus(int donationRequestId, string newStatus, DateTime changeDate)
+    {
+        var donationRequest = await _context.DonationRequests.FindAsync(donationRequestId);
+
+        // Actualizar el estado
+        donationRequest.Status = newStatus;
+        donationRequest.LastStatusChangeDate = changeDate;
+
+        // Registrar en el historial
+        var statusHistory = new DonationRequestStatusHistory
+        {
+            DonationRequestId = donationRequest.Id,
+            Status = newStatus,
+            ChangeDate = changeDate
+        };
+
+        _context.DonationRequestStatusHistories.Add(statusHistory);
+        await _context.SaveChangesAsync();
+    }
 }

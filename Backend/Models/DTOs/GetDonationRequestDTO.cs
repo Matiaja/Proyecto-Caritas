@@ -10,8 +10,11 @@ namespace ProyectoCaritas.Models.DTOs
         public int Quantity { get; set; }
         public DateTime? ShipmentDate { get; set; }
         public DateTime? ReceptionDate { get; set; }
+        public DateTime AssignmentDate { get; set; } // Fecha de asignación de la solicitud
         public required string Status { get; set; }
+        public DateTime? LastStatusChangeDate { get; set; } // Fecha del último cambio de estado
         public OrderLineDTO? OrderLine { get; set; }
         public GetCenterDTO? AssignedCenter { get; set; }
+        public List<DonationRequestStatusHistoryDTO>? StatusHistory { get; set; } // Historial de cambios de estado
     }
 }

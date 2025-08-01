@@ -12,6 +12,7 @@ namespace ProyectoCaritas.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<Center> Centers { get; set; }
         public DbSet<DonationRequest> DonationRequests { get; set; }
+        public DbSet<DonationRequestStatusHistory> DonationRequestStatusHistories { get; set; }
         public DbSet<OrderLine> OrderLines { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Request> Requests { get; set; }
