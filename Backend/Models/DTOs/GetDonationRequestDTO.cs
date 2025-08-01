@@ -15,6 +15,6 @@ namespace ProyectoCaritas.Models.DTOs
         public DateTime? LastStatusChangeDate { get; set; } // Fecha del último cambio de estado
         public OrderLineDTO? OrderLine { get; set; }
         public GetCenterDTO? AssignedCenter { get; set; }
-        public List<DonationRequestStatusHistoryDTO>? StatusHistory { get; set; } // Historial de cambios de estado
+        public List<DonationRequestStatusDTO>? StatusHistory { get; set; } // Historial de cambios de estado
     }
 }

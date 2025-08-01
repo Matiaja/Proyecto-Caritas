@@ -201,7 +201,7 @@ namespace ProyectoCaritas.Controllers
             };
 
             // Agregar el primer registro al historial
-            var statusHistory = new DonationRequestStatusHistory
+            var statusHistory = new DonationRequestStatus
             {
                 DonationRequest = donationRequest,
                 Status = "Asignada",
@@ -209,7 +209,7 @@ namespace ProyectoCaritas.Controllers
             };
 
             _context.DonationRequests.Add(donationRequest);
-            _context.DonationRequestStatusHistories.Add(statusHistory);
+            _context.DonationRequestStatus.Add(statusHistory);
 
             await _context.SaveChangesAsync();
 
@@ -406,7 +406,7 @@ namespace ProyectoCaritas.Controllers
                     Location = donationRequest.AssignedCenter.Location,
                     Manager = donationRequest.AssignedCenter.Manager
                 } : null,
-                StatusHistory = donationRequest.StatusHistory?.Select(sh => new DonationRequestStatusHistoryDTO
+                StatusHistory = donationRequest.StatusHistory?.Select(sh => new DonationRequestStatusDTO
                 {
                     Id = sh.Id,
                     DonationRequestId = sh.DonationRequestId,

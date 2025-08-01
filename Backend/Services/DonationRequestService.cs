@@ -32,14 +32,14 @@ public class DonationRequestService
         donationRequest.LastStatusChangeDate = changeDate;
 
         // Registrar en el historial
-        var statusHistory = new DonationRequestStatusHistory
+        var statusHistory = new DonationRequestStatus
         {
             DonationRequestId = donationRequest.Id,
             Status = newStatus,
             ChangeDate = changeDate
         };
 
-        _context.DonationRequestStatusHistories.Add(statusHistory);
+        _context.DonationRequestStatus.Add(statusHistory);
         await _context.SaveChangesAsync();
     }
 }

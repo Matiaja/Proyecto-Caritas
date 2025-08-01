@@ -1,6 +1,6 @@
 namespace ProyectoCaritas.Models.DTOs
 {
-    public class DonationRequestStatusHistoryDTO
+    public class DonationRequestStatusDTO
     {
         public int Id { get; set; }
         public int DonationRequestId { get; set; }

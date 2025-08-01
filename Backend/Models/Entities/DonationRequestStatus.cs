@@ -1,6 +1,6 @@
 namespace ProyectoCaritas.Models.Entities
 {
-    public class DonationRequestStatusHistory
+    public class DonationRequestStatus
     {
         public int Id { get; set; }
         public int DonationRequestId { get; set; }

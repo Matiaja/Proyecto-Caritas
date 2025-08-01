@@ -12,6 +12,6 @@
 
         public Center? AssignedCenter { get; set; } // Una Solicitud de Donación pertenece a cero o un Centro
         public OrderLine? OrderLine { get; set; } // Una Línea de Pedido tiene cero o una Solicitud.
-        public ICollection<DonationRequestStatusHistory>? StatusHistory { get; set; }
+        public ICollection<DonationRequestStatus>? StatusHistory { get; set; }
     }
 }
