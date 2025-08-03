@@ -63,6 +63,24 @@
 </div>
 </div>
 
+<!-- Leyenda de estados -->
+<div class="d-sm-none">
+    <div class="status-legend my-3">
+        <div class="status-legend-item">
+            <div class="status-legend-color legend-received"></div>
+            <span>Recibidas</span>
+        </div>
+        <div class="status-legend-item">
+            <div class="status-legend-color legend-rejected"></div>
+            <span>Rechazadas</span>
+        </div>
+        <div class="status-legend-item">
+            <div class="status-legend-color legend-other"></div>
+            <span>Otros estados</span>
+        </div>
+    </div>
+</div>
+
 <!-- TABLA -->
 <ui-table
     [title]="title"
@@ -73,5 +91,6 @@
     [mobileHeaders]="mobileHeaders"
     [showSelectButton]="true"
     [showFilterButton]="false"
+    [rowClass]="getRowClass"
 >
 </ui-table>

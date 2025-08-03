@@ -12,6 +12,7 @@ import { CommonModule } from '@angular/common';
 import {provideNativeDateAdapter} from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { UiTableComponent } from "../../shared/components/ui-table/ui-table.component";
+import { ResponsiveService } from '../../services/responsive/responsive.service';
 
 @Component({
   selector: 'app-movement',
@@ -38,23 +39,23 @@ provideNativeDateAdapter()],
 export class MovementComponent implements OnInit {
   // Datos de la tabla
   movements: Movement[] = [];
-  displayedColumns = ['fromCenter', 'toCenter', 'productName', 'quantity', 'status', 'assignmentDate'];
+  displayedColumns = ['fromCenter', 'toCenter', 'productName', 'quantity', 'status', 'updatedDate'];
   columnHeaders = {
     fromCenter: 'Desde',
     toCenter: 'Hacia',
     productName: 'Producto',
     quantity: 'Cantidad',
     status: 'Estado',
-    assignmentDate: 'Fecha'
+    updatedDate: 'Fecha'
   };
   title = 'Movimientos entre centros';
-  mobileColumns = ['fromCenter', 'toCenter', 'productName', 'quantity', 'assignmentDate'];
+  mobileColumns = ['fromCenter', 'toCenter', 'productName', 'quantity', 'updatedDate'];
   mobileHeaders = {
     fromCenter: 'Desde',
     toCenter: 'Hacia',
     productName: 'Producto',
     quantity: 'Cant.',
-    assignmentDate: 'Fecha'
+    updatedDate: 'Fecha'
   };
 
   // Filtros
@@ -64,7 +65,16 @@ export class MovementComponent implements OnInit {
   status: string | null = null;
   productName: string | null = null;
 
-  constructor(private movementService: MovementService) {}
+  isMobile = false;
+
+  constructor(
+    private movementService: MovementService,
+    private responsiveService: ResponsiveService
+  ) {
+      this.responsiveService.isMobile$.subscribe((isMobile) => {
+        this.isMobile = isMobile;
+      });
+  }
 
   ngOnInit(): void {
     this.loadMovements();
@@ -90,11 +100,11 @@ export class MovementComponent implements OnInit {
       next: (data) => {
         this.movements = data.map(movement => ({
           ...movement,
-          assignmentDate: new Date(movement.assignmentDate).toLocaleDateString('es-ES', {
+          updatedDate: new Date(movement.updatedDate).toLocaleDateString('es-ES', {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric',
-          }) + ' ' + new Date(movement.assignmentDate).toLocaleTimeString('es-ES', {
+          }) + ' ' + new Date(movement.updatedDate).toLocaleTimeString('es-ES', {
             hour: '2-digit',
             minute: '2-digit',
           })
@@ -104,6 +114,22 @@ export class MovementComponent implements OnInit {
         console.error('Error al obtener movimientos:', err);
       }
     });
+  }
+
+  // Agregar método para determinar el color según el estado
+  getStatusColor(status: string): string {
+    switch(status) {
+      case 'Recibida':
+        return 'bg-success-light'; // Verde claro
+      case 'Rechazada':
+        return 'bg-danger-light'; // Rojo claro
+      default:
+        return 'bg-light'; // Gris claro (para otros estados)
+    }
+  }
+
+  getRowClass = (movement: Movement) => {
+    return this.isMobile ? this.getStatusColor(movement.status) : '';
   }
 
   toggleFilters() {

@@ -17,6 +17,7 @@ export class UiTableComponent<T extends Record<string, any>> implements OnChange
   @Input() title = '';
   @Input() displayedColumns: string[] = [];
   @Input() dataSource: T[] = [];
+  @Input() rowClass: (row: any) => string = () => ''; 
   @Input() columnHeaders: Record<string, string> = {};
   @Input() mobileHeaders: Record<string, string> = {};
   @Input() htmlColumns: string[] = [];

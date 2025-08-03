@@ -6,6 +6,6 @@ export interface Movement {
     quantity: number;
     status: string;
     assignmentDate: string;
-    updatedDate?: string;
+    updatedDate: string;
     description?: string;
 }

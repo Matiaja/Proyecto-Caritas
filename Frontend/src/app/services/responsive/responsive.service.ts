@@ -5,7 +5,7 @@ import { BehaviorSubject, debounceTime, fromEvent } from 'rxjs';
   providedIn: 'root',
 })
 export class ResponsiveService {
-  private mobileBreakpoint = 600;
+  private mobileBreakpoint = 576;
   isMobile$ = new BehaviorSubject<boolean>(false);
 
   constructor() {

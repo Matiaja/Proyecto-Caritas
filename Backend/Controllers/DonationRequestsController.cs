@@ -257,10 +257,10 @@ namespace ProyectoCaritas.Controllers
 
             // Filtros básicos
             if (dateFrom.HasValue)
-                query = query.Where(dr => dr.AssignmentDate >= dateFrom.Value);
+                query = query.Where(dr => dr.LastStatusChangeDate >= dateFrom.Value);
 
             if (dateTo.HasValue)
-                query = query.Where(dr => dr.AssignmentDate <= dateTo.Value);
+                query = query.Where(dr => dr.LastStatusChangeDate <= dateTo.Value);
 
             if (!string.IsNullOrEmpty(status))
                 query = query.Where(dr => dr.Status == status);
@@ -280,7 +280,7 @@ namespace ProyectoCaritas.Controllers
             }
 
             var movements = await query
-                .OrderByDescending(dr => dr.AssignmentDate)
+                .OrderByDescending(dr => dr.LastStatusChangeDate)
                 .Select(dr => new MovementDTO
                 {
                     DonationRequestId = dr.Id,
@@ -289,6 +289,7 @@ namespace ProyectoCaritas.Controllers
                     ProductName = dr.OrderLine.Product.Name,
                     Quantity = dr.Quantity,
                     Status = dr.Status,
+                    UpdatedDate = dr.LastStatusChangeDate,
                     AssignmentDate = dr.AssignmentDate
                 })
                 .ToListAsync();

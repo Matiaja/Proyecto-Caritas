@@ -21,6 +21,58 @@
     border-radius: 20px;
 }
 
+/* Estilos para la leyenda de estados */
+.status-legend {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.status-legend-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.875rem;
+}
+
+.status-legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    margin-right: 0.5rem;
+}
+
+.legend-received {
+    background-color: rgba(40, 167, 69, 0.2);
+    border: 1px solid rgba(40, 167, 69, 0.7);
+}
+
+.legend-rejected {
+    background-color: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.5);
+}
+
+.legend-other {
+    background-color: #ffffff;
+    border: 1px solid #b6babe;
+}
+
+/* Estilos para los fondos */
+.bg-success-light {
+    background-color: rgba(40, 167, 70, 0.2) !important;
+    /* Verde claro */
+}
+
+.bg-danger-light {
+    background-color: rgba(220, 53, 69, 0.1) !important;
+    /* Rojo claro */
+}
+
+.bg-light {
+    background-color: inherit !important;
+    /* Gris claro */
+}
+
 /* ESTILOS PARA ANGULAR MATERIAL */
 /* Ajustes generales para los campos de formulario MDC */
 .mat-mdc-text-field-wrapper {
