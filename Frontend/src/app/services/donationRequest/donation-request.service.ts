@@ -12,6 +12,10 @@ export class DonationRequestService {
   baseUrl = environment.baseUrl;
   constructor(private http: HttpClient) {}
 
+  getDonationRequestById(id: number): Observable<DonationRequest> {
+    return this.http.get<DonationRequest>(this.baseUrl + 'donationRequests/' + id);
+  }
+
   addDonationRequest(dr: DonationRequest): Observable<DonationRequest> {
     return this.http.post<DonationRequest>(this.baseUrl + 'donationRequests', dr);
   }

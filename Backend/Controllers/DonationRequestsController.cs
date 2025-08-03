@@ -44,6 +44,8 @@ namespace ProyectoCaritas.Controllers
             var donationRequest = await _context.DonationRequests
                 .Include(dr => dr.OrderLine)
                     .ThenInclude(ol => ol.Product)
+                .Include(dr => dr.OrderLine.Request)
+                    .ThenInclude(r => r.RequestingCenter)
                 .Include(dr => dr.AssignedCenter)
                 .Include(dr => dr.StatusHistory)
                 .FirstOrDefaultAsync(dr => dr.Id == id);
@@ -390,6 +392,20 @@ namespace ProyectoCaritas.Controllers
                 {
                     Id = donationRequest.OrderLine.Id,
                     RequestId = donationRequest.OrderLine.RequestId,
+                    Request = donationRequest.OrderLine.Request != null ? new RequestBasicDTO
+                    {
+                        Id = donationRequest.OrderLine.Request.Id,
+                        UrgencyLevel = donationRequest.OrderLine.Request.UrgencyLevel,
+                        RequestDate = donationRequest.OrderLine.Request.RequestDate,
+                        RequestingCenterId = donationRequest.OrderLine.Request.RequestingCenterId,
+                        RequestingCenter = donationRequest.OrderLine.Request.RequestingCenter != null ? new GetCenterDTO
+                        {
+                            Id = donationRequest.OrderLine.Request.RequestingCenter.Id,
+                            Name = donationRequest.OrderLine.Request.RequestingCenter.Name,
+                            Location = donationRequest.OrderLine.Request.RequestingCenter.Location,
+                            Manager = donationRequest.OrderLine.Request.RequestingCenter.Manager
+                        } : null
+                    } : null,
                     Quantity = donationRequest.OrderLine.Quantity,
                     Description = donationRequest.OrderLine.Description,
                     ProductId = donationRequest.OrderLine.ProductId,
@@ -407,13 +423,15 @@ namespace ProyectoCaritas.Controllers
                     Location = donationRequest.AssignedCenter.Location,
                     Manager = donationRequest.AssignedCenter.Manager
                 } : null,
-                StatusHistory = donationRequest.StatusHistory?.Select(sh => new DonationRequestStatusDTO
-                {
-                    Id = sh.Id,
-                    DonationRequestId = sh.DonationRequestId,
-                    Status = sh.Status,
-                    ChangeDate = sh.ChangeDate
-                }).ToList()
+                StatusHistory = donationRequest.StatusHistory?
+                    .OrderByDescending(sh => sh.ChangeDate)
+                    .Select(sh => new DonationRequestStatusDTO
+                    {
+                        Id = sh.Id,
+                        DonationRequestId = sh.DonationRequestId,
+                        Status = sh.Status,
+                        ChangeDate = sh.ChangeDate
+                    }).ToList()
             };
     }
 }

@@ -8,11 +8,11 @@ export interface DonationRequest {
   assignedCenterId: number;
   assignedCenter?: CenterModel;
   quantity: number;
-  assignmentDate?: Date;
+  assignmentDate?: Date | string;
   status?: string;
-  lastStatusChangeDate?: Date;
+  lastStatusChangeDate?: Date | string;
   statusHistory?: {
     status: string;
-    changeDate: Date;
+    changeDate: Date | string;
   }[];
 }

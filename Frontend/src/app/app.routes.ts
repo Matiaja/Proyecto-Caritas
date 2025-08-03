@@ -31,6 +31,7 @@ import { roleGuard } from './guards/role.guard';
 import { UnauthorizedComponent } from './pages/unauthorized/unauthorized.component';
 import { OrderlineComponent } from './pages/orderline/orderline/orderline.component';
 import { MovementComponent } from './pages/movement/movement.component';
+import { MovementDetailComponent } from './pages/movement/movement-detail/movement-detail.component';
 
 export const routes: Routes = [
   {
@@ -112,9 +113,12 @@ export const routes: Routes = [
   },
   {
     path: 'movements',
-    component: MovementComponent,
     data: { breadcrumb: 'Movimientos' },
-    canActivate: [authGuard]
+    canActivate: [authGuard],
+    children: [
+      { path: '', component: MovementComponent },
+      { path: ':id', component: MovementDetailComponent, data: { breadcrumb: 'Detalle de movimiento' } }
+    ]
   },
   {
     path: 'products',

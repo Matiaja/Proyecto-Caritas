@@ -13,6 +13,7 @@ import {provideNativeDateAdapter} from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { UiTableComponent } from "../../shared/components/ui-table/ui-table.component";
 import { ResponsiveService } from '../../services/responsive/responsive.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-movement',
@@ -69,7 +70,8 @@ export class MovementComponent implements OnInit {
 
   constructor(
     private movementService: MovementService,
-    private responsiveService: ResponsiveService
+    private responsiveService: ResponsiveService,
+    private router: Router
   ) {
       this.responsiveService.isMobile$.subscribe((isMobile) => {
         this.isMobile = isMobile;
@@ -146,5 +148,9 @@ export class MovementComponent implements OnInit {
     this.status = null;
     this.productName = null;
     this.loadMovements();
+  }
+
+  onSelectMovement(m: Movement) {
+    this.router.navigate(['/movements', m.donationRequestId]);
   }
 }
