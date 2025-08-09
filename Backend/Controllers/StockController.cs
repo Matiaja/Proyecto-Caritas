@@ -175,6 +175,7 @@ namespace ProyectoCaritas.Controllers
             existingStock.Quantity = updateGetStockDTO.Quantity;
             existingStock.Weight = updateGetStockDTO.Weight;
             existingStock.Type = updateGetStockDTO.Type;
+            existingStock.Origin = updateGetStockDTO.Origin;
 
             _context.Entry(existingStock).State = EntityState.Modified;
 
@@ -579,9 +580,106 @@ namespace ProyectoCaritas.Controllers
                 })
                 .ToListAsync();
 
+            return Ok(result);        }
+
+        // GET: api/Stocks/stock-history
+        [Authorize]
+        [HttpGet("stock-history")]
+        public async Task<ActionResult<List<StockHistoryDTO>>> GetStockHistory(
+            [FromQuery] int? centerId = null,
+            [FromQuery] int? categoryId = null,
+            [FromQuery] int? productId = null,
+            [FromQuery] DateTime? dateFrom = null,
+            [FromQuery] DateTime? dateTo = null)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return Unauthorized();
+
+            var user = await _context.Users.Include(u => u.Center).FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+                return Unauthorized();
+
+            var query = _context.StockReports.AsQueryable();
+
+            // Filtrar por centro según el rol del usuario
+            if (!User.IsInRole("Admin"))
+            {
+                if (!user.CenterId.HasValue)
+                    return BadRequest("Usuario no tiene un centro asignado.");
+                
+                query = query.Where(sr => sr.CenterId == user.CenterId.Value);
+            }
+            else if (centerId.HasValue)
+            {
+                query = query.Where(sr => sr.CenterId == centerId.Value);
+            }
+
+            // Aplicar filtros adicionales
+            if (categoryId.HasValue)
+                query = query.Where(sr => sr.CategoryId == categoryId.Value);
+
+            if (productId.HasValue)
+                query = query.Where(sr => sr.ProductId == productId.Value);
+
+            if (dateFrom.HasValue)
+                query = query.Where(sr => sr.StockDate >= dateFrom.Value);
+
+            if (dateTo.HasValue)
+                query = query.Where(sr => sr.StockDate <= dateTo.Value);
+
+            // Obtener los datos ordenados
+            var stockData = await query
+                .OrderBy(sr => sr.ProductId)
+                .ThenBy(sr => sr.StockDate)
+                .ThenBy(sr => sr.CenterId)
+                .Select(sr => new
+                {
+                    sr.StockId,
+                    sr.StockDate,
+                    sr.StockQuantity,
+                    sr.StockType,
+                    sr.CenterId,
+                    sr.ProductId,
+                    sr.ProductName,
+                    sr.CategoryId,
+                    sr.CategoryName
+                })
+                .ToListAsync();
+
+            // Recalcular stock acumulado considerando múltiples centros
+            var result = new List<StockHistoryDTO>();
+            var stockAcumuladoPorProducto = new Dictionary<int, int>();
+
+            foreach (var item in stockData.OrderBy(x => x.ProductId).ThenBy(x => x.StockDate))
+            {
+                // Si es un nuevo producto, inicializar el stock acumulado
+                if (!stockAcumuladoPorProducto.ContainsKey(item.ProductId))
+                {
+                    stockAcumuladoPorProducto[item.ProductId] = 0;
+                }
+
+                // Actualizar stock acumulado según el tipo de movimiento
+                int cantidadMovimiento = item.StockType == "Ingreso" ? item.StockQuantity : -item.StockQuantity;
+                stockAcumuladoPorProducto[item.ProductId] += cantidadMovimiento;
+
+                result.Add(new StockHistoryDTO
+                {
+                    StockId = item.StockId,
+                    StockDate = item.StockDate,
+                    StockQuantity = item.StockQuantity,
+                    StockType = item.StockType,
+                    CenterId = item.CenterId,
+                    ProductId = item.ProductId,
+                    ProductName = item.ProductName,
+                    CategoryId = item.CategoryId,
+                    CategoryName = item.CategoryName,
+                    StockAcumulado = stockAcumuladoPorProducto[item.ProductId]
+                });
+            }
+
             return Ok(result);
         }
-
 
         private bool StockExists(int id)
         {
@@ -600,6 +698,7 @@ namespace ProyectoCaritas.Controllers
             Quantity = stock.Quantity,
             Weight = stock.Weight,
             Type = stock.Type,
+            Origin = stock.Origin,
             Product = stock.Product != null ? new GetProductDTO
             {
                 Name = stock.Product.Name,
