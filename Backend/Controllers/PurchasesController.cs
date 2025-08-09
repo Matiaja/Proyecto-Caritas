@@ -26,6 +26,7 @@ public class PurchasesController : ControllerBase
             .Include(p => p.Center)
             .Include(p => p.Items).ThenInclude(i => i.ItemsDistribution)
             .Include(p => p.Items).ThenInclude(i => i.Product)
+            .OrderByDescending(p => p.PurchaseDate)
             .ToListAsync();
 
         return purchases.Select(p => new PurchaseDTO(p)).ToList();
