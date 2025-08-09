@@ -84,7 +84,6 @@ export class RequestAddComponent implements OnInit {
   onDeleteRequest3() {}
   onDeleteRequest(orderLine: OrderLine) {
     const index = this.orderLines.findIndex((ol) => ol === orderLine);
-    console.log(index);
     if (index > -1) {
       this.orderLines = this.orderLines.filter((ol) => ol !== orderLine);
     }
@@ -135,7 +134,6 @@ export class RequestAddComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log(new Date().toISOString());
     this.formGroup1 = new FormGroup({});
     this.formGroup2 = this.fb.group({
       product: [null, Validators.required],
@@ -268,17 +266,14 @@ export class RequestAddComponent implements OnInit {
       ...this.formGroup1.value,
       orderLines: this.orderLines,
     };
-    // console.log(this.request);
     this.requestService.addRequest(requestDTO).subscribe({
       next: (response) => {
         this.toastr.success('Solicitud creada con éxito', 'Éxito');
-        console.log('Solicitud creada con éxito', response);
         this.router.navigate(['requests/']);
       },
       error: (err) => {
         console.error('Error al crear la solicitud', err);
         this.toastr.error('Hubo un error al crear la solicitud. Inténtalo nuevamente.', 'Error');
-        alert('Hubo un error al crear la solicitud. Inténtalo nuevamente.');
       },
     });
   }

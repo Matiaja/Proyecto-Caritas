@@ -120,8 +120,6 @@ export class StorageAddComponent {
       centerId: centerId,
     };
 
-    console.log('Payload to create stock:', payload);
-
     this.stockService.createStock(payload).subscribe({
       next: () => {
         this.toastr.success('Stock creado con éxito', 'Exito');

@@ -40,7 +40,6 @@ export class PurchaseDetailComponent implements OnInit {
     this.purchaseService.getById(this.purchaseId).subscribe(p => {
       this.purchase = p;
       this.items = p.items;
-      console.log('Detalles de la compra:', this.purchase);
     });
   }
 

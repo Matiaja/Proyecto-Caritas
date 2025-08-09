@@ -46,7 +46,6 @@ export class StockService {
   }
 
   validateQuantity(centerId: number, productId: number, newQuantity: number, typeStock: string) {
-    console.log(`Validating quantity for CenterId: ${centerId}, ProductId: ${productId}, NewQuantity: ${newQuantity}, Type: ${typeStock}`);
     return this.http.get(`${this.baseUrl}/validate-quantity`, {
       params: { centerId, productId, newQuantity, type: typeStock},
     });

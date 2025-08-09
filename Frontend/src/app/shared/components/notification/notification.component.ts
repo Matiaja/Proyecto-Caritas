@@ -30,7 +30,6 @@ export class NotificationComponent implements OnInit, OnDestroy {
     this.notificationService.notifications$
       .pipe(takeUntil(this.destroy$))
       .subscribe(notifs => {
-        console.log('Notificaciones recibidas:', notifs);
         this.notifications = notifs;
         this.unreadCount = notifs.filter((n: any) => !n.isRead).length;
     });
@@ -82,7 +81,6 @@ export class NotificationComponent implements OnInit, OnDestroy {
 
   rejectAssignment(notification: any) {
     // Lógica para rechazar
-    console.log('Rechazando asignación:', notification);
   }
   
   markAsShipped(notification: any) {
