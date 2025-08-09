@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { StockReportService, ProductStockSummary } from '../../services/stock-report/stock-report.service';
+import { StockReportService, ProductStockSummary, StockHistory } from '../../services/stock-report/stock-report.service';
 import { CategoryService } from '../../services/category/category.service';
 import { ProductService } from '../../services/product/product.service';
 import { CenterService } from '../../services/center/center.service';
@@ -327,13 +327,52 @@ export class HomeComponent implements OnInit {
   }
 
   generateStockOverTimeChart(): void {
+    // Usar el servicio de histórico para obtener datos más precisos
+    const cleanCenterId = this.centerId === undefined ? undefined : this.centerId;
+    const cleanCategoryId = this.categoryId === undefined ? undefined : this.categoryId;
+    const cleanProductId = this.productId === undefined ? undefined : this.productId;
+    const cleanFromDate = this.fromDate === undefined || this.fromDate === '' ? undefined : this.fromDate;
+    const cleanToDate = this.toDate === undefined || this.toDate === '' ? undefined : this.toDate;
+    
+    this.stockReportService.getStockHistory(
+      cleanCenterId,
+      cleanCategoryId,
+      cleanProductId,
+      cleanFromDate,
+      cleanToDate
+    ).subscribe({
+      next: (historyData) => {
+        const grouped = this.groupStockHistoryByDate(historyData);
+        const sorted = Object.entries(grouped).sort((a, b) => a[0].localeCompare(b[0]));
+        
+        this.lineChartData = {
+          labels: sorted.map(x => new Date(x[0]).toLocaleDateString()),
+          datasets: [{
+            data: sorted.map(x => x[1] as number),
+            label: 'Stock Acumulado',
+            borderColor: '#36337f',
+            backgroundColor: 'rgba(54, 51, 127, 0.1)',
+            fill: true,
+            tension: 0.4
+          }]
+        };
+      },
+      error: (error) => {
+        console.error('Error loading stock history:', error);
+        // Fallback al método original si falla
+        this.generateStockOverTimeChartFallback();
+      }
+    });
+  }
+
+  generateStockOverTimeChartFallback(): void {
     const grouped = this.groupByDate(this.stockData);
     const sorted = Object.entries(grouped).sort((a, b) => a[0].localeCompare(b[0]));
     
     this.lineChartData = {
       labels: sorted.map(x => new Date(x[0]).toLocaleDateString()),
       datasets: [{
-        data: sorted.map(x => x[1]),
+        data: sorted.map(x => x[1] as number),
         label: 'Stock Total',
         borderColor: '#36337f',
         backgroundColor: 'rgba(54, 51, 127, 0.1)',
@@ -381,5 +420,18 @@ export class HomeComponent implements OnInit {
       acc[date] = (acc[date] || 0) + Math.max(0, item.totalStock); // Only positive stock
       return acc;
     }, {} as Record<string, number>);
+  }
+
+  private groupStockHistoryByDate(arr: StockHistory[]): Record<string, number> {
+    // Agrupar por fecha y tomar el stock acumulado más reciente para cada fecha
+    const grouped = arr.reduce((acc, item) => {
+      const date = item.stockDate.split('T')[0];
+      if (!acc[date] || acc[date] < item.stockAcumulado) {
+        acc[date] = item.stockAcumulado;
+      }
+      return acc;
+    }, {} as Record<string, number>);
+    
+    return grouped;
   }
 }
