@@ -6,6 +6,7 @@ import { ProductService } from '../../../services/product/product.service';
 import { UiTableComponent } from '../../../shared/components/ui-table/ui-table.component';
 import { CommonModule, Location } from '@angular/common';
 import { ResponsiveService } from '../../../services/responsive/responsive.service';
+import { PdfService } from '../../../services/pdf/pdf.service';
 
 @Component({
   selector: 'app-request-detail',
@@ -54,7 +55,8 @@ export class RequestDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private location: Location,
-    private responsiveService: ResponsiveService
+    private responsiveService: ResponsiveService,
+    private pdfService: PdfService
   ) {
     this.responsiveService.isMobile$.subscribe((isMobile) => {
       this.isMobile = isMobile;
@@ -113,6 +115,29 @@ export class RequestDetailComponent implements OnInit {
 
   goBack() {
     this.router.navigate(['/requests']);
+  }
+
+  generateRequestPdf(): void {
+    if (!this.request || !this.request.id) {
+      console.error('No hay datos de solicitud para generar PDF');
+      return;
+    }
+
+    // Preparar los datos con los nombres de productos ya cargados
+    const requestDataForPdf = {
+      ...this.request,
+      orderLines: this.orderLines, // Usar orderLines que ya tiene productName
+    };
+
+    this.pdfService.generateRequestDetailPdfWithData(requestDataForPdf).subscribe({
+      next: (blob) => {
+        const filename = `solicitud_${this.request.id}_${new Date().toISOString().split('T')[0]}.pdf`;
+        this.pdfService.downloadPdf(blob, filename);
+      },
+      error: (error) => {
+        console.error('Error generating PDF:', error);
+      },
+    });
   }
 
   onAddElement = null;
