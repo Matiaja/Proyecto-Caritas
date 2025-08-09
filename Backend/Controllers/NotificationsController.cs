@@ -17,13 +17,15 @@ namespace ProyectoCaritas.Controllers
         private readonly ApplicationDbContext _context;
         private readonly INotificationService _notificationService;
         private readonly IStockService _stockService;
+        private readonly IRequestStatusService _requestStatusService;
 
 
-        public NotificationsController(ApplicationDbContext context, INotificationService notificationService, IStockService stockService)
+        public NotificationsController(ApplicationDbContext context, INotificationService notificationService, IStockService stockService, IRequestStatusService requestStatusService)
         {
             _context = context;
             _notificationService = notificationService;
             _stockService = stockService;
+            _requestStatusService = requestStatusService;
         }
 
         // GET: api/notifications
@@ -114,10 +116,23 @@ namespace ProyectoCaritas.Controllers
                 };
             }
 
-            // Verify donation request is in the order line
+            // Verificar que la donación es sobre esa order line
             if (donationRequest.OrderLineId != dto.OrderLineId)
             {
-                throw new ArgumentException("Donation request does not belong to the specified order line.");
+                throw new ArgumentException("La donación no corresponde a este pedido.");
+            }
+
+            // Verificar que el centro tiene suficiente stock disponible para aceptar la donación
+            var canAssign = await _stockService.CanAssignDonation(donationRequest.AssignedCenterId, orderLine.ProductId ?? 0, donationRequest.Quantity);
+            if (!canAssign)
+            {
+                return BadRequest(new
+                {
+                    Status = 400,
+                    Error = "Bad Request",
+                    Message = "No hay suficiente stock disponible para aceptar la donación de "
+                        + $"{donationRequest.Quantity} unidad{(donationRequest.Quantity == 1 ? "" : "es")} del producto."
+                });
             }
 
             var notification = await _context.Notifications
@@ -372,6 +387,9 @@ namespace ProyectoCaritas.Controllers
             {
                 // Actualizar estado de la donación
                 donationRequest.Status = "Recibida";
+
+                // Verificar si hay que actualizar estados de order line y request
+                await _requestStatusService.UpdateOrderLineAndRequestStatusAsync(dto.OrderLineId);
 
                 // Marcar notificación de aceptación como leída
                 notification.IsRead = true;

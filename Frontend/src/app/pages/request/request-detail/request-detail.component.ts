@@ -35,16 +35,16 @@ export class RequestDetailComponent implements OnInit {
     productName: 'Producto',
     quantity: 'Cantidad',
     description: 'Descripción',
-    isAssigned: 'Asignado',
+    status: 'Estado',
   };
   mobileHeaders: Record<string, string> = {
     id: 'Cod.',
     productName: 'Producto',
     quantity: 'Cant.',
-    isAssigned: 'Estado',
+    status: 'Estado',
   };
-  displayedColumns = ['id', 'productName', 'quantity', 'description', 'isAssigned'];
-  mobileColumns = ['id', 'productName', 'quantity', 'isAssigned'];
+  displayedColumns = ['id', 'productName', 'quantity', 'description', 'status'];
+  mobileColumns = ['id', 'productName', 'quantity', 'status'];
   orderLines: any[] = [];
 
   isMobile = false;
@@ -86,7 +86,6 @@ export class RequestDetailComponent implements OnInit {
     this.orderLines = this.request.orderLines.map((line) => {
       const orderLine = {
         ...line,
-        isAssigned: 'No',
         productName: '',
       };
       this.productService.getProductById(line.productId).subscribe({

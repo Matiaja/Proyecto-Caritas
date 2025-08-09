@@ -436,12 +436,17 @@ namespace ProyectoCaritas.Controllers
                     .Where(p => p.StockQuantity > 0)
                     .ToListAsync();
 
+                // Calcular AvailableQuantity para cada centro
+                foreach (var stock in productWithStock)
+                {
+                    stock.AvailableQuantity = await _stockService.GetQuantityAvailable(stock.CenterId ?? 0, stock.ProductId);
+                }
+
                 return Ok(productWithStock);
             }
             return BadRequest(new { message = "Invalid productId" });
 
         }
-
 
         // GET: api/Stocks/product-with-stock-for-id"
         [Authorize]

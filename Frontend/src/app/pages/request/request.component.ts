@@ -4,6 +4,9 @@ import { RequestService } from '../../services/request/request.service';
 import { CommonModule } from '@angular/common';
 import { UiTableComponent } from '../../shared/components/ui-table/ui-table.component';
 import { Router } from '@angular/router';
+import { ResponsiveService } from '../../services/responsive/responsive.service';
+import { ConfirmModalService } from '../../services/confirmModal/confirm-modal.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-request',
@@ -30,7 +33,7 @@ export class RequestComponent implements OnInit {
   requests: RequestModel[] = [];
 
   // filters
-  
+
   selectedStatus: string | null = null;
   sortBy = '';
   sortOptions = [
@@ -45,10 +48,18 @@ export class RequestComponent implements OnInit {
   itemsPerPage = 10;
   totalItems = 0;
 
+  isMobile = false;
   constructor(
     private reqService: RequestService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private modalService: ConfirmModalService,
+    private toastr: ToastrService,
+    private responsiveService: ResponsiveService
+  ) {
+    this.responsiveService.isMobile$.subscribe((isMobile) => {
+      this.isMobile = isMobile;
+    });
+  }
 
   ngOnInit() {
     this.loadRequests();
@@ -70,7 +81,7 @@ export class RequestComponent implements OnInit {
         if (this.selectedStatus) {
           filtered = filtered.filter((r) => r.status === this.selectedStatus);
         }
-        
+
         console.log('Filtered', filtered);
         // Ordenamiento
         if (this.sortBy) {
@@ -83,7 +94,7 @@ export class RequestComponent implements OnInit {
             return 0;
           });
         }
-  
+
         this.requests = filtered.map((req) => ({
           ...req,
           requestDate: new Date(req.requestDate).toLocaleDateString('es-ES', {
@@ -111,6 +122,28 @@ export class RequestComponent implements OnInit {
   onAddRequest() {
     this.router.navigate(['/requests/add']);
   }
+
+  async close(row: any) {
+    const confirmed = await this.modalService.confirm(
+      'Cerrar solicitud',
+      'Esta solicitud se cerrará manualmente y no podrá recibir más donaciones. ¿Confirmás su finalización?'
+    );
+
+    if (confirmed) {
+      this.reqService.closeRequest(row.id).subscribe({
+        next: () => {
+          this.toastr.success('Solicitud cerrada correctamente');
+          // Reload requests
+          this.loadRequests();
+        },
+        error: (err) => {
+          console.error(err);
+          this.toastr.error(err.error || 'Ocurrió un error al cerrar la solicitud');
+        }
+      });
+    }
+  }
+
   onEditRequest(req: RequestModel) {
     console.log('Edit request', req);
   }

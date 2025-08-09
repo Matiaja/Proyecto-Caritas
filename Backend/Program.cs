@@ -73,6 +73,8 @@ builder.Services.AddScoped<OrderLineService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IStockService, StockService>();
 builder.Services.AddScoped<IPdfService, PdfService>();
+builder.Services.AddScoped<IRequestStatusService, RequestStatusService>();
+builder.Services.AddScoped<DonationRequestService>();
 builder.Services.AddHttpClient();
 // Configurar Identity
 builder.Services.AddIdentity<User, IdentityRole>(
@@ -97,7 +99,7 @@ builder.Services.AddIdentity<User, IdentityRole>(
     .AddDefaultTokenProviders();
 
 // Clave secreta para firmar el token (usa una clave segura)
-var key = Encoding.ASCII.GetBytes("SuperSecureKey1234!·$%&/()=asdfasdf");
+var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]!);
 
 // Configuración de la autenticación JWT
 builder.Services.AddAuthentication(options =>

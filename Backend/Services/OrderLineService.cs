@@ -50,7 +50,7 @@ public class OrderLineService
             ProductId = dto.ProductId,
             Quantity = dto.Quantity,
             Description = dto.Description,
-            Status = dto.Status ?? "Pending", // Default status
+            Status = dto.Status ?? "Pendiente", // Default status
         };
 
         _context.OrderLines.Add(orderLine);

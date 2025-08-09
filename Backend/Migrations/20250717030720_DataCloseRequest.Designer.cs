@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProyectoCaritas.Data;
 
@@ -11,9 +12,11 @@ using ProyectoCaritas.Data;
 namespace ProyectoCaritas.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250717030720_DataCloseRequest")]
+    partial class DataCloseRequest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -415,9 +418,6 @@ namespace ProyectoCaritas.Migrations
                     b.Property<byte[]>("Image")
                         .HasColumnType("longblob");
 
-                    b.Property<string>("Origin")
-                        .HasColumnType("longtext");
-
                     b.Property<int?>("ProductId")
                         .HasColumnType("int");
 
@@ -437,48 +437,6 @@ namespace ProyectoCaritas.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("Stocks");
-                });
-
-            modelBuilder.Entity("ProyectoCaritas.Models.Entities.StockReport", b =>
-                {
-                    b.Property<int>("StockId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CategoryName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("CenterId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ProductName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("StockAcumulado")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("StockDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("StockQuantity")
-                        .HasColumnType("int");
-
-                    b.Property<string>("StockType")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("StockId");
-
-                    b.ToTable((string)null);
-
-                    b.ToView("stockreport", (string)null);
                 });
 
             modelBuilder.Entity("ProyectoCaritas.Models.Entities.User", b =>

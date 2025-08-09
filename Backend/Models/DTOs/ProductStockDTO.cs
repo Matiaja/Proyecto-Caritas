@@ -8,5 +8,6 @@
         public int? CenterId { get; set; }
         public string? CenterName { get; set; }
         public int StockQuantity { get; set; }
+        public int? AvailableQuantity { get; set; }
     }
 }

@@ -13,22 +13,23 @@
     border-radius: 8px;
     border: none;
     /* para las animaciones */
-    transition:
+    /* transition-duration: 0.25s; */
+    /* transition:
         opacity 0.25s ease-out,
         transform 0.25s ease-out,
-        visibility 0.25s step-end;
+        visibility 0.25s step-end; */
     opacity: 0;
     transform: translateY(-10px);
-    display: block !important;
     pointer-events: none;
-
+    
     &.show {
         opacity: 1;
         transform: translateY(0);
         pointer-events: auto;
     }
-
-    @media (max-width: 991px) {
+    
+    @media (max-width: 991.98px) {
+        display: block !important;
         position: fixed;
         top: 70px !important;
         left: 15px;

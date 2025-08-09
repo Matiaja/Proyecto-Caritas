@@ -40,39 +40,98 @@
 .form-group {
   display: flex;
   flex-direction: column;
+  gap: 15px; 
 }
 
+/* General styling for all form inputs */
 .login-card input {
-  margin-bottom: 12px;
   padding: 12px 16px;
   border: 1px solid #ae3336;
-  border-radius: 6px;
   background: #f5f5f5;
   color: #36337f;
   font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box; 
+  border-radius: 6px;
 }
 
-.login-card button {
+/* Wrapper for the password input and its toggle button */
+.password-wrapper {
+  display: flex;
+  width: 100%;
+  gap: 5px; 
+}
+
+/* The password input inside the wrapper */
+.password-wrapper input {
+  flex-grow: 1; 
+}
+
+/* The show/hide password button */
+.toggle-password {
+  padding: 0 12px;
+  border: 1px solid #ae3336;
   background: #ae3336;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: background-color 0.2s; 
+}
+
+/* Hover effect for the toggle button */
+.toggle-password:hover {
+  background-color: #36337f;
+  border-color: #36337f; 
+}
+
+.toggle-password svg {
   color: #fff;
+}
+
+/* General button styling */
+.login-card button {
+  cursor: pointer;
+  font-size: 1rem;
   font-weight: bold;
-  border: none;
   border-radius: 6px;
   padding: 12px;
-  margin-top: 8px;
-  font-size: 1rem;
-  transition: background 0.2s;
+  border: none;
 }
 
-.login-card button:hover {
+/* Specific styling for the submit button */
+.login-card button[type="submit"] {
+  background: #ae3336;
+  color: #fff;
+  transition: background-color 0.2s;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.login-card button[type="submit"]:hover {
   background: #36337f;
 }
 
+.login-card button[type="submit"]:disabled {
+  background: #ae3336;
+  cursor: not-allowed;
+}
+
+/* General error message for incorrect credentials */
 .error-message {
   margin-top: 10px;
   color: #ae3336;
   font-weight: bold;
   text-align: center;
+}
+
+/* Styling for individual field validation messages */
+.error-feedback {
+  color: #ae3336;
+  font-size: 0.9em;
+  text-align: left;
+  margin-top: 4px;
 }
 
 @media (max-width: 600px) {
