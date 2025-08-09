@@ -18,14 +18,16 @@ namespace ProyectoCaritas.Controllers
         private readonly INotificationService _notificationService;
         private readonly IStockService _stockService;
         private readonly IRequestStatusService _requestStatusService;
+        private readonly DonationRequestService _donationRequestService;
 
 
-        public NotificationsController(ApplicationDbContext context, INotificationService notificationService, IStockService stockService, IRequestStatusService requestStatusService)
+        public NotificationsController(ApplicationDbContext context, INotificationService notificationService, IStockService stockService, IRequestStatusService requestStatusService, DonationRequestService donationRequestService)
         {
             _context = context;
             _notificationService = notificationService;
             _stockService = stockService;
             _requestStatusService = requestStatusService;
+            _donationRequestService = donationRequestService;
         }
 
         // GET: api/notifications
@@ -149,8 +151,10 @@ namespace ProyectoCaritas.Controllers
 
             try
             {
+                var now = DateTime.UtcNow;
+
                 // Actualizar estado de la donacion
-                donationRequest.Status = "Aceptada";
+                await _donationRequestService.UpdateStatus(dto.DonationRequestId, "Aceptada", now);
 
                 // Marcar la notificación relacionada como leída                
                 notification.IsRead = true;
@@ -263,7 +267,7 @@ namespace ProyectoCaritas.Controllers
             try
             {
                 // Actualizar estado de la donación
-                donationRequest.Status = "En camino";
+                await _donationRequestService.UpdateStatus(dto.DonationRequestId, "En camino", DateTime.UtcNow);
 
                 // Marcar notificación de aceptación como leída
                 notification.IsRead = true;
@@ -386,7 +390,7 @@ namespace ProyectoCaritas.Controllers
             try
             {
                 // Actualizar estado de la donación
-                donationRequest.Status = "Recibida";
+                await _donationRequestService.UpdateStatus(dto.DonationRequestId, "Recibida", DateTime.UtcNow);
 
                 // Verificar si hay que actualizar estados de order line y request
                 await _requestStatusService.UpdateOrderLineAndRequestStatusAsync(dto.OrderLineId);

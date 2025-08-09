@@ -95,6 +95,10 @@
 }
 
 @media (max-width: 575.98px) {
+  .mat-mdc-cell {
+    background: initial !important;
+  }
+
   .mobile-table {
     font-size: 0.85rem;
   }

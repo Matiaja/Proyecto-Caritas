@@ -23,17 +23,19 @@ export class OrderlineComponent  implements OnInit {
   // Variables para la tabla
   title = 'Donaciones asignadas';
   columnHeaders: Record<string, string> = {
+    lastStatusChangeDate: 'Fecha',
     status: 'Estado',
     centerName: 'Centro',
     quantity: 'Cantidad',
   };
   mobileHeaders: Record<string, string> = {
+    lastStatusChangeDate: 'Fecha',
     status: 'Estado',
     centerName: 'Centro',
     quantity: 'Cantidad',
   };
-  displayedColumns = ['status', 'centerName', 'quantity'];
-  mobileColumns = ['status', 'centerName', 'quantity'];
+  displayedColumns = ['lastStatusChangeDate', 'status', 'centerName', 'quantity'];
+  mobileColumns = ['lastStatusChangeDate', 'status', 'centerName', 'quantity'];
   donationsData: any[] = [];
 
   constructor(
@@ -48,6 +50,7 @@ export class OrderlineComponent  implements OnInit {
       this.orderLineService.getOrderLineById(this.orderLineId).subscribe({
         next: (data) => {
           this.orderLine = data;
+          console.log('Order Line:', this.orderLine);
           this.assignedQuantity = data.donationRequests?.reduce((sum: number, dr) => sum + dr.quantity, 0) ?? 0;
           this.pendingQuantity = data.quantity - this.assignedQuantity;
           
@@ -56,6 +59,13 @@ export class OrderlineComponent  implements OnInit {
             centerName: dr.assignedCenter?.name || 'Sin nombre',
             quantity: dr.quantity,
             status: dr.status,
+            lastStatusChangeDate: dr.lastStatusChangeDate ? new Date(dr.lastStatusChangeDate).toLocaleDateString('es-ES', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            }) : null
           }));
         },
         error: (error) => console.error(error)

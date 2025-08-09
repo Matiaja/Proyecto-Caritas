@@ -3,7 +3,7 @@
     @if (showFilterButton) {
     <div>
       <button
-        class="btn btn-link text-primary p-0 border-0 d-flex align-items-center mb-3 ms-3"
+        class="btn btn-link link-underline link-underline-opacity-0 text-secondary p-0 border-0 d-flex align-items-center mb-3 ms-3"
         (click)="toggleFilters()"
       >
         <span class="me-2">{{ filtersVisible ? 'Ocultar filtros' : 'Mostrar filtros' }}</span>
@@ -194,7 +194,7 @@
                 style="text-align: right"
                 class="border-bottom"
               >
-                <div class="btn-group mobile-btn-group">
+                <div class="btn-group mobile-btn-group me-1">
                   @if (showSelectButton) {
                     <button
                       class="btn btn-outline-primary btn-xs mobile-action-btn"
@@ -265,7 +265,7 @@
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
-            <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
+            <tr mat-row *matRowDef="let row; columns: columnsToDisplay" [ngClass]="rowClass(row)"></tr>
           </table>
         </div>
       }
@@ -372,7 +372,7 @@
               </td>
             </ng-container>
             <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
-            <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
+            <tr mat-row *matRowDef="let row; columns: columnsToDisplay" [ngClass]="rowClass(row)"></tr>
           </table>
         </div>
       }

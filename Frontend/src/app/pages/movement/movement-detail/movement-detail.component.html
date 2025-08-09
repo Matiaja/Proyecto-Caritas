@@ -1,0 +1,43 @@
+@if (donation) {
+<div class="mb-md-3">
+    <div class="d-flex justify-content-center mt-5">
+        <div class="card container w-100 w-md-75 mx-auto p-md-3 shadow-sm">
+            <div class="card-header d-md-flex justify-content-md-between align-items-center">
+                <h5 class="mb-md-0">Movimiento Nro. {{ donation.id }}</h5>
+                <button class="btn btn-outline-secondary btn-sm" (click)="goBack()">Volver</button>
+            </div>
+            <div class="row align-items-center py-4 g-4 px-3">
+                <div class="col-sm-6">
+                    <span class="fw-medium">Desde:</span>
+                    <span class="ps-2">{{ donation.assignedCenter?.name }}</span>
+                </div>
+                <div class="col-sm-6">
+                    <span class="fw-medium">Hacia:</span>
+                    <span class="ps-2">{{ donation.orderLine?.request?.requestingCenter?.name }}</span>
+                </div>
+                <div class="col-sm-6">
+                    <span class="fw-medium">Producto:</span>
+                    <span class="ps-2">{{ donation.orderLine?.product?.name }}</span>
+                </div>
+                <div class="col-sm-6">
+                    <span class="fw-medium">Cantidad:</span>
+                    <span class="ps-2">{{ donation.quantity }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TABLA -->
+<ui-table
+    [title]="title"
+    [displayedColumns]="displayedColumns"
+    [mobileColumns]="mobileColumns"
+    [dataSource]="statusHistory"
+    [columnHeaders]="columnHeaders"
+    [mobileHeaders]="mobileHeaders"
+    [showSelectButton]="false"
+    [showFilterButton]="false"
+>
+</ui-table>
+}

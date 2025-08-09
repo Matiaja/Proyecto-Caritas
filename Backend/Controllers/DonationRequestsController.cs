@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProyectoCaritas.Data;
-using ProyectoCaritas.Models.DTOs;
 using ProyectoCaritas.Models.Entities;
 using ProyectoCaritas.Services;
+using ProyectoCaritas.Models.DTOs;
 
 namespace ProyectoCaritas.Controllers
 {
@@ -43,6 +43,11 @@ namespace ProyectoCaritas.Controllers
         {
             var donationRequest = await _context.DonationRequests
                 .Include(dr => dr.OrderLine)
+                    .ThenInclude(ol => ol.Product)
+                .Include(dr => dr.OrderLine.Request)
+                    .ThenInclude(r => r.RequestingCenter)
+                .Include(dr => dr.AssignedCenter)
+                .Include(dr => dr.StatusHistory)
                 .FirstOrDefaultAsync(dr => dr.Id == id);
 
             if (donationRequest == null)
@@ -61,7 +66,7 @@ namespace ProyectoCaritas.Controllers
         // POST: api/DonationRequests
         [HttpPost]
         [Authorize]
-        public async Task<ActionResult<DonationRequestDTO>> CreateDonationRequest(DonationRequestDTO addDonationRequestDto)
+        public async Task<ActionResult<DonationRequestDTO>> CreateDonationRequest(AddDonationRequestDTO addDonationRequestDto)
         {
             // validate if the DonationRequest was sended
             if (addDonationRequestDto == null)
@@ -184,15 +189,30 @@ namespace ProyectoCaritas.Controllers
                 });
             }
 
+            var now = DateTime.UtcNow;
+
             // create DonationRequest
             var donationRequest = new DonationRequest
             {
                 OrderLineId = addDonationRequestDto.OrderLineId,
                 AssignedCenterId = addDonationRequestDto.AssignedCenterId,
                 Quantity = addDonationRequestDto.Quantity,
-                Status = "Asignada"
+                AssignmentDate = now,
+                Status = "Asignada",
+                LastStatusChangeDate = now
             };
+
+            // Agregar el primer registro al historial
+            var statusHistory = new DonationRequestStatus
+            {
+                DonationRequest = donationRequest,
+                Status = "Asignada",
+                ChangeDate = now
+            };
+
             _context.DonationRequests.Add(donationRequest);
+            _context.DonationRequestStatus.Add(statusHistory);
+
             await _context.SaveChangesAsync();
 
             await _notificationService.CreateAssignmentNotification(
@@ -204,6 +224,79 @@ namespace ProyectoCaritas.Controllers
 
             return CreatedAtAction(nameof(GetDonationRequestById), new { id = donationRequest.Id }, DonationRequestToDto(donationRequest));
 
+        }
+
+        // GET: api/DonationRequests/movements
+        [HttpGet("movements")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<MovementDTO>>> GetMovements(
+            [FromQuery] DateTime? dateFrom = null,
+            [FromQuery] DateTime? dateTo = null,
+            [FromQuery] string status = null,
+            [FromQuery] string productName = null,
+            [FromQuery] int? centerId = null
+        )
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return Unauthorized();
+
+            var user = await _context.Users.Include(u => u.Center).FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+                return Unauthorized();
+
+            // Validar parámetros
+            if (dateFrom.HasValue && dateTo.HasValue && dateTo < dateFrom)
+                return BadRequest(new { message = "La 'Fecha hasta' no puede ser anterior a la 'Fecha desde'." });
+
+            var query = _context.DonationRequests
+                .Include(dr => dr.OrderLine)
+                    .ThenInclude(ol => ol.Product)
+                .Include(dr => dr.AssignedCenter)
+                .Include(dr => dr.OrderLine.Request)
+                    .ThenInclude(r => r.RequestingCenter)
+                .AsQueryable();
+
+            // Filtros básicos
+            if (dateFrom.HasValue)
+                query = query.Where(dr => dr.LastStatusChangeDate >= dateFrom.Value);
+
+            if (dateTo.HasValue)
+                query = query.Where(dr => dr.LastStatusChangeDate <= dateTo.Value);
+
+            if (!string.IsNullOrEmpty(status))
+                query = query.Where(dr => dr.Status == status);
+
+            if (!string.IsNullOrEmpty(productName))
+                query = query.Where(dr => dr.OrderLine.Product.Name.Contains(productName, StringComparison.OrdinalIgnoreCase));
+
+            if (centerId.HasValue)
+                query = query.Where(dr => dr.AssignedCenterId == centerId.Value ||
+                    dr.OrderLine.Request.RequestingCenterId == centerId.Value);
+
+            // Filtro por centro si no es admin
+            if (!User.IsInRole("Admin") && user.CenterId != null)
+            {
+                query = query.Where(dr => dr.AssignedCenterId == user.CenterId || // Movimientos donde es el centro donante
+                     dr.OrderLine.Request.RequestingCenterId == user.CenterId); // donde es el centro receptor
+            }
+
+            var movements = await query
+                .OrderByDescending(dr => dr.LastStatusChangeDate)
+                .Select(dr => new MovementDTO
+                {
+                    DonationRequestId = dr.Id,
+                    FromCenter = dr.AssignedCenter.Name,
+                    ToCenter = dr.OrderLine.Request.RequestingCenter.Name,
+                    ProductName = dr.OrderLine.Product.Name,
+                    Quantity = dr.Quantity,
+                    Status = dr.Status,
+                    UpdatedDate = dr.LastStatusChangeDate,
+                    AssignmentDate = dr.AssignmentDate
+                })
+                .ToListAsync();
+
+            return Ok(movements);
         }
 
         // PUT: api/DonationRequests/{id}
@@ -244,8 +337,6 @@ namespace ProyectoCaritas.Controllers
 
 
             donationRequest.AssignedCenterId = updateDonationRequestDto.AssignedCenterId;
-            donationRequest.ShipmentDate = updateDonationRequestDto.ShipmentDate;
-            donationRequest.ReceptionDate = updateDonationRequestDto.ReceptionDate;
             donationRequest.Status = updateDonationRequestDto.Status;
 
             try
@@ -294,17 +385,53 @@ namespace ProyectoCaritas.Controllers
                 AssignedCenterId = donationRequest.AssignedCenterId,
                 OrderLineId = donationRequest.OrderLineId,
                 Quantity = donationRequest.Quantity,
-                ShipmentDate = donationRequest.ShipmentDate ?? null,
-                ReceptionDate = donationRequest.ReceptionDate ?? null,
                 Status = donationRequest.Status,
+                AssignmentDate = donationRequest.AssignmentDate,
+                LastStatusChangeDate = donationRequest.LastStatusChangeDate,
                 OrderLine = donationRequest.OrderLine != null ? new OrderLineDTO
                 {
                     Id = donationRequest.OrderLine.Id,
                     RequestId = donationRequest.OrderLine.RequestId,
+                    Request = donationRequest.OrderLine.Request != null ? new RequestBasicDTO
+                    {
+                        Id = donationRequest.OrderLine.Request.Id,
+                        UrgencyLevel = donationRequest.OrderLine.Request.UrgencyLevel,
+                        RequestDate = donationRequest.OrderLine.Request.RequestDate,
+                        RequestingCenterId = donationRequest.OrderLine.Request.RequestingCenterId,
+                        RequestingCenter = donationRequest.OrderLine.Request.RequestingCenter != null ? new GetCenterDTO
+                        {
+                            Id = donationRequest.OrderLine.Request.RequestingCenter.Id,
+                            Name = donationRequest.OrderLine.Request.RequestingCenter.Name,
+                            Location = donationRequest.OrderLine.Request.RequestingCenter.Location,
+                            Manager = donationRequest.OrderLine.Request.RequestingCenter.Manager
+                        } : null
+                    } : null,
                     Quantity = donationRequest.OrderLine.Quantity,
                     Description = donationRequest.OrderLine.Description,
-                    ProductId = donationRequest.OrderLine.ProductId
-                } : null
+                    ProductId = donationRequest.OrderLine.ProductId,
+                    Product = donationRequest.OrderLine.Product != null ? new ProductDTO
+                    {
+                        Id = donationRequest.OrderLine.Product.Id,
+                        Name = donationRequest.OrderLine.Product.Name,
+                        CategoryId = donationRequest.OrderLine.Product.CategoryId,
+                    } : null
+                } : null,
+                AssignedCenter = donationRequest.AssignedCenter != null ? new GetCenterDTO
+                {
+                    Id = donationRequest.AssignedCenter.Id,
+                    Name = donationRequest.AssignedCenter.Name,
+                    Location = donationRequest.AssignedCenter.Location,
+                    Manager = donationRequest.AssignedCenter.Manager
+                } : null,
+                StatusHistory = donationRequest.StatusHistory?
+                    .OrderByDescending(sh => sh.ChangeDate)
+                    .Select(sh => new DonationRequestStatusDTO
+                    {
+                        Id = sh.Id,
+                        DonationRequestId = sh.DonationRequestId,
+                        Status = sh.Status,
+                        ChangeDate = sh.ChangeDate
+                    }).ToList()
             };
     }
 }

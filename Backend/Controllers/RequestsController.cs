@@ -411,7 +411,9 @@ namespace ProyectoCaritas.Controllers
                        Id = dr.Id,
                        AssignedCenterId = dr.AssignedCenterId,
                        Quantity = dr.Quantity,
-                       Status = dr.Status
+                       AssignmentDate = dr.AssignmentDate,
+                       Status = dr.Status,
+                       LastStatusChangeDate = dr.LastStatusChangeDate
                    }).ToList()
                }).ToList() ?? new List<OrderLineDTO>(),
                RequestingCenter = request.RequestingCenter != null ? new GetCenterDTO

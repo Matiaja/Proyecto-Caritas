@@ -206,22 +206,27 @@ namespace ProyectoCaritas.Controllers
                         Phone = orderLine.Request.RequestingCenter.Phone
                     } : null
                 } : null,
-                DonationRequests = orderLine.DonationRequests?.Select(dr => new GetDonationRequestDTO
-                {
-                    Id = dr.Id,
-                    AssignedCenterId = dr.AssignedCenterId,
-                    AssignedCenter = dr.AssignedCenter != null ? new GetCenterDTO
+                DonationRequests = orderLine.DonationRequests?
+                    .OrderByDescending(dr => dr.LastStatusChangeDate)
+                    .Select(dr => new GetDonationRequestDTO
                     {
-                        Id = dr.AssignedCenter.Id,
-                        Name = dr.AssignedCenter.Name,
-                        Location = dr.AssignedCenter.Location,
-                        Manager = dr.AssignedCenter.Manager,
-                        Phone = dr.AssignedCenter.Phone
-                    } : null,
-                    OrderLineId = dr.OrderLineId,
-                    Quantity = dr.Quantity,
-                    Status = dr.Status
-                }).ToList()
+                        Id = dr.Id,
+                        AssignedCenterId = dr.AssignedCenterId,
+                        AssignedCenter = dr.AssignedCenter != null ? new GetCenterDTO
+                        {
+                            Id = dr.AssignedCenter.Id,
+                            Name = dr.AssignedCenter.Name,
+                            Location = dr.AssignedCenter.Location,
+                            Manager = dr.AssignedCenter.Manager,
+                            Phone = dr.AssignedCenter.Phone
+                        } : null,
+                        OrderLineId = dr.OrderLineId,
+                        Quantity = dr.Quantity,
+                        AssignmentDate = dr.AssignmentDate,
+                        Status = dr.Status,
+                        LastStatusChangeDate = dr.LastStatusChangeDate
+                    }
+                ).ToList()
             };
         }
     }

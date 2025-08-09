@@ -209,6 +209,48 @@ namespace ProyectoCaritas.Migrations
                     b.ToTable("Centers");
                 });
 
+            modelBuilder.Entity("ProyectoCaritas.Models.Entities.Distribution", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CenterId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("DeliveryDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("PersonDNI")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PersonMemberFamily")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PersonName")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("PurchaseId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CenterId");
+
+                    b.HasIndex("PurchaseId");
+
+                    b.ToTable("Distributions");
+                });
+
             modelBuilder.Entity("ProyectoCaritas.Models.Entities.DonationRequest", b =>
                 {
                     b.Property<int>("Id")
@@ -217,23 +259,20 @@ namespace ProyectoCaritas.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("AsignationDate")
-                        .HasColumnType("datetime(6)");
-
                     b.Property<int>("AssignedCenterId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("AssignmentDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("LastStatusChangeDate")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("OrderLineId")
                         .HasColumnType("int");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
-
-                    b.Property<DateTime?>("ReceptionDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime?>("ShipmentDate")
-                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -246,6 +285,89 @@ namespace ProyectoCaritas.Migrations
                     b.HasIndex("OrderLineId");
 
                     b.ToTable("DonationRequests");
+                });
+
+            modelBuilder.Entity("ProyectoCaritas.Models.Entities.DonationRequestStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ChangeDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("DonationRequestId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DonationRequestId");
+
+                    b.ToTable("DonationRequestStatus");
+                });
+
+            modelBuilder.Entity("ProyectoCaritas.Models.Entities.ItemDistribution", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("DistributionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ItemPurchaseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DistributionId");
+
+                    b.HasIndex("ItemPurchaseId");
+
+                    b.ToTable("ItemsDistribution");
+                });
+
+            modelBuilder.Entity("ProyectoCaritas.Models.Entities.ItemPurchase", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PurchaseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("PurchaseId");
+
+                    b.ToTable("ItemsPurchase");
                 });
 
             modelBuilder.Entity("ProyectoCaritas.Models.Entities.Notification", b =>
@@ -356,6 +478,34 @@ namespace ProyectoCaritas.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("ProyectoCaritas.Models.Entities.Purchase", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CenterId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("PurchaseDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CenterId");
+
+                    b.ToTable("Purchases");
                 });
 
             modelBuilder.Entity("ProyectoCaritas.Models.Entities.Request", b =>
@@ -628,6 +778,23 @@ namespace ProyectoCaritas.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ProyectoCaritas.Models.Entities.Distribution", b =>
+                {
+                    b.HasOne("ProyectoCaritas.Models.Entities.Center", "Center")
+                        .WithMany()
+                        .HasForeignKey("CenterId");
+
+                    b.HasOne("ProyectoCaritas.Models.Entities.Purchase", "Purchase")
+                        .WithMany()
+                        .HasForeignKey("PurchaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Center");
+
+                    b.Navigation("Purchase");
+                });
+
             modelBuilder.Entity("ProyectoCaritas.Models.Entities.DonationRequest", b =>
                 {
                     b.HasOne("ProyectoCaritas.Models.Entities.Center", "AssignedCenter")
@@ -645,6 +812,55 @@ namespace ProyectoCaritas.Migrations
                     b.Navigation("AssignedCenter");
 
                     b.Navigation("OrderLine");
+                });
+
+            modelBuilder.Entity("ProyectoCaritas.Models.Entities.DonationRequestStatus", b =>
+                {
+                    b.HasOne("ProyectoCaritas.Models.Entities.DonationRequest", "DonationRequest")
+                        .WithMany("StatusHistory")
+                        .HasForeignKey("DonationRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DonationRequest");
+                });
+
+            modelBuilder.Entity("ProyectoCaritas.Models.Entities.ItemDistribution", b =>
+                {
+                    b.HasOne("ProyectoCaritas.Models.Entities.Distribution", "Distribution")
+                        .WithMany("Items")
+                        .HasForeignKey("DistributionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProyectoCaritas.Models.Entities.ItemPurchase", "ItemPurchase")
+                        .WithMany("ItemsDistribution")
+                        .HasForeignKey("ItemPurchaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Distribution");
+
+                    b.Navigation("ItemPurchase");
+                });
+
+            modelBuilder.Entity("ProyectoCaritas.Models.Entities.ItemPurchase", b =>
+                {
+                    b.HasOne("ProyectoCaritas.Models.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProyectoCaritas.Models.Entities.Purchase", "Purchase")
+                        .WithMany("Items")
+                        .HasForeignKey("PurchaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Purchase");
                 });
 
             modelBuilder.Entity("ProyectoCaritas.Models.Entities.OrderLine", b =>
@@ -671,6 +887,17 @@ namespace ProyectoCaritas.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("ProyectoCaritas.Models.Entities.Purchase", b =>
+                {
+                    b.HasOne("ProyectoCaritas.Models.Entities.Center", "Center")
+                        .WithMany()
+                        .HasForeignKey("CenterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Center");
                 });
 
             modelBuilder.Entity("ProyectoCaritas.Models.Entities.Request", b =>
@@ -739,6 +966,21 @@ namespace ProyectoCaritas.Migrations
                     b.Navigation("Users");
                 });
 
+            modelBuilder.Entity("ProyectoCaritas.Models.Entities.Distribution", b =>
+                {
+                    b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("ProyectoCaritas.Models.Entities.DonationRequest", b =>
+                {
+                    b.Navigation("StatusHistory");
+                });
+
+            modelBuilder.Entity("ProyectoCaritas.Models.Entities.ItemPurchase", b =>
+                {
+                    b.Navigation("ItemsDistribution");
+                });
+
             modelBuilder.Entity("ProyectoCaritas.Models.Entities.OrderLine", b =>
                 {
                     b.Navigation("DonationRequests");
@@ -749,6 +991,11 @@ namespace ProyectoCaritas.Migrations
                     b.Navigation("OrderLines");
 
                     b.Navigation("Stocks");
+                });
+
+            modelBuilder.Entity("ProyectoCaritas.Models.Entities.Purchase", b =>
+                {
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("ProyectoCaritas.Models.Entities.Request", b =>

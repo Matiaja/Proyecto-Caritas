@@ -1,0 +1,61 @@
+<div class="container my-4">
+  <h2>Entregar desde Compra #{{ purchase.id }}</h2>
+
+  <!-- Selector de destino -->
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <label class="form-label">Destino</label>
+      <select class="form-select" [(ngModel)]="destinationType">
+        <option value="center">Centro</option>
+        <option value="person">Persona</option>
+      </select>
+    </div>
+    <div class="col-md-8" *ngIf="destinationType === 'center'">
+      <label class="form-label">Seleccionar Centro</label>
+      <select class="form-select" [(ngModel)]="destinationValue">
+        <option *ngFor="let c of centers" [value]="c.id">{{ c.name }}</option>
+      </select>
+    </div>
+    <div class="col-md-8" *ngIf="destinationType === 'person'">
+      <label class="form-label">Nombre / DNI</label>
+      <input type="text" class="form-control" placeholder="Nombre o DNI" [(ngModel)]="destinationValue">
+    </div>
+  </div>
+
+  <!-- Ítems a distribuir -->
+  <div class="card mb-3">
+    <div class="card-header">
+      Ítems disponibles
+    </div>
+    <div class="card-body p-0">
+      <table class="table mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Producto</th>
+            <th class="text-center">Disponible</th>
+            <th class="text-center">Cantidad a entregar</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of items">
+            <td>{{ row.item.productName }}</td>
+            <td class="text-center">{{ row.item.remainingQuantity }}</td>
+            <td class="text-center">
+              <input type="number"
+                     class="form-control form-control-sm text-center"
+                     [(ngModel)]="row.quantityToDeliver"
+                     [min]="0"
+                     [max]="row.item.remainingQuantity">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Botones acción -->
+  <div class="d-flex justify-content-end gap-2">
+    <button class="btn btn-secondary" (click)="cancel()">Cancelar</button>
+    <button class="btn btn-primary" (click)="confirmDistribution()">Confirmar Entrega</button>
+  </div>
+</div>

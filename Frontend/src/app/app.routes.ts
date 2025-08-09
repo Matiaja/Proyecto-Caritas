@@ -30,6 +30,12 @@ import { NotFoundComponent } from './pages/not-found/not-found.component';
 import { roleGuard } from './guards/role.guard';
 import { UnauthorizedComponent } from './pages/unauthorized/unauthorized.component';
 import { OrderlineComponent } from './pages/orderline/orderline/orderline.component';
+import { MovementComponent } from './pages/movement/movement.component';
+import { MovementDetailComponent } from './pages/movement/movement-detail/movement-detail.component';
+import { PurchaseComponent } from './pages/purchase/purchase.component';
+import { PurchaseDetailComponent } from './pages/purchase/purchase-detail/purchase-detail.component';
+import { DistributionComponent } from './pages/purchase/distribution/distribution.component';
+import { PurchaseAddComponent } from './pages/purchase/purchase-add/purchase-add.component';
 
 export const routes: Routes = [
   {
@@ -60,12 +66,13 @@ export const routes: Routes = [
   },
   {
     path: 'requests',
+    data: { breadcrumb: 'Solicitudes' },
     canActivate: [authGuard],
     children: [
       { path: '', component: RequestComponent },
-      { path: 'add', component: RequestAddComponent },
-      { path: ':id', component: RequestDetailComponent },
-      { path: ':id/assign/:idorderline', component: RequestAssignComponent },
+      { path: 'add', component: RequestAddComponent, data: { breadcrumb: 'Agregar solicitudes' }, },
+      { path: ':id', component: RequestDetailComponent, data: { breadcrumb: 'Detalle solicitud' }, },
+      { path: ':id/assign/:idorderline', component: RequestAssignComponent, data: { breadcrumb: 'Asignar solicitud' } },
     ],
   },
   {
@@ -109,6 +116,15 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'movements',
+    data: { breadcrumb: 'Movimientos' },
+    canActivate: [authGuard],
+    children: [
+      { path: '', component: MovementComponent },
+      { path: ':id', component: MovementDetailComponent, data: { breadcrumb: 'Detalle de movimiento' } }
+    ]
+  },
+  {
     path: 'products',
     data: { breadcrumb: 'Productos' },
     canActivate: [authGuard],
@@ -121,6 +137,17 @@ export const routes: Routes = [
         data: { breadcrumb: 'Detalle de Producto' },
       },
     ],
+  },
+  {
+    path: 'purchases',
+    data: { breadcrumb: 'Compras y bolsones' },
+    canActivate: [authGuard],
+    children: [
+      { path: '', component: PurchaseComponent },
+      { path: 'add', component: PurchaseAddComponent, data: { breadcrumb: 'Nueva compra' }  },
+      { path: ':id', component: PurchaseDetailComponent, data: { breadcrumb: 'Detalle de compra' }  },
+      { path: ':id/distribute', component: DistributionComponent, data: { breadcrumb: 'Nueva salida' }  }
+    ]
   },
   {
     path: 'storage',

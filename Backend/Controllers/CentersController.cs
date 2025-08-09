@@ -151,8 +151,6 @@ namespace ProyectoCaritas.Controllers
                 {
                     Id = dr.Id,
                     AssignedCenterId = dr.AssignedCenterId,
-                    ShipmentDate = dr.ShipmentDate,
-                    ReceptionDate = dr.ReceptionDate,
                     Status = dr.Status
                 }).ToList() ?? new List<GetDonationRequestDTO>(),
                 Stocks = center.Stocks?.Select(s => new GetStockDTO
