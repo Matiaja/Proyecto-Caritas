@@ -1,5 +1,4 @@
-﻿
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using ProyectoCaritas.Data; // Importa el namespace del contexto
 using Microsoft.AspNetCore.Identity;
 using ProyectoCaritas.Models.Entities;
@@ -73,6 +72,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<OrderLineService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IStockService, StockService>();
+builder.Services.AddScoped<IPdfService, PdfService>();
 builder.Services.AddScoped<IRequestStatusService, RequestStatusService>();
 builder.Services.AddScoped<DonationRequestService>();
 builder.Services.AddHttpClient();

@@ -7,6 +7,7 @@ import { StockService } from '../../../services/stock/stock.service';
 import { ProductService } from '../../../services/product/product.service';
 import { GlobalStateService } from '../../../services/global/global-state.service';
 import { FormsModule } from '@angular/forms';
+import { PdfService } from '../../../services/pdf/pdf.service';
 
 @Component({
   selector: 'app-storage-detail',
@@ -45,7 +46,8 @@ export class StorageDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private location: Location,
-    private globalStateService: GlobalStateService
+    private globalStateService: GlobalStateService,
+    private pdfService: PdfService
   ) {}
 
   ngOnInit(): void {
@@ -103,6 +105,77 @@ export class StorageDetailComponent implements OnInit {
 
   goBack() {
     this.location.back();
+  }
+
+
+  generatePdf(): void {
+    if (!this.stock || this.stock.length === 0) {
+      console.error('No hay datos de stock para generar PDF');
+      return;
+    }
+
+    const productData = {
+      name: this.stock[0].product.name,
+      code: this.stock[0].product.code
+    };
+
+    const centerData = {
+      name: 'Traer nombre del centro'
+    };
+
+    this.pdfService.generateStockDetailPdfWithData(productData, centerData, this.filteredStock).subscribe({
+      next: (blob) => {
+        const filename = `detalle_stock_${this.stock[0].product.name}_${new Date().toISOString().split('T')[0]}.pdf`;
+        this.pdfService.downloadPdf(blob, filename);
+      },
+      error: (error) => {
+        console.error('Error generating PDF:', error);
+      }
+    });
+  }
+
+  // Custom metodos para generar PDF con más detalles
+  generateCustomPdf(): void {
+    if (!this.stock || this.stock.length === 0) return;
+
+    const pdfRequest = {
+      title: `Detalle de Stock - ${this.stock[0].product.name}`,
+      subtitle: `Código: ${this.stock[0].product.code}`,
+      sections: [
+        {
+          title: 'Información del Producto',
+          keyValuePairs: [
+            { key: 'Nombre', value: this.stock[0].product.name },
+            { key: 'Código', value: this.stock[0].product.code },
+            { key: 'ID del Producto', value: this.stock[0].productId.toString() }
+          ]
+        }
+      ],
+      tableData: {
+        title: 'Movimientos de Stock',
+        headers: ['Tipo', 'Cantidad', 'Descripción', 'Origen', 'Fecha', 'Fecha Exp.', 'Peso'],
+        rows: this.filteredStock.map(item => [
+          item.type || '-',
+          item.quantity?.toString() || '-',
+          item.description || '-',
+          item.origin || '-',
+          new Date(item.date).toLocaleDateString('es-AR'),
+          item.expirationDate ? new Date(item.expirationDate).toLocaleDateString('es-AR') : '-',
+          item.weight && item.weight > 0 ? item.weight.toString() : '-'
+        ])
+      },
+      footer: `Generado el ${new Date().toLocaleDateString('es-AR')} por Sistema Cáritas`
+    };
+
+    this.pdfService.generatePdf(pdfRequest).subscribe({
+      next: (blob) => {
+        const filename = `detalle_stock_${this.stock[0].product.name}_${new Date().toISOString().split('T')[0]}.pdf`;
+        this.pdfService.downloadPdf(blob, filename);
+      },
+      error: (error) => {
+        console.error('Error generating custom PDF:', error);
+      }
+    });
   }
 
   onAddElement = null;
