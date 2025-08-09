@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProyectoCaritas.Data;
 
@@ -11,9 +12,11 @@ using ProyectoCaritas.Data;
 namespace ProyectoCaritas.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250803224542_AddCompraSalidaTables")]
+    partial class AddCompraSalidaTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -846,13 +849,13 @@ namespace ProyectoCaritas.Migrations
 
             modelBuilder.Entity("ProyectoCaritas.Models.Entities.Purchase", b =>
                 {
-                    b.HasOne("ProyectoCaritas.Models.Entities.Center", "Center")
+                    b.HasOne("ProyectoCaritas.Models.Entities.Center", "Centro")
                         .WithMany()
                         .HasForeignKey("CenterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Center");
+                    b.Navigation("Centro");
                 });
 
             modelBuilder.Entity("ProyectoCaritas.Models.Entities.Request", b =>

@@ -18,6 +18,10 @@ namespace ProyectoCaritas.Data
         public DbSet<Request> Requests { get; set; }
         public DbSet<Stock> Stocks { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<Purchase> Purchases { get; set; }
+        public DbSet<ItemPurchase> ItemsPurchase { get; set; }
+        public DbSet<Distribution> Distributions { get; set; }
+        public DbSet<ItemDistribution> ItemsDistribution { get; set; }
         // public DbSet<User> Users { get; set; } se maneja con identity, no se necesita
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

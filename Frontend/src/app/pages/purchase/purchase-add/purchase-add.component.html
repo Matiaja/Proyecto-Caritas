@@ -1,0 +1,49 @@
+<div class="container mt-4">
+  <h2>Registrar Nueva Compra</h2>
+
+  <form (ngSubmit)="submit()" #purchaseForm="ngForm">
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <label class="form-label">Fecha</label>
+        <input type="date" class="form-control" [(ngModel)]="purchase.purchaseDate" name="purchaseDate" required>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Tipo</label>
+        <input type="text" class="form-control" [(ngModel)]="purchase.type" name="type" required>
+      </div>
+      <!-- <div class="col-md-4">
+        <label class="form-label">Centro</label>
+        <select class="form-select" [(ngModel)]="purchase.centerId" name="centerId" required>
+          <option *ngFor="let c of centers" [value]="c.id">{{ c.name }}</option>
+        </select>
+      </div> -->
+    </div>
+
+    <h5>Productos Comprados</h5>
+    <div *ngFor="let item of purchase.items; let i = index" class="border rounded p-2 mb-2">
+      <div class="row g-2 align-items-end">
+        <div class="col-md-5">
+          <label class="form-label">Producto</label>
+          <select class="form-select" [(ngModel)]="item.productId" [name]="'productId' + i" required>
+            <option *ngFor="let p of products" [value]="p.id">{{ p.name }}</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Cantidad</label>
+          <input type="number" class="form-control" [(ngModel)]="item.quantity" [name]="'quantity' + i" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Descripción</label>
+          <input type="text" class="form-control" [(ngModel)]="item.description" [name]="'description' + i">
+        </div>
+        <div class="col-md-1 text-end">
+          <button type="button" class="btn btn-danger btn-sm" (click)="removeItem(i)">X</button>
+        </div>
+      </div>
+    </div>
+
+    <button type="button" class="btn btn-outline-primary" (click)="addItem()">+ Agregar Producto</button>
+    <hr>
+    <button type="submit" class="btn btn-success" [disabled]="!purchaseForm.form.valid">Guardar Compra</button>
+  </form>
+</div>

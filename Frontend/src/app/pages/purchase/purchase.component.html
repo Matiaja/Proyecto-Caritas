@@ -1,0 +1,29 @@
+<!-- TABLA -->
+<ui-table
+    [title]="title"
+    [displayedColumns]="displayedColumns"
+    [mobileColumns]="mobileColumns"
+    [dataSource]="purchases"
+    [columnHeaders]="columnHeaders"
+    [mobileHeaders]="mobileHeaders"
+    [customActions]="actionTemplate"
+    [showAddButton]="true"
+    [showSelectButton]="true"
+    [showFilterButton]="false"
+    (addElement)="onAddPurchase()"
+    (selectElement)="viewDetails($event)"
+>
+</ui-table>
+
+<ng-template #actionTemplate let-row>
+  <button class="btn btn-outline-primary btn-distribution"
+    [ngClass]="isMobile ? 'btn-xs mobile-action-btn' : 'btn-sm'"
+    (click)="startDistribution(row)">
+    <svg xmlns="http://www.w3.org/2000/svg" [ngClass]="isMobile ? 'mobile-btn-icon' : ''"
+      [attr.width]="isMobile ? '24' : '24'" [attr.height]="isMobile ? '24' : '24'" viewBox="0 0 24 24">
+    <path fill="currentColor"
+        d="M4.293 3.293a1 1 0 0 1 1.414 1.414L5.414 5H21a1 1 0 1 1 0 2H5.414l.293.293a1 1 0 0 1-1.414 1.414l-2-2a1 1 0 0 1 0-1.414zM18.586 19l-.293.293a1 1 0 0 0 1.414 1.414l2-2a1 1 0 0 0 0-1.414l-2-2a1 1 0 0 0-1.414 1.414l.293.293H3a1 1 0 1 0 0 2zM3 11a1 1 0 1 0 0 2h18a1 1 0 1 0 0-2z" />
+    </svg>
+    <span *ngIf="!isMobile">Entregar</span>
+  </button>
+</ng-template>

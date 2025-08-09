@@ -32,6 +32,10 @@ import { UnauthorizedComponent } from './pages/unauthorized/unauthorized.compone
 import { OrderlineComponent } from './pages/orderline/orderline/orderline.component';
 import { MovementComponent } from './pages/movement/movement.component';
 import { MovementDetailComponent } from './pages/movement/movement-detail/movement-detail.component';
+import { PurchaseComponent } from './pages/purchase/purchase.component';
+import { PurchaseDetailComponent } from './pages/purchase/purchase-detail/purchase-detail.component';
+import { DistributionComponent } from './pages/purchase/distribution/distribution.component';
+import { PurchaseAddComponent } from './pages/purchase/purchase-add/purchase-add.component';
 
 export const routes: Routes = [
   {
@@ -133,6 +137,17 @@ export const routes: Routes = [
         data: { breadcrumb: 'Detalle de Producto' },
       },
     ],
+  },
+  {
+    path: 'purchases',
+    data: { breadcrumb: 'Compras y bolsones' },
+    canActivate: [authGuard],
+    children: [
+      { path: '', component: PurchaseComponent },
+      { path: 'add', component: PurchaseAddComponent, data: { breadcrumb: 'Nueva compra' }  },
+      { path: ':id', component: PurchaseDetailComponent, data: { breadcrumb: 'Detalle de compra' }  },
+      { path: ':id/distribute', component: DistributionComponent, data: { breadcrumb: 'Nueva salida' }  }
+    ]
   },
   {
     path: 'storage',

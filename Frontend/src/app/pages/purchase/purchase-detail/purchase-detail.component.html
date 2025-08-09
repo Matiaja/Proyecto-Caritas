@@ -1,0 +1,100 @@
+<div class="container my-4">
+    <h2>Detalle de Compra #{{ purchase.id }}</h2>
+    <p><strong>Fecha:</strong> {{ purchase.purchaseDate | date:'dd/MM/yyyy' }}</p>
+    <p><strong>Tipo:</strong> {{ purchase.type }}</p>
+    <p><strong>Centro origen:</strong> {{ purchase.centerName }}</p>
+
+    <!-- Ítems de la compra -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            Ítems de la Compra
+        </div>
+        <div class="card-body p-0">
+            <table class="table mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Producto</th>
+                        <th class="text-center">Cantidad</th>
+                        <th class="text-center">Restante</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of items">
+                        <td>{{ item.productName }}</td>
+                        <td class="text-center">{{ item.quantity }}</td>
+                        <td class="text-center">{{ item.remainingQuantity }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Historial de Salidas -->
+    <div class="card">
+        <div class="card-header bg-secondary text-white">
+            Historial de Entregas
+        </div>
+        <div class="card-body p-0">
+            <table class="table mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Destino</th>
+                        <th>Estado</th>
+                        <!-- <th class="text-center"># Items</th> -->
+                        <th class="text-end"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <ng-container *ngFor="let dist of purchase.distributions">
+                        <tr (click)="toggleDetails(dist.id)" style="cursor: pointer;" [ngClass]="{'d-none': expandedDistId !== null && expandedDistId !== dist.id}">
+                            <td>{{ dist.deliveryDate | date:'dd/MM/yyyy' }}</td>
+                            <td>
+                                <span *ngIf="dist.centerId !== 0">{{ dist.centerName }}</span>
+                                <span *ngIf="dist.centerId === 0">{{ dist.personName }}</span>
+                            </td>
+                            <td>{{ dist.status }}</td>
+                            <!-- <td class="text-center">{{ dist.items.length }}</td> -->
+                            <td class="text-end">
+                                <i class="bi" [ngClass]="{
+                                      'bi-chevron-down': expandedDistId === dist.id,
+                                      'bi-chevron-right': expandedDistId !== dist.id
+                                    }">
+                                </i>
+                            </td>
+                        </tr>
+                        <!-- Fila expandible con detalles -->
+                        <tr *ngIf="expandedDistId === dist.id">
+                            <td colspan="5" class="p-0">
+                                <div class="p-3">
+                                    <strong>Detalle</strong>
+                                    <table class="table table-sm mt-2">
+                                        <thead>
+                                            <tr>
+                                                <th>Producto</th>
+                                                <th class="text-center">Cant.</th>
+                                                <th class="text-center">Observaciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let item of dist.items">
+                                                <td>{{ item.productName }}</td>
+                                                <td class="text-center">{{ item.quantity }}</td>
+                                                <td class="text-center">{{ item.description || '—' }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-container>
+                    
+                    <!-- Mensaje cuando no hay nada -->
+                    <tr *ngIf="!purchase.distributions.length">
+                        <td colspan="5" class="text-center py-3">Sin entregas registradas.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
