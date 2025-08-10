@@ -1,0 +1,24 @@
+@media (max-width: 575.98px) {
+    .mobile-table {
+        font-size: 0.85rem;
+    }
+
+    .mobile-header {
+        font-size: 0.75rem;
+        font-weight: 600 !important;
+        top: 0;
+        white-space: normal;
+    }
+
+    .mobile-cell {
+        font-size: 0.7rem;
+        --webkit-line-clamp: 3;
+        --webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: normal;
+        word-break: break-word;
+        line-height: 1.2rem;
+        max-height: 3.6rem;
+    }
+}

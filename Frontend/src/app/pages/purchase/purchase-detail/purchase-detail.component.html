@@ -1,7 +1,7 @@
     <div class="d-flex justify-content-center mt-5">
         <div class="card container w-100 w-md-75 mx-auto p-md-3 shadow-sm">
         <div class="card-header d-sm-flex justify-content-sm-between align-items-center">
-            <h5 class="mb-md-0">Compra #{{ purchase.id }}</h5>
+            <h5 class="mb-0">Compra #{{ purchase.id }}</h5>
             <!-- <button class="btn btn-outline-secondary btn-sm" (click)="goBack()">Volver</button> -->
         </div>
         <div class="row align-items-center py-4 g-4 px-3">
@@ -41,26 +41,24 @@
             <h5 class="mb-0">Historial de entregas</h5>
         </div>
     <div class="card-body p-0">
-        <table class="table table-hover">
-            <thead class="table-light">
+        <table class="table table-hover table-responsive overflow-x-auto mt-3 mobile-table">
+            <thead>
                 <tr>
-                    <th>Fecha</th>
-                    <th>Destino</th>
-                    <th>Estado</th>
-                    <!-- <th class="text-center"># Items</th> -->
+                    <th class="fw-semibold mobile-header" style="font-size: 14px;">Fecha</th>
+                    <th class="fw-semibold mobile-header" style="font-size: 14px;">Destino</th>
+                    <th class="fw-semibold mobile-header" style="font-size: 14px;">Estado</th>
                     <th class="text-end"></th>
                 </tr>
             </thead>
             <tbody>
                 <ng-container *ngFor="let dist of purchase.distributions">
                     <tr (click)="toggleDetails(dist.id)" style="cursor: pointer;" [ngClass]="{'d-none': expandedDistId !== null && expandedDistId !== dist.id}">
-                        <td>{{ dist.deliveryDate | date:'dd/MM/yyyy' }}</td>
-                        <td>
+                        <td class="mobile-cell" style="font-size: 14px;">{{ dist.deliveryDate | date:'dd/MM/yyyy' }}</td>
+                        <td class="mobile-cell" style="font-size: 14px;">
                             <span *ngIf="dist.centerId !== 0">{{ dist.centerName }}</span>
                             <span *ngIf="dist.centerId === 0">{{ dist.personName }}</span>
                         </td>
-                        <td>{{ dist.status }}</td>
-                        <!-- <td class="text-center">{{ dist.items.length }}</td> -->
+                        <td class="mobile-cell" style="font-size: 14px;">{{ dist.status }}</td>
                         <td class="text-end">
                             <i class="bi" [ngClass]="{
                                     'bi-chevron-down': expandedDistId === dist.id,
