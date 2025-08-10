@@ -22,6 +22,9 @@ export class DistributionComponent implements OnInit {
 
   destinationType: 'center' | 'person' = 'center';
   destinationValue = '';
+  destinationPerson = '';
+  destinationDNI = '';
+  destinationMemberFamily = '';
 
   items: { item: any; quantityToDeliver: number }[] = [];
 
@@ -51,7 +54,9 @@ export class DistributionComponent implements OnInit {
     const distribution: any = {
       purchaseId: this.purchaseId,
       centerId: this.destinationType === 'center' ? Number(this.destinationValue) : null,
-      personName: this.destinationType === 'person' ? this.destinationValue : null,
+      personName: this.destinationType === 'person' ? this.destinationPerson : null,
+      personDNI: this.destinationType === 'person' ? this.destinationDNI : null,
+      personMemberFamily: this.destinationType === 'person' ? this.destinationMemberFamily : null,
       items: this.items
         .filter(i => i.quantityToDeliver > 0)
         .map(i => ({

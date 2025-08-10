@@ -17,8 +17,16 @@
       </select>
     </div>
     <div class="col-md-8" *ngIf="destinationType === 'person'">
-      <label class="form-label">Nombre / DNI</label>
-      <input type="text" class="form-control" placeholder="Nombre o DNI" [(ngModel)]="destinationValue">
+      <label class="form-label">Nombre y apellido</label>
+      <input type="text" class="form-control" placeholder="Nombre y apellido " [(ngModel)]="destinationPerson">
+    </div>
+    <div class="mt-2 col-md-6" *ngIf="destinationType === 'person'">
+      <label class="form-label">DNI</label>
+      <input type="text" class="form-control" placeholder="DNI" [(ngModel)]="destinationDNI">
+    </div>
+    <div class="mt-2 col-md-6" *ngIf="destinationType === 'person'">
+      <label class="form-label">Miembro de la familia</label>
+      <input type="text" class="form-control" placeholder="Padre, Madre, etc" [(ngModel)]="destinationMemberFamily">
     </div>
   </div>
 
