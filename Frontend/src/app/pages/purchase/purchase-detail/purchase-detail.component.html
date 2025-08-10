@@ -1,8 +1,12 @@
-    <div class="d-flex justify-content-center mt-5">
+<div class="d-flex justify-content-center mt-5">
         <div class="card container w-100 w-md-75 mx-auto p-md-3 shadow-sm">
         <div class="card-header d-sm-flex justify-content-sm-between align-items-center">
             <h5 class="mb-md-0">Compra #{{ purchase.id }}</h5>
-            <!-- <button class="btn btn-outline-secondary btn-sm" (click)="goBack()">Volver</button> -->
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-outline-secondary btn-sm" (click)="printPurchase()">
+                <i class="bi bi-printer me-1"></i> Imprimir compra
+              </button>
+            </div>
         </div>
         <div class="row align-items-center py-4 g-4 px-3">
             <div class="col-sm-6">
@@ -47,8 +51,7 @@
                     <th>Fecha</th>
                     <th>Destino</th>
                     <th>Estado</th>
-                    <!-- <th class="text-center"># Items</th> -->
-                    <th class="text-end"></th>
+                    <th class="text-end">Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -60,13 +63,20 @@
                             <span *ngIf="dist.centerId === 0">{{ dist.personName }}</span>
                         </td>
                         <td>{{ dist.status }}</td>
-                        <!-- <td class="text-center">{{ dist.items.length }}</td> -->
                         <td class="text-end">
-                            <i class="bi" [ngClass]="{
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-outline-secondary"
+                                        (click)="printDistribution(dist, $event)" title="Imprimir entrega">
+                                  <i class="bi bi-printer"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary"
+                                        (click)="toggleDetails(dist.id); $event.stopPropagation()" title="Ver detalle">
+                                  <i class="bi" [ngClass]="{
                                     'bi-chevron-down': expandedDistId === dist.id,
                                     'bi-chevron-right': expandedDistId !== dist.id
-                                }">
-                            </i>
+                                  }"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     <!-- Fila expandible con detalles -->
@@ -94,7 +104,7 @@
                         </td>
                     </tr>
                 </ng-container>
-                
+
                 <!-- Mensaje cuando no hay nada -->
                 <tr *ngIf="!purchase.distributions.length">
                     <td colspan="5" class="text-center py-3">Sin entregas registradas.</td>

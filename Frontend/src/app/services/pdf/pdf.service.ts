@@ -11,6 +11,9 @@ export interface PdfGenerationRequest {
   tableData?: PdfTableData;
   logoBase64?: string;
   footer?: string;
+  orientation?: 'portrait' | 'landscape';
+  signatureAreas?: string[];
+  rightNotes?: string[];
 }
 
 export interface PdfSection {
