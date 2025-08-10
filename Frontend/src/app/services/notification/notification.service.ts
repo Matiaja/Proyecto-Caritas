@@ -11,6 +11,7 @@ import { AuthService } from '../../auth/auth.service';
 export class NotificationService implements OnDestroy {
   private hubConnection!: HubConnection;
   baseUrl = environment.baseUrl;
+  notificationHubUrl = environment.notificationHubUrl;
   private notificationsSubject = new BehaviorSubject<any[]>([]);
   public notifications$ = this.notificationsSubject.asObservable();
 
@@ -32,7 +33,7 @@ export class NotificationService implements OnDestroy {
   
   private buildConnection(token: string) {
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl('http://localhost:5110/notificationHub', {
+      .withUrl(this.notificationHubUrl, {
         accessTokenFactory: () => token
       })
       .configureLogging(LogLevel.None)
@@ -43,7 +44,6 @@ export class NotificationService implements OnDestroy {
   private startConnection() {
     this.hubConnection.start()
       .then(() => {
-        console.log('SignalR connected');
         this.loadInitialNotifications();
       })
       .catch(err => {
@@ -53,7 +53,6 @@ export class NotificationService implements OnDestroy {
 
   private registerHandlers() {
     this.hubConnection.on('ReceiveNotification', (notification: any) => {
-      console.log('Notificación recibida:', notification);
       const currentNotifications = this.notificationsSubject.value;
       if (!currentNotifications.some(n => n.id === notification.id)) {
         this.notificationsSubject.next([notification, ...currentNotifications]);
@@ -61,11 +60,9 @@ export class NotificationService implements OnDestroy {
     });
 
     this.hubConnection.onreconnecting(() => {
-      console.log('SignalR reconectando...');
     });
 
     this.hubConnection.onreconnected(() => {
-      console.log('SignalR reconectado');
     });
   }
 

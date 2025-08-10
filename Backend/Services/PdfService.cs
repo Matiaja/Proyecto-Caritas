@@ -1,3 +1,4 @@
+using PdfSharpCore;
 using PdfSharpCore.Drawing;
 using PdfSharpCore.Pdf;
 using ProyectoCaritas.Models.DTOs;
@@ -10,52 +11,237 @@ namespace ProyectoCaritas.Services
         {
             var document = new PdfDocument();
             var page = document.AddPage();
+
+            // A4 y orientación
+            page.Size = PageSize.A4;
+            if (string.Equals(request.Orientation, "landscape", StringComparison.OrdinalIgnoreCase))
+                page.Orientation = PageOrientation.Landscape;
+
             var gfx = XGraphics.FromPdfPage(page);
-            var yPoint = 40;
+
+            // márgenes
+            const int margin = 20;
+            const int topMargin = 40;
+            const int bottomMargin = 40;
+
+            var yPoint = topMargin;
 
             var titleFont = new XFont("Arial", 18, XFontStyle.Bold);
             var subTitleFont = new XFont("Arial", 14, XFontStyle.Regular);
             var textFont = new XFont("Arial", 10, XFontStyle.Regular);
             var boldFont = new XFont("Arial", 10, XFontStyle.Bold);
 
-            // Título
-            gfx.DrawString(request.Title, titleFont, XBrushes.Black, new XRect(0, yPoint, page.Width, 20), XStringFormats.TopCenter);
-            yPoint += 30;
+            // Título (mayúsculas) con ajuste al ancho de A4
+            var titleText = (request.Title ?? string.Empty).ToUpperInvariant();
+            var (titleFit, titleFitFont) = FitText(gfx, titleText, titleFont, page.Width - (margin * 2), minSize: 9);
+            gfx.DrawString(titleFit, titleFitFont, XBrushes.Black, new XRect(margin, yPoint, page.Width - (margin * 2), 24), XStringFormats.TopCenter);
+
+            yPoint += 28; // espacio bajo título
+
+            // RightNotes bajo el título, a la derecha, sin superponer
+            if (request.RightNotes != null && request.RightNotes.Count > 0)
+            {
+                int yn = yPoint;
+                var rightNoteFont = new XFont("Arial", 10, XFontStyle.Bold);
+                foreach (var raw in request.RightNotes)
+                {
+                    var noteText = (raw ?? string.Empty).ToUpperInvariant();
+                    gfx.DrawString(noteText, rightNoteFont, XBrushes.Black, new XRect(margin, yn, page.Width - (margin * 2), 14), XStringFormats.TopRight);
+                    yn += 16;
+                }
+                yPoint = yn + 6; // deja margen extra después de las notas
+            }
 
             // Subtítulo
             if (!string.IsNullOrEmpty(request.Subtitle))
             {
-                gfx.DrawString(request.Subtitle, subTitleFont, XBrushes.Gray, new XRect(0, yPoint, page.Width, 20), XStringFormats.TopCenter);
-                yPoint += 25;
+                // ajusta subtítulo si es largo
+                var (subFit, subFont) = FitText(gfx, request.Subtitle, subTitleFont, page.Width - (margin * 2), minSize: 9);
+                gfx.DrawString(subFit, subFont, XBrushes.Gray, new XRect(margin, yPoint, page.Width - (margin * 2), 20), XStringFormats.TopCenter);
+                yPoint += 24;
             }
 
-            // Fecha de generación
-            gfx.DrawString($"Generado el: {request.GeneratedDate:dd/MM/yyyy HH:mm}", textFont, XBrushes.Gray, new XRect(0, yPoint, page.Width - 40, 20), XStringFormats.TopRight);
-            yPoint += 30;
+            // Fecha arriba a la derecha
+            gfx.DrawString($"Generado el: {request.GeneratedDate:dd/MM/yyyy HH:mm}", textFont, XBrushes.Gray, new XRect(margin, yPoint, page.Width - (margin * 2), 16), XStringFormats.TopRight);
+            yPoint += 24;
 
-            // Secciones
-            foreach (var section in request.Sections)
+            // Secciones (básicas, sin paginación avanzada)
+            if (request.Sections != null)
             {
-                yPoint = AddSection(gfx, page, section, yPoint, boldFont, textFont);
+                foreach (var section in request.Sections)
+                {
+                    yPoint = AddSection(gfx, page, section, yPoint, boldFont, textFont);
+                }
             }
 
-            // Tabla
+            // Tabla con paginado y centrado
             if (request.TableData != null)
             {
-                yPoint = AddTable(gfx, page, request.TableData, yPoint, textFont, boldFont);
+                yPoint = AddTable(document, request.Orientation, ref page, ref gfx, request.TableData, yPoint, textFont, boldFont, topMargin, bottomMargin, margin);
             }
 
-            // Footer
+            // Firmas SOLO en la última página
+            if (request.SignatureAreas != null && request.SignatureAreas.Count > 0)
+            {
+                yPoint = DrawSignatureAreas(gfx, page, yPoint, request.SignatureAreas, textFont);
+            }
+
+            // Footer de texto
             if (!string.IsNullOrEmpty(request.Footer))
             {
-                yPoint += 40;
-                gfx.DrawString(request.Footer, textFont, XBrushes.Gray, new XRect(0, yPoint, page.Width, 20), XStringFormats.TopCenter);
+                gfx.DrawString(request.Footer, textFont, XBrushes.Gray, new XRect(margin, page.Height - 30, page.Width - (margin * 2), 16), XStringFormats.Center);
             }
 
-            // Guardar en memoria
             using var stream = new MemoryStream();
             document.Save(stream, false);
             return stream.ToArray();
+        }
+
+        // Crea una nueva página manteniendo orientación y devuelve gfx
+        private void NewPage(PdfDocument document, string? orientation, ref PdfPage page, ref XGraphics gfx)
+        {
+            page = document.AddPage();
+            page.Size = PageSize.A4;
+            if (string.Equals(orientation, "landscape", StringComparison.OrdinalIgnoreCase))
+                page.Orientation = PageOrientation.Landscape;
+
+            gfx.Dispose();
+            gfx = XGraphics.FromPdfPage(page);
+        }
+
+        private int AddTable(
+            PdfDocument document,
+            string? orientation,
+            ref PdfPage page,
+            ref XGraphics gfx,
+            PdfTableData tableData,
+            int y,
+            XFont textFont,
+            XFont headerFont,
+            int topMargin,
+            int bottomMargin,
+            int sideMargin)
+        {
+            double availableWidth = page.Width - (sideMargin * 2);
+            int cols = tableData.Headers.Count;
+            if (cols == 0) return y;
+
+            double colWidth = availableWidth / cols;
+            double headerHeight = 24;
+            double rowHeight = 22;
+            const double pad = 4;
+
+            // Título de la tabla (ajuste + clip)
+            if (!string.IsNullOrEmpty(tableData.Title))
+            {
+                var (fit, font) = FitText(gfx, tableData.Title!, headerFont, availableWidth, minSize: 8);
+                var tRect = new XRect(sideMargin, y, availableWidth, 18);
+                DrawClippedString(gfx, fit, font, XBrushes.Black, tRect, XStringFormats.TopLeft);
+                y += 20;
+            }
+
+            // Nueva página si no entra el header
+            if (y + headerHeight > page.Height - bottomMargin)
+            {
+                NewPage(document, orientation, ref page, ref gfx);
+                y = topMargin;
+            }
+
+            // Encabezado
+            y = DrawTableHeader(gfx, y, sideMargin, availableWidth, headerHeight, colWidth, cols, tableData.Headers, headerFont, pad);
+
+            // Filas con salto de página
+            foreach (var row in tableData.Rows)
+            {
+                if (y + rowHeight > page.Height - bottomMargin)
+                {
+                    NewPage(document, orientation, ref page, ref gfx);
+                    y = topMargin;
+                    y = DrawTableHeader(gfx, y, sideMargin, availableWidth, headerHeight, colWidth, cols, tableData.Headers, headerFont, pad);
+                }
+
+                y = DrawTableRow(gfx, y, sideMargin, colWidth, rowHeight, cols, row, textFont, pad);
+            }
+
+            return y + 8;
+        }
+
+        // Header de tabla (helper normal, no función local)
+        private int DrawTableHeader(
+            XGraphics gfx,
+            int y,
+            double sideMargin,
+            double availableWidth,
+            double headerHeight,
+            double colWidth,
+            int cols,
+            IList<string> headers,
+            XFont headerFont,
+            double pad)
+        {
+            var headerRect = new XRect(sideMargin, y, availableWidth, headerHeight);
+            gfx.DrawRectangle(new XSolidBrush(XColor.FromArgb(230, 230, 230)), headerRect);
+            gfx.DrawRectangle(XPens.Black, headerRect);
+
+            for (int c = 0; c < cols; c++)
+            {
+                var cellRect = new XRect(sideMargin + c * colWidth, y, colWidth, headerHeight);
+                gfx.DrawRectangle(XPens.Black, cellRect);
+
+                var allowed = cellRect.Width - pad * 2;
+                var (hdrText, hdrFont) = FitText(gfx, headers[c] ?? string.Empty, headerFont, allowed, minSize: 8);
+                var inner = new XRect(cellRect.X + pad, cellRect.Y, allowed, headerHeight);
+                DrawClippedString(gfx, hdrText, hdrFont, XBrushes.Black, inner, XStringFormats.Center);
+            }
+
+            return y + (int)headerHeight;
+        }
+
+        // Fila de tabla (helper normal, no función local)
+        private int DrawTableRow(
+            XGraphics gfx,
+            int y,
+            double sideMargin,
+            double colWidth,
+            double rowHeight,
+            int cols,
+            IReadOnlyList<string> row,
+            XFont textFont,
+            double pad)
+        {
+            for (int c = 0; c < cols; c++)
+            {
+                var text = (c < row.Count ? row[c] : string.Empty) ?? string.Empty;
+                var cellRect = new XRect(sideMargin + c * colWidth, y, colWidth, rowHeight);
+                gfx.DrawRectangle(XPens.Black, cellRect);
+
+                var allowed = cellRect.Width - pad * 2;
+                var (cellText, cellFont) = FitText(gfx, text, textFont, allowed, minSize: 8);
+                var inner = new XRect(cellRect.X + pad, cellRect.Y, allowed, rowHeight);
+                DrawClippedString(gfx, cellText, cellFont, XBrushes.Black, inner, XStringFormats.Center);
+            }
+
+            return y + (int)rowHeight;
+        }
+
+        private int DrawSignatureAreas(XGraphics gfx, PdfPage page, int y, List<string> labels, XFont textFont)
+        {
+            var bottomAreaTop = (int)page.Height - 120;
+            y = Math.Max(y + 10, bottomAreaTop);
+
+            int margin = 20;
+            int totalWidth = (int)page.Width - (margin * 2);
+            int per = labels.Count > 0 ? totalWidth / labels.Count : totalWidth;
+
+            for (int i = 0; i < labels.Count; i++)
+            {
+                int x = margin + (i * per);
+                int lineY = (int)page.Height - 60;
+
+                gfx.DrawLine(XPens.Black, x + 20, lineY, x + per - 20, lineY);
+                gfx.DrawString(labels[i], textFont, XBrushes.Gray, new XRect(x, lineY + 5, per, 18), XStringFormats.TopCenter);
+            }
+            return (int)page.Height - 40;
         }
 
         public async Task<byte[]> GenerateStockDetailPdfAsync(int productId, int centerId, List<dynamic> stockData)
@@ -93,7 +279,6 @@ namespace ProyectoCaritas.Services
                 },
                 Footer = $"Generado el {DateTime.Now:dd/MM/yyyy HH:mm}"
             };
-
             return await GeneratePdfAsync(request);
         }
 
@@ -118,62 +303,91 @@ namespace ProyectoCaritas.Services
                 },
                 Footer = $"Generado el {DateTime.Now:dd/MM/yyyy HH:mm}"
             };
-
             return await GeneratePdfAsync(request);
         }
 
         private int AddSection(XGraphics gfx, PdfPage page, PdfSection section, int y, XFont boldFont, XFont textFont)
         {
-            y += 10;
-            gfx.DrawString(section.Title, boldFont, XBrushes.Black, new XRect(20, y, page.Width - 40, 20), XStringFormats.TopLeft);
-            y += 20;
+            y += 8;
+            gfx.DrawString(section.Title, boldFont, XBrushes.Black, new XRect(20, y, page.Width - 40, 18), XStringFormats.TopLeft);
+            y += 18;
 
             if (!string.IsNullOrEmpty(section.Content))
             {
-                gfx.DrawString(section.Content, textFont, XBrushes.Black, new XRect(25, y, page.Width - 50, 20), XStringFormats.TopLeft);
-                y += 20;
+                gfx.DrawString(section.Content, textFont, XBrushes.Black, new XRect(25, y, page.Width - 50, 18), XStringFormats.TopLeft);
+                y += 18;
             }
 
             foreach (var kvp in section.KeyValuePairs)
             {
-                gfx.DrawString($"{kvp.Key}: ", boldFont, XBrushes.Black, new XRect(25, y, 150, 20), XStringFormats.TopLeft);
-                gfx.DrawString(kvp.Value, textFont, XBrushes.Black, new XRect(180, y, page.Width - 200, 20), XStringFormats.TopLeft);
-                y += 18;
+                gfx.DrawString($"{kvp.Key}:", boldFont, XBrushes.Black, new XRect(25, y, 150, 16), XStringFormats.TopLeft);
+                gfx.DrawString(kvp.Value ?? string.Empty, textFont, XBrushes.Black, new XRect(180, y, page.Width - 200, 16), XStringFormats.TopLeft);
+                y += 16;
             }
 
-            return y + 10;
+            return y + 8;
         }
 
-        private int AddTable(XGraphics gfx, PdfPage page, PdfTableData tableData, int y, XFont textFont, XFont headerFont)
+        // Ajusta el tamaño de fuente hasta un mínimo y si aún no entra, trunca con "…"
+        private (string text, XFont font) FitText(XGraphics gfx, string text, XFont baseFont, double maxWidth, double minSize = 7, double step = 0.5)
         {
-            y += 20;
-            if (!string.IsNullOrEmpty(tableData.Title))
+            if (string.IsNullOrEmpty(text)) return (string.Empty, baseFont);
+
+            var size = baseFont.Size;
+            XFont font = baseFont;
+
+            while (size > minSize)
             {
-                gfx.DrawString(tableData.Title, headerFont, XBrushes.Black, new XRect(20, y, page.Width - 40, 20), XStringFormats.TopLeft);
-                y += 20;
+                font = new XFont(baseFont.FontFamily.Name, size, baseFont.Style);
+                var w = gfx.MeasureString(text, font).Width;
+                if (w <= maxWidth) return (text, font);
+                size -= step;
             }
 
-            const int colWidth = 70;
-            int startX = 20;
+            // Truncar con elipsis
+            string ellipsis = "…";
+            string t = text;
+            while (t.Length > 0 && gfx.MeasureString(t + ellipsis, font).Width > maxWidth)
+                t = t[..^1];
 
-            // Headers
-            for (int i = 0; i < tableData.Headers.Count; i++)
-            {
-                gfx.DrawString(tableData.Headers[i], headerFont, XBrushes.Black, new XRect(startX + i * colWidth, y, colWidth, 20), XStringFormats.TopLeft);
-            }
-            y += 20;
+            return (t.Length == 0 ? string.Empty : t + ellipsis, font);
+        }
 
-            // Rows
-            foreach (var row in tableData.Rows)
+        // Dibuja texto recortado en un rectángulo, sin romper palabras
+        private void DrawClippedString(XGraphics gfx, string text, XFont font, XBrush brush, XRect rect, XStringFormat format)
+        {
+            // Palabras en el texto
+            var words = text.Split(' ');
+            string line = string.Empty;
+            double y = rect.Y;
+
+            foreach (var word in words)
             {
-                for (int i = 0; i < row.Count; i++)
+                // Probar con la nueva palabra
+                var testLine = line + (line.Length > 0 ? " " : "") + word;
+                var size = gfx.MeasureString(testLine, font);
+
+                // Si no cabe, dibujar la línea anterior y empezar una nueva
+                if (size.Width > rect.Width)
                 {
-                    gfx.DrawString(row[i], textFont, XBrushes.Black, new XRect(startX + i * colWidth, y, colWidth, 20), XStringFormats.TopLeft);
+                    if (line.Length > 0)
+                    {
+                        gfx.DrawString(line, font, brush, new XRect(rect.X, y, rect.Width, rect.Height), format);
+                        y += font.Size + 2; // Espacio entre líneas
+                    }
+                    line = word; // Nueva línea comienza con la palabra actual
                 }
-                y += 18;
+                else
+                {
+                    line = testLine; // La palabra cabe, así que actualiza la línea de texto
+                }
             }
 
-            return y + 10;
+            // Dibujar la última línea si no está vacía
+            if (line.Length > 0)
+            {
+                gfx.DrawString(line, font, brush, new XRect(rect.X, y, rect.Width, rect.Height), format);
+            }
         }
     }
 }

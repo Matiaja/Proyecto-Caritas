@@ -125,7 +125,6 @@ export class StorageComponent implements OnInit {
         this.order,
         this.groupByCenter
       );
-      console.log(this.stocks);
       this.totalItems = this.stockService.totalItems;
 
       const showAvailable = this.selectedCenter != null || this.groupByCenter;
@@ -180,7 +179,6 @@ export class StorageComponent implements OnInit {
   }
 
   onSelectStock(stock: any) {
-    console.log(stock);
     const extras = this.isAdmin ? { queryParams: { centerId: stock.centerId } } : {};
     this.router.navigate(['/storage/detail', stock.productId], extras);
   }

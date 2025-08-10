@@ -50,7 +50,6 @@ export class OrderlineComponent  implements OnInit {
       this.orderLineService.getOrderLineById(this.orderLineId).subscribe({
         next: (data) => {
           this.orderLine = data;
-          console.log('Order Line:', this.orderLine);
           this.assignedQuantity = data.donationRequests?.reduce((sum: number, dr) => sum + dr.quantity, 0) ?? 0;
           this.pendingQuantity = data.quantity - this.assignedQuantity;
           

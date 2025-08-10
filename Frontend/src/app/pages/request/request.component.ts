@@ -82,7 +82,6 @@ export class RequestComponent implements OnInit {
           filtered = filtered.filter((r) => r.status === this.selectedStatus);
         }
 
-        console.log('Filtered', filtered);
         // Ordenamiento
         if (this.sortBy) {
           filtered = filtered.sort((a: any, b: any) => {
