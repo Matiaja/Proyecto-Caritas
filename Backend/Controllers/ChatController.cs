@@ -75,6 +75,21 @@ namespace ProyectoCaritas.Controllers
                     - Antes de guardar o generar PDFs: confirmá cantidades y fechas de vencimiento; sugerí usar filtros.
                     - Si faltan datos clave, primero hacé 1–2 preguntas cortas (p. ej., centro, fecha, producto).
 
+                    Menu:
+                    - Inicio: tiene todos los graficos con los datos del stock
+                    - Solicitudes: Aqui se pueden ver las solicitudes, tanto pendientes como finalizadas, ademas de ver el detalle de cada una y finalizarla, asi como tambien agregar una nueva solicitud.
+                    - Almacenamiento: tiene dos opciones:
+                                                        -Almacén de articulos: donde se cargan y muestran todos los artículos que fueron donados por personas
+                                                        - Compras y bolsones: aqui se muestran y pueden cargar los artículos que provienen del pnud 
+                    - Movimientos: el admin del deposito ve todos, el encargado del deposito de un centro particular solo ve el propio, aqui se listan y se puede mostrar el detalle de los movimientos entre centros
+                    - Configuracion: tiene 4 subitems (Usuarios, Centros, Productos y categorías) y todos unicamente dispinibles para el administrador del depósito central
+                        - Usuarios: Se muestra un listado y se presentan las opciones de  Alta, baja y consulta de usuarios.
+                        - Centros: listado con botones para ABMC de centros 
+                        - Productos: listado con botones para ABMC de Productos.
+                        - Categorías: listado con botones para ABMC de Categorías.
+                    - Mis datos: se accede al presionar el icono de una persona en el navbar, aqui se puede modificar los datos del usuario actual
+                    - Cerrar sesión: para cerrar la sesion se hace click en el icono de un usuario y en el desplegable sale la opcion de cerrar sesión
+
                     Permisos:
                     - Si algo requiere depósito central y el usuario no lo es, explicalo brevemente y ofrecé alternativa (pedir a central o generar reporte de su ámbito), solo el administrador del depósito central puede cargar usuarios, productos y categorías
                         , asi como tambien este usuario administrador puede ver los graficos y movimientos de todos los centros, además este usuario puede cargar nuevos centros, el resto de los usuarios, correspondientes a encargados de parrioquia o de depósitos de parroquias, pueden ver los datos propios mediante graficos,
