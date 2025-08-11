@@ -91,11 +91,11 @@ export class PurchaseDetailComponent implements OnInit {
   }
 
   printDistribution(dist: any, $event?: Event): void {
+    console.log('Printing distribution:', dist);
     $event?.stopPropagation();
     if (!this.purchase || !dist) { return; }
 
     const destino = dist.centerId !== 0 ? (dist.centerName || '-') : (dist.personName || '-');
-    const bolsonesEntregados = (dist.items || []).reduce((acc: number, it: any) => acc + (Number(it.quantity) || 0), 0);
 
     const req: PdfGenerationRequest = {
       title: 'Abordaje comunitario proyecto pnud.Arg/20/004-secretaria nacional de la niñez, adolescencia, familia',
@@ -128,16 +128,14 @@ export class PurchaseDetailComponent implements OnInit {
           'DNI',
           'Direccion/Ciudad',
           'Integrante de familia',
-          'Bolsones entregados',
           'Firma'
         ],
         rows: [[
           '1',
           dist.personName || '-',
-          dist.personDni || '-',
-          dist.personAddress || '-',
-          dist.familyMember ?? '-',     // si no existe, deja '-'
-          String(bolsonesEntregados),
+          dist.personDNI || '-',
+          dist.personLocation || '-',
+          dist.personMemberFamily || '-',
           '' // espacio para firma en la celda
         ]]
       },

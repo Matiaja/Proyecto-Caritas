@@ -49,8 +49,9 @@ namespace ProyectoCaritas.Models.Entities
         public string? PersonName { get; set; } // Nombre de la persona que recibe
         public string? PersonDNI { get; set; } // DNI de la persona que recibe
         public string? PersonMemberFamily { get; set; } // Integrante de la familia
+        public string? PersonLocation { get; set; } // Direccion o ciudad de la persona que recibe
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public string Status { get; set; } = "Pendiente";
+        public string Status { get; set; } = "Entregado";
 
         // Propiedades de navegación
         public Center? Center { get; set; } = null!;

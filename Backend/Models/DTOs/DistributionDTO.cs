@@ -13,6 +13,7 @@ public class DistributionDTO
     public string PersonName { get; set; }
     public string PersonDNI { get; set; }
     public string PersonMemberFamily { get; set; }
+    public string PersonLocation { get; set; }
     public List<ItemDistributionDTO> Items { get; set; }
 
     public DistributionDTO(Distribution dist)
@@ -26,6 +27,7 @@ public class DistributionDTO
         PersonName = dist.PersonName ?? "";
         PersonDNI = dist.PersonDNI ?? "";
         PersonMemberFamily = dist.PersonMemberFamily ?? "";
+        PersonLocation = dist.PersonLocation ?? "";
         Items = dist.Items.Select(i => new ItemDistributionDTO(i)).ToList();
     }
 }

@@ -71,11 +71,12 @@ public class DistributionsController : ControllerBase
         var salida = new Distribution
         {
             PurchaseId = dto.PurchaseId,
-            DeliveryDate = dto.DeliveryDate,
+            DeliveryDate = DateTime.UtcNow,
             CenterId = dto.CenterId,
             PersonName = dto.PersonName,
             PersonDNI = dto.PersonDNI,
             PersonMemberFamily = dto.PersonMemberFamily,
+            PersonLocation = dto.PersonLocation,
             Items = dto.Items.Select(i => new ItemDistribution
             {
                 ItemPurchaseId = i.ItemPurchaseId,
