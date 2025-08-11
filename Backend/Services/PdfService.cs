@@ -68,9 +68,21 @@ namespace ProyectoCaritas.Services
             // Secciones (básicas, sin paginación avanzada)
             if (request.Sections != null)
             {
-                foreach (var section in request.Sections)
+                for (int si = 0; si < request.Sections.Count; si++)
                 {
-                    yPoint = AddSection(gfx, page, section, yPoint, boldFont, textFont);
+                    var section = request.Sections[si];
+
+                    // Si la sección indica render side-by-side con la siguiente y existe la siguiente
+                    if (section.SideBySideWithNext && si + 1 < request.Sections.Count)
+                    {
+                        var nextSection = request.Sections[si + 1];
+                        yPoint = AddSectionsSideBySide(gfx, page, section, nextSection, yPoint, boldFont, textFont);
+                        si++; // saltar la siguiente porque ya fue renderizada en paralelo
+                    }
+                    else
+                    {
+                        yPoint = AddSection(gfx, page, section, yPoint, boldFont, textFont);
+                    }
                 }
             }
 
@@ -327,6 +339,95 @@ namespace ProyectoCaritas.Services
 
             return y + 8;
         }
+
+        private int AddSectionsSideBySide(
+            XGraphics gfx,
+            PdfPage page,
+            PdfSection left,
+            PdfSection right,
+            int y,
+            XFont boldFont,
+            XFont textFont)
+        {
+            const int margin = 20;
+            const int gap = 20; // espacio entre columnas
+            double pageWidth = page.Width;
+            double availableWidth = pageWidth - (margin * 2);
+            double colWidth = (availableWidth - gap) / 2;
+
+            // Coordenadas iniciales para cada columna
+            double leftX = margin;
+            double rightX = margin + colWidth + gap;
+
+            double curYLeft = y;
+            double curYRight = y;
+
+            // Espacio superior
+            curYLeft += 8;
+            curYRight += 8;
+
+            // Dibujar títulos de cada columna (si existen), y ajustar tamaño si es necesario
+            if (!string.IsNullOrEmpty(left.Title))
+            {
+                var (txtLeftTitle, fLeftTitle) = FitText(gfx, left.Title!, boldFont, colWidth);
+                DrawClippedString(gfx, txtLeftTitle, fLeftTitle, XBrushes.Black, new XRect(leftX, curYLeft, colWidth, fLeftTitle.Size + 4), XStringFormats.TopLeft);
+                curYLeft += (int)fLeftTitle.Size + 6;
+            }
+
+            if (!string.IsNullOrEmpty(right.Title))
+            {
+                var (txtRightTitle, fRightTitle) = FitText(gfx, right.Title!, boldFont, colWidth);
+                DrawClippedString(gfx, txtRightTitle, fRightTitle, XBrushes.Black, new XRect(rightX, curYRight, colWidth, fRightTitle.Size + 4), XStringFormats.TopLeft);
+                curYRight += (int)fRightTitle.Size + 6;
+            }
+
+            // Ahora dibujamos key-value pairs en cada columna por separado:
+            // Para consistencia usamos keyWidth fijo dentro de la columna.
+            double keyWidth = Math.Min(120, colWidth * 0.4); // ancho para la clave
+            double valueWidth = colWidth - keyWidth - 6;
+            double lineHeight = textFont.Size + 4;
+
+            // Left column key-values
+            if (left.KeyValuePairs != null)
+            {
+                foreach (var kv in left.KeyValuePairs)
+                {
+                    // Key (negrita)
+                    var keyRect = new XRect(leftX, curYLeft, keyWidth, lineHeight);
+                    var (keyText, keyFont) = FitText(gfx, (kv.Key ?? string.Empty) + ":", boldFont, keyWidth);
+                    DrawClippedString(gfx, keyText, keyFont, XBrushes.Black, keyRect, XStringFormats.TopLeft);
+
+                    // Value
+                    var valRect = new XRect(leftX + keyWidth + 6, curYLeft, valueWidth, lineHeight * 3);
+                    var (valText, valFont) = FitText(gfx, kv.Value ?? string.Empty, textFont, valueWidth, minSize: 7);
+                    DrawClippedString(gfx, valText, valFont, XBrushes.Black, valRect, XStringFormats.TopLeft);
+
+                    curYLeft += (int)lineHeight;
+                }
+            }
+
+            // Right column key-values
+            if (right.KeyValuePairs != null)
+            {
+                foreach (var kv in right.KeyValuePairs)
+                {
+                    var keyRect = new XRect(rightX, curYRight, keyWidth, lineHeight);
+                    var (keyText, keyFont) = FitText(gfx, (kv.Key ?? string.Empty) + ":", boldFont, keyWidth);
+                    DrawClippedString(gfx, keyText, keyFont, XBrushes.Black, keyRect, XStringFormats.TopLeft);
+
+                    var valRect = new XRect(rightX + keyWidth + 6, curYRight, valueWidth, lineHeight * 3);
+                    var (valText, valFont) = FitText(gfx, kv.Value ?? string.Empty, textFont, valueWidth, minSize: 7);
+                    DrawClippedString(gfx, valText, valFont, XBrushes.Black, valRect, XStringFormats.TopLeft);
+
+                    curYRight += (int)lineHeight;
+                }
+            }
+
+            // calcular la altura usada por ambas columnas y devolver la nueva Y (con un pequeño padding)
+            double usedHeight = Math.Max(curYLeft, curYRight) - y;
+            return y + (int)usedHeight + 8;
+        }
+
 
         // Ajusta el tamaño de fuente hasta un mínimo y si aún no entra, trunca con "…"
         private (string text, XFont font) FitText(XGraphics gfx, string text, XFont baseFont, double maxWidth, double minSize = 7, double step = 0.5)

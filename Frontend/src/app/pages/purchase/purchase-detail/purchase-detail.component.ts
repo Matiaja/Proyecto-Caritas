@@ -109,7 +109,8 @@ export class PurchaseDetailComponent implements OnInit {
             { key: 'Fecha de Compra', value: this.purchase.purchaseDate ? new Date(this.purchase.purchaseDate).toLocaleDateString('es-AR') : '-' },
             { key: 'Origen', value: this.purchase.centerName || '-' },
             { key: 'Tipo', value: this.purchase.type || '-' }
-          ]
+          ],
+          sideBySideWithNext: true
         },
         {
           title: 'Datos de la Entrega',
@@ -124,7 +125,7 @@ export class PurchaseDetailComponent implements OnInit {
         title: 'Listado de Receptores',
         headers: [
           'Numero',
-          'Apellido y nombre del integrante',
+          'Nombre y apellido',
           'DNI',
           'Direccion/Ciudad',
           'Integrante de familia',

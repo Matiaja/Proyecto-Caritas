@@ -20,6 +20,7 @@ export interface PdfSection {
   title: string;
   content?: string;
   keyValuePairs?: { key: string; value: string }[];
+  sideBySideWithNext?: boolean;
 }
 
 export interface PdfTableData {

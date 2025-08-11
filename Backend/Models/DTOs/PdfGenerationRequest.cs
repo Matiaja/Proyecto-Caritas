@@ -21,6 +21,7 @@ namespace ProyectoCaritas.Models.DTOs
         public string Title { get; set; } = "";
         public string? Content { get; set; }
         public List<KeyValuePair<string, string>> KeyValuePairs { get; set; } = new();
+        public bool SideBySideWithNext { get; set; } = false;
     }
 
     public class PdfTableData
