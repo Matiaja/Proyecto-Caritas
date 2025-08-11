@@ -70,7 +70,7 @@ export class PurchaseDetailComponent implements OnInit {
           ]
         }
       ],
-      tableData: {
+      tableData: [{
         title: 'Productos',
         headers: ['Producto', 'Cantidad', 'Restante'],
         rows: (this.items || []).map(i => [
@@ -78,7 +78,7 @@ export class PurchaseDetailComponent implements OnInit {
           (i.quantity ?? '-').toString(),
           (i.remainingQuantity ?? '-').toString()
         ])
-      },
+      }],
       footer: 'Generado por Sistema Cáritas',
       orientation: 'landscape',
       signatureAreas: [
@@ -96,6 +96,21 @@ export class PurchaseDetailComponent implements OnInit {
     if (!this.purchase || !dist) { return; }
 
     const destino = dist.centerId !== 0 ? (dist.centerName || '-') : (dist.personName || '-');
+    const receiversRows = [[
+      '1',
+      dist.personName || '-',
+      dist.personDNI || '-',
+      dist.personLocation || '-' ,
+      dist.personMemberFamily || '-',
+      '' // firma
+    ]];
+
+    const itemsRows = (dist.items || []).map((it: any, idx: number) => [
+      (idx + 1).toString(),
+      it.productName || it.itemPurchase?.productName || '-',
+      (it.quantity ?? '-').toString(),
+      it.description || '-'
+    ]);
 
     const req: PdfGenerationRequest = {
       title: 'Abordaje comunitario proyecto pnud.Arg/20/004-secretaria nacional de la niñez, adolescencia, familia',
@@ -121,7 +136,7 @@ export class PurchaseDetailComponent implements OnInit {
           ]
         }
       ],
-      tableData: {
+      tableData: [{
         title: 'Listado de Receptores',
         headers: [
           'Numero',
@@ -131,15 +146,14 @@ export class PurchaseDetailComponent implements OnInit {
           'Integrante de familia',
           'Firma'
         ],
-        rows: [[
-          '1',
-          dist.personName || '-',
-          dist.personDNI || '-',
-          dist.personLocation || '-',
-          dist.personMemberFamily || '-',
-          '' // espacio para firma en la celda
-        ]]
+        rows: receiversRows
       },
+      {
+        title: 'Items entregados',
+        headers: ['#','Producto','Cantidad','Observaciones'],
+        rows: itemsRows
+      }
+      ],
       footer: 'Generado por Sistema Cáritas',
       orientation: 'landscape',
       signatureAreas: [

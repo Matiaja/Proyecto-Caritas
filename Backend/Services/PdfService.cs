@@ -9,104 +9,110 @@ namespace ProyectoCaritas.Services
     {
         public async Task<byte[]> GeneratePdfAsync(PdfGenerationRequest request)
         {
-            var document = new PdfDocument();
-            var page = document.AddPage();
-
-            // A4 y orientación
-            page.Size = PageSize.A4;
-            if (string.Equals(request.Orientation, "landscape", StringComparison.OrdinalIgnoreCase))
-                page.Orientation = PageOrientation.Landscape;
-
-            var gfx = XGraphics.FromPdfPage(page);
-
-            // márgenes
-            const int margin = 20;
-            const int topMargin = 40;
-            const int bottomMargin = 40;
-
-            var yPoint = topMargin;
-
-            var titleFont = new XFont("Arial", 18, XFontStyle.Bold);
-            var subTitleFont = new XFont("Arial", 14, XFontStyle.Regular);
-            var textFont = new XFont("Arial", 10, XFontStyle.Regular);
-            var boldFont = new XFont("Arial", 10, XFontStyle.Bold);
-
-            // Título (mayúsculas) con ajuste al ancho de A4
-            var titleText = (request.Title ?? string.Empty).ToUpperInvariant();
-            var (titleFit, titleFitFont) = FitText(gfx, titleText, titleFont, page.Width - (margin * 2), minSize: 9);
-            gfx.DrawString(titleFit, titleFitFont, XBrushes.Black, new XRect(margin, yPoint, page.Width - (margin * 2), 24), XStringFormats.TopCenter);
-
-            yPoint += 28; // espacio bajo título
-
-            // RightNotes bajo el título, a la derecha, sin superponer
-            if (request.RightNotes != null && request.RightNotes.Count > 0)
+            return await Task.Run(() =>
             {
-                int yn = yPoint;
-                var rightNoteFont = new XFont("Arial", 10, XFontStyle.Bold);
-                foreach (var raw in request.RightNotes)
+                var document = new PdfDocument();
+                var page = document.AddPage();
+
+                // A4 y orientación
+                page.Size = PageSize.A4;
+                if (string.Equals(request.Orientation, "landscape", StringComparison.OrdinalIgnoreCase))
+                    page.Orientation = PageOrientation.Landscape;
+
+                var gfx = XGraphics.FromPdfPage(page);
+
+                // márgenes
+                const int margin = 20;
+                const int topMargin = 40;
+                const int bottomMargin = 40;
+
+                var yPoint = topMargin;
+
+                var titleFont = new XFont("Arial", 18, XFontStyle.Bold);
+                var subTitleFont = new XFont("Arial", 14, XFontStyle.Regular);
+                var textFont = new XFont("Arial", 10, XFontStyle.Regular);
+                var boldFont = new XFont("Arial", 10, XFontStyle.Bold);
+
+                // Título (mayúsculas) con ajuste al ancho de A4
+                var titleText = (request.Title ?? string.Empty).ToUpperInvariant();
+                var (titleFit, titleFitFont) = FitText(gfx, titleText, titleFont, page.Width - (margin * 2), minSize: 9);
+                gfx.DrawString(titleFit, titleFitFont, XBrushes.Black, new XRect(margin, yPoint, page.Width - (margin * 2), 24), XStringFormats.TopCenter);
+
+                yPoint += 28; // espacio bajo título
+
+                // RightNotes bajo el título, a la derecha, sin superponer
+                if (request.RightNotes != null && request.RightNotes.Count > 0)
                 {
-                    var noteText = (raw ?? string.Empty).ToUpperInvariant();
-                    gfx.DrawString(noteText, rightNoteFont, XBrushes.Black, new XRect(margin, yn, page.Width - (margin * 2), 14), XStringFormats.TopRight);
-                    yn += 16;
+                    int yn = yPoint;
+                    var rightNoteFont = new XFont("Arial", 10, XFontStyle.Bold);
+                    foreach (var raw in request.RightNotes)
+                    {
+                        var noteText = (raw ?? string.Empty).ToUpperInvariant();
+                        gfx.DrawString(noteText, rightNoteFont, XBrushes.Black, new XRect(margin, yn, page.Width - (margin * 2), 14), XStringFormats.TopRight);
+                        yn += 16;
+                    }
+                    yPoint = yn + 6; // deja margen extra después de las notas
                 }
-                yPoint = yn + 6; // deja margen extra después de las notas
-            }
 
-            // Subtítulo
-            if (!string.IsNullOrEmpty(request.Subtitle))
-            {
-                // ajusta subtítulo si es largo
-                var (subFit, subFont) = FitText(gfx, request.Subtitle, subTitleFont, page.Width - (margin * 2), minSize: 9);
-                gfx.DrawString(subFit, subFont, XBrushes.Gray, new XRect(margin, yPoint, page.Width - (margin * 2), 20), XStringFormats.TopCenter);
+                // Subtítulo
+                if (!string.IsNullOrEmpty(request.Subtitle))
+                {
+                    // ajusta subtítulo si es largo
+                    var (subFit, subFont) = FitText(gfx, request.Subtitle, subTitleFont, page.Width - (margin * 2), minSize: 9);
+                    gfx.DrawString(subFit, subFont, XBrushes.Gray, new XRect(margin, yPoint, page.Width - (margin * 2), 20), XStringFormats.TopCenter);
+                    yPoint += 24;
+                }
+
+                // Fecha arriba a la derecha
+                gfx.DrawString($"Generado el: {request.GeneratedDate:dd/MM/yyyy HH:mm}", textFont, XBrushes.Gray, new XRect(margin, yPoint, page.Width - (margin * 2), 16), XStringFormats.TopRight);
                 yPoint += 24;
-            }
 
-            // Fecha arriba a la derecha
-            gfx.DrawString($"Generado el: {request.GeneratedDate:dd/MM/yyyy HH:mm}", textFont, XBrushes.Gray, new XRect(margin, yPoint, page.Width - (margin * 2), 16), XStringFormats.TopRight);
-            yPoint += 24;
-
-            // Secciones (básicas, sin paginación avanzada)
-            if (request.Sections != null)
-            {
-                for (int si = 0; si < request.Sections.Count; si++)
+                // Secciones (básicas, sin paginación avanzada)
+                if (request.Sections != null)
                 {
-                    var section = request.Sections[si];
+                    for (int si = 0; si < request.Sections.Count; si++)
+                    {
+                        var section = request.Sections[si];
 
-                    // Si la sección indica render side-by-side con la siguiente y existe la siguiente
-                    if (section.SideBySideWithNext && si + 1 < request.Sections.Count)
-                    {
-                        var nextSection = request.Sections[si + 1];
-                        yPoint = AddSectionsSideBySide(gfx, page, section, nextSection, yPoint, boldFont, textFont);
-                        si++; // saltar la siguiente porque ya fue renderizada en paralelo
-                    }
-                    else
-                    {
-                        yPoint = AddSection(gfx, page, section, yPoint, boldFont, textFont);
+                        // Si la sección indica render side-by-side con la siguiente y existe la siguiente
+                        if (section.SideBySideWithNext && si + 1 < request.Sections.Count)
+                        {
+                            var nextSection = request.Sections[si + 1];
+                            yPoint = AddSectionsSideBySide(gfx, page, section, nextSection, yPoint, boldFont, textFont);
+                            si++; // saltar la siguiente porque ya fue renderizada en paralelo
+                        }
+                        else
+                        {
+                            yPoint = AddSection(gfx, page, section, yPoint, boldFont, textFont);
+                        }
                     }
                 }
-            }
 
-            // Tabla con paginado y centrado
-            if (request.TableData != null)
-            {
-                yPoint = AddTable(document, request.Orientation, ref page, ref gfx, request.TableData, yPoint, textFont, boldFont, topMargin, bottomMargin, margin);
-            }
+                // Tabla con paginado y centrado
+                if (request.TableData != null && request.TableData.Count > 0)
+                {
+                    foreach (var table in request.TableData)
+                    {
+                        yPoint = AddTable(document, request.Orientation, ref page, ref gfx, table, yPoint, textFont, boldFont, topMargin, bottomMargin, margin);
+                    }
+                }
 
-            // Firmas SOLO en la última página
-            if (request.SignatureAreas != null && request.SignatureAreas.Count > 0)
-            {
-                yPoint = DrawSignatureAreas(gfx, page, yPoint, request.SignatureAreas, textFont);
-            }
+                // Firmas SOLO en la última página
+                if (request.SignatureAreas != null && request.SignatureAreas.Count > 0)
+                {
+                    yPoint = DrawSignatureAreas(gfx, page, yPoint, request.SignatureAreas, textFont);
+                }
 
-            // Footer de texto
-            if (!string.IsNullOrEmpty(request.Footer))
-            {
-                gfx.DrawString(request.Footer, textFont, XBrushes.Gray, new XRect(margin, page.Height - 30, page.Width - (margin * 2), 16), XStringFormats.Center);
-            }
+                // Footer de texto
+                if (!string.IsNullOrEmpty(request.Footer))
+                {
+                    gfx.DrawString(request.Footer, textFont, XBrushes.Gray, new XRect(margin, page.Height - 30, page.Width - (margin * 2), 16), XStringFormats.Center);
+                }
 
-            using var stream = new MemoryStream();
-            document.Save(stream, false);
-            return stream.ToArray();
+                using var stream = new MemoryStream();
+                document.Save(stream, false);
+                return stream.ToArray();
+            });
         }
 
         // Crea una nueva página manteniendo orientación y devuelve gfx
@@ -274,20 +280,23 @@ namespace ProyectoCaritas.Services
                         }
                     }
                 },
-                TableData = new PdfTableData
+                TableData = new List<PdfTableData>
                 {
-                    Title = "Movimientos de Stock",
-                    Headers = new List<string> { "Tipo", "Cantidad", "Descripción", "Origen", "Fecha", "Fecha Exp.", "Peso" },
-                    Rows = stockData.Select(item => new List<string>
+                    new PdfTableData
                     {
-                        item.type?.ToString() ?? "-",
-                        item.quantity?.ToString() ?? "-",
-                        item.description?.ToString() ?? "-",
-                        item.origin?.ToString() ?? "-",
-                        ((DateTime?)item.date)?.ToString("dd/MM/yyyy") ?? "-",
-                        ((DateTime?)item.expirationDate)?.ToString("dd/MM/yyyy") ?? "-",
-                        item.weight?.ToString() ?? "-"
-                    }).ToList()
+                        Title = "Movimientos de Stock",
+                        Headers = new List<string> { "Tipo", "Cantidad", "Descripción", "Origen", "Fecha", "Fecha Exp.", "Peso" },
+                        Rows = stockData.Select(item => new List<string>
+                        {
+                            item.type?.ToString() ?? "-",
+                            item.quantity?.ToString() ?? "-",
+                            item.description?.ToString() ?? "-",
+                            item.origin?.ToString() ?? "-",
+                            ((DateTime?)item.date)?.ToString("dd/MM/yyyy") ?? "-",
+                            ((DateTime?)item.expirationDate)?.ToString("dd/MM/yyyy") ?? "-",
+                            item.weight?.ToString() ?? "-"
+                        }).ToList()
+                    }
                 },
                 Footer = $"Generado el {DateTime.Now:dd/MM/yyyy HH:mm}"
             };

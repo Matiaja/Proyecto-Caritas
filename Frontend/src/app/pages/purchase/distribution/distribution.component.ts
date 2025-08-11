@@ -27,7 +27,7 @@ export class DistributionComponent implements OnInit {
   destinationMemberFamily = '';
   destinationLocation = '';
 
-  items: { item: any; quantityToDeliver: number }[] = [];
+  items: { item: any; quantityToDeliver: number; description: string }[] = [];
 
   centers: any[] = [];
 
@@ -63,7 +63,8 @@ export class DistributionComponent implements OnInit {
         .filter(i => i.quantityToDeliver > 0)
         .map(i => ({
           itemPurchaseId: i.item.id,
-          quantity: i.quantityToDeliver
+          quantity: i.quantityToDeliver,
+          description: i.description || ''
         }))
     };
 

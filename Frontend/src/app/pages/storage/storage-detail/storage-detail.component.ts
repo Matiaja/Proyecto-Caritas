@@ -151,7 +151,7 @@ export class StorageDetailComponent implements OnInit {
           ]
         }
       ],
-      tableData: {
+      tableData: [{
         title: 'Movimientos de Stock',
         headers: ['Tipo', 'Cantidad', 'Descripción', 'Origen', 'Fecha', 'Fecha Exp.', 'Peso'],
         rows: this.filteredStock.map(item => [
@@ -163,7 +163,7 @@ export class StorageDetailComponent implements OnInit {
           item.expirationDate ? new Date(item.expirationDate).toLocaleDateString('es-AR') : '-',
           item.weight && item.weight > 0 ? item.weight.toString() : '-'
         ])
-      },
+      }],
       footer: `Generado el ${new Date().toLocaleDateString('es-AR')} por Sistema Cáritas`
     };
 

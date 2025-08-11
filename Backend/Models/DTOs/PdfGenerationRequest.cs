@@ -6,7 +6,7 @@ namespace ProyectoCaritas.Models.DTOs
         public string? Subtitle { get; set; }
         public DateTime GeneratedDate { get; set; } = DateTime.Now;
         public List<PdfSection> Sections { get; set; } = new();
-        public PdfTableData? TableData { get; set; }
+        public List<PdfTableData>? TableData { get; set; }
         public string? Footer { get; set; }
 
         public string? Orientation { get; set; } // "portrait" | "landscape"
@@ -29,5 +29,10 @@ namespace ProyectoCaritas.Models.DTOs
         public string? Title { get; set; }
         public List<string> Headers { get; set; } = new();
         public List<List<string>> Rows { get; set; } = new();
+
+        public static implicit operator List<object>(PdfTableData v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

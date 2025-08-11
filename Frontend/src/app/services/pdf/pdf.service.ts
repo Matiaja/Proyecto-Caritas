@@ -8,7 +8,7 @@ export interface PdfGenerationRequest {
   subtitle?: string;
   generatedDate?: Date;
   sections?: PdfSection[];
-  tableData?: PdfTableData;
+  tableData?: PdfTableData[];
   logoBase64?: string;
   footer?: string;
   orientation?: 'portrait' | 'landscape';
@@ -73,7 +73,7 @@ export class PdfService {
           ]
         }
       ],
-      tableData: requestData.orderLines && requestData.orderLines.length > 0 ? {
+      tableData: requestData.orderLines && requestData.orderLines.length > 0 ? [{
         title: 'Productos Solicitados',
         headers: ['Código', 'Producto', 'Cantidad', 'Descripción', 'Asignado'],
         rows: requestData.orderLines.map((line: any) => [
@@ -83,7 +83,7 @@ export class PdfService {
           line.description || '-',
           line.isAssigned || 'No'
         ])
-      } : undefined,
+      }] : undefined,
       footer: `Generado el ${new Date().toLocaleDateString('es-AR')} por Sistema Cáritas`
     };
 
@@ -104,7 +104,7 @@ export class PdfService {
           ]
         }
       ],
-      tableData: {
+      tableData: [{
         title: 'Movimientos de Stock',
         headers: ['Tipo', 'Cantidad', 'Descripción', 'Origen', 'Fecha', 'Fecha Exp.', 'Peso'],
         rows: stockData.map(item => [
@@ -116,7 +116,7 @@ export class PdfService {
           item.expirationDate ? new Date(item.expirationDate).toLocaleDateString('es-AR') : '-',
           (item.weight && item.weight > 0) ? item.weight.toString() : '-'
         ])
-      },
+      }],
       footer: `Generado el ${new Date().toLocaleDateString('es-AR')} por Sistema Cáritas`
     };
 
