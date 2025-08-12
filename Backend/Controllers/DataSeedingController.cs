@@ -77,7 +77,6 @@ namespace ProyectoCaritas.Controllers
                     }
                 }
             }
-            // Add admin user to the list if it exists, for relationship assignment
             var adminUser = await _userManager.FindByNameAsync("admin");
             if (adminUser != null) createdUsers.Add(adminUser);
 
@@ -123,7 +122,7 @@ namespace ProyectoCaritas.Controllers
             await _context.DonationRequests.AddRangeAsync(donationRequests);
             await _context.SaveChangesAsync();
 
-            // 7. Seed Purchases -> ItemPurchases
+            // 7. Seed Purchases and create corresponding 'Ingreso' Stock records
             var itemPurchaseFaker = new Faker<ItemPurchase>("es")
                 .RuleFor(ip => ip.ProductId, f => f.Random.ListItem(products).Id)
                 .RuleFor(ip => ip.Quantity, f => f.Random.Int(10, 200))
@@ -134,15 +133,37 @@ namespace ProyectoCaritas.Controllers
                 .RuleFor(p => p.CenterId, f => f.Random.ListItem(centers).Id)
                 .RuleFor(p => p.Items, f => itemPurchaseFaker.Generate(f.Random.Int(1, 10)).ToList())
                 .Generate(150);
+
             await _context.Purchases.AddRangeAsync(purchases);
             await _context.SaveChangesAsync();
 
-            // 8. Seed Distributions with correct stock logic
+            // Create 'Ingreso' stock movements from the purchases
+            var ingresoStocks = new List<Stock>();
+            foreach (var purchase in purchases)
+            {
+                foreach (var item in purchase.Items)
+                {
+                    ingresoStocks.Add(new Stock
+                    {
+                        CenterId = purchase.CenterId,
+                        ProductId = item.ProductId,
+                        Date = purchase.PurchaseDate,
+                        Quantity = item.Quantity,
+                        Type = "Ingreso",
+                        Description = $"Ingreso por compra #{purchase.Id}"
+                    });
+                }
+            }
+            await _context.Stocks.AddRangeAsync(ingresoStocks);
+            await _context.SaveChangesAsync();
+
+
+            // 8. Seed Distributions and create corresponding 'Egreso' Stock records
             var allItemPurchases = await _context.ItemsPurchase.AsNoTracking().ToListAsync();
             var remainingQuantities = allItemPurchases.ToDictionary(ip => ip.Id, ip => ip.Quantity);
             var distributions = new List<Distribution>();
 
-            for (int i = 0; i < 200; i++) // Create 200 distributions
+            for (int i = 0; i < 200; i++)
             {
                 var availableItems = remainingQuantities.Where(rq => rq.Value > 0).ToList();
                 if (!availableItems.Any()) break;
@@ -166,7 +187,7 @@ namespace ProyectoCaritas.Controllers
                     Distribution = distribution,
                     ItemPurchaseId = itemPurchaseId,
                     Quantity = quantityToDistribute,
-                    Description = "Seeded distribution"
+                    Description = "Salida por donación"
                 };
 
                 distribution.Items.Add(itemDistribution);
@@ -177,26 +198,38 @@ namespace ProyectoCaritas.Controllers
             await _context.Distributions.AddRangeAsync(distributions);
             await _context.SaveChangesAsync();
 
-
-            // 9. Seed Stocks
-            var stocks = new Faker<Stock>("es")
-                .RuleFor(s => s.ProductId, f => f.Random.ListItem(products).Id)
-                .RuleFor(s => s.CenterId, f => f.Random.ListItem(centers).Id)
-                .RuleFor(s => s.Quantity, f => f.Random.Int(0, 500))
-                .RuleFor(s => s.Date, f => f.Date.Past(1))
-                .Generate(300);
-            await _context.Stocks.AddRangeAsync(stocks);
+            // Create 'Egreso' stock movements from the distributions
+            var egresoStocks = new List<Stock>();
+            foreach (var dist in distributions)
+            {
+                foreach (var item in dist.Items)
+                {
+                    // We need to find the original ItemPurchase to know the ProductId
+                    var originalItemPurchase = allItemPurchases.First(ip => ip.Id == item.ItemPurchaseId);
+                    egresoStocks.Add(new Stock
+                    {
+                        CenterId = dist.CenterId.Value, // Assuming destination center for the stock movement
+                        ProductId = originalItemPurchase.ProductId,
+                        Date = dist.DeliveryDate,
+                        Quantity = item.Quantity,
+                        Type = "Egreso",
+                        Description = $"Egreso por distribución #{dist.Id}"
+                    });
+                }
+            }
+            await _context.Stocks.AddRangeAsync(egresoStocks);
             await _context.SaveChangesAsync();
 
-            // 10. Seed Notifications
+            // 9. Seed Notifications
+            var allUsers = await _context.Users.ToListAsync();
             var notificationFaker = new Faker<Notification>("es")
                 .RuleFor(n => n.Title, f => f.Lorem.Sentence(3))
                 .RuleFor(n => n.Message, f => f.Lorem.Paragraph(1))
                 .RuleFor(n => n.Type, f => f.Random.Enum<NotificationType>())
                 .RuleFor(n => n.OrderLineId, f => f.Random.ListItem(allOrderLines).Id)
                 .RuleFor(n => n.DonationRequestId, f => f.Random.ListItem(donationRequests).Id)
-                .RuleFor(n => n.RecipientUserId, f => f.Random.ListItem(createdUsers).Id)
-                .RuleFor(n => n.UserId, f => f.Random.ListItem(createdUsers).Id)
+                .RuleFor(n => n.RecipientUserId, f => f.Random.ListItem(allUsers).Id)
+                .RuleFor(n => n.UserId, f => f.Random.ListItem(allUsers).Id)
                 .RuleFor(n => n.CreatedAt, f => f.Date.Past(1))
                 .RuleFor(n => n.IsRead, f => f.Random.Bool())
                 .RuleFor(n => n.Status, f => f.Random.ListItem(new List<string> { "Active", "Completed", "Expired" }));
@@ -204,7 +237,7 @@ namespace ProyectoCaritas.Controllers
             await _context.Notifications.AddRangeAsync(notifications);
             await _context.SaveChangesAsync();
 
-            return Ok("Database seeded successfully with a large amount of data and correct stock logic.");
+            return Ok("Database seeded successfully with correct transactional stock logic.");
         }
     }
 }

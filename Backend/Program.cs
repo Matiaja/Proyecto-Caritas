@@ -33,7 +33,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(
     c =>
     {
-        c.SwaggerDoc("v1", new() { Title = "NEXO-Caritas", Version = "v1" });
+        c.SwaggerDoc("v1", new() { Title = "Tu API", Version = "v1" });
 
         c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
         {
@@ -167,7 +167,7 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Ocurrió un error durante la inicialización de roles o usuario admin.");
+        logger.LogError(ex, "Ocurrió un error durante la inicialización de roles.");
     }
 }
 
