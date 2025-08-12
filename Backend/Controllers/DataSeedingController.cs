@@ -100,7 +100,7 @@ namespace ProyectoCaritas.Controllers
             // 5. Seed Requests
             var requestFaker = new Faker<Request>("es")
                 .RuleFor(r => r.RequestingCenterId, f => f.Random.ListItem(centers).Id)
-                .RuleFor(r => r.UrgencyLevel, f => f.Random.ListItem(new List<string> { "Baja", "Media", "Alta", "Crítica" }))
+                .RuleFor(r => r.UrgencyLevel, f => f.Random.ListItem(new List<string> { "Baja", "Media", "Alta", "CrÃ­tica" }))
                 .RuleFor(r => r.RequestDate, f => f.Date.Past(2));
             var requests = requestFaker.Generate(300);
             await _context.Requests.AddRangeAsync(requests);
@@ -187,10 +187,16 @@ namespace ProyectoCaritas.Controllers
 
             // 12. Seed Notifications
             var notificationFaker = new Faker<Notification>("es")
-                .RuleFor(n => n.Message, f => f.Lorem.Sentence())
-                .RuleFor(n => n.IsRead, f => f.Random.Bool())
+                .RuleFor(n => n.Title, f => f.Lorem.Sentence(3))
+                .RuleFor(n => n.Message, f => f.Lorem.Paragraph(1))
+                .RuleFor(n => n.Type, f => f.Random.Enum<NotificationType>())
+                .RuleFor(n => n.OrderLineId, f => f.Random.ListItem(orderLines).Id)
+                .RuleFor(n => n.DonationRequestId, f => f.Random.ListItem(donationRequests).Id)
+                .RuleFor(n => n.RecipientUserId, f => f.Random.ListItem(createdUsers).Id)
+                .RuleFor(n => n.UserId, f => f.Random.ListItem(createdUsers).Id)
                 .RuleFor(n => n.CreatedAt, f => f.Date.Past(1))
-                .RuleFor(n => n.UserId, f => f.Random.ListItem(createdUsers).Id);
+                .RuleFor(n => n.IsRead, f => f.Random.Bool())
+                .RuleFor(n => n.Status, f => f.Random.ListItem(new List<string> { "Active", "Completed", "Expired" }));
             var notifications = notificationFaker.Generate(300);
             await _context.Notifications.AddRangeAsync(notifications);
             await _context.SaveChangesAsync();
