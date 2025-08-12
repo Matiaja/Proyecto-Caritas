@@ -180,7 +180,7 @@ namespace ProyectoCaritas.Controllers
                 .RuleFor(s => s.ProductId, f => f.Random.ListItem(products).Id)
                 .RuleFor(s => s.CenterId, f => f.Random.ListItem(centers).Id)
                 .RuleFor(s => s.Quantity, f => f.Random.Int(1, 500))
-                .RuleFor(s => s.EntryDate, f => f.Date.Past(1));
+                .RuleFor(s => s.Date, f => f.Date.Past(1));
             var stocks = stockFaker.Generate(300);
             await _context.Stocks.AddRangeAsync(stocks);
             await _context.SaveChangesAsync();
