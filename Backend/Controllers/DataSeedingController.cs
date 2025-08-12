@@ -28,7 +28,7 @@ namespace ProyectoCaritas.Controllers
         public async Task<IActionResult> Seed()
         {
             // Safety check to prevent seeding a populated database
-            if (await _context.Users.AnyAsync() || await _context.Categories.AnyAsync())
+            if (await _context.Products.AnyAsync())
             {
                 return BadRequest("Database already has data. Seeding aborted.");
             }
