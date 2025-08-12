@@ -167,7 +167,7 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Ocurrió un error durante la inicialización de roles.");
+        logger.LogError(ex, "Ocurrió un error durante la inicialización de roles o usuario admin.");
     }
 }
 
