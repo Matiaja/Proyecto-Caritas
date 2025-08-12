@@ -161,7 +161,8 @@ using (var scope = app.Services.CreateScope())
     {
         var dbContext = services.GetRequiredService<ApplicationDbContext>();
         await RoleInitializer.CreateRoles(services);
-        Console.WriteLine("Roles inicializados correctamente.");
+        await AdminUserSeeder.SeedAdminUserAsync(services);
+        Console.WriteLine("Roles y usuario admin inicializados correctamente.");
     }
     catch (Exception ex)
     {
