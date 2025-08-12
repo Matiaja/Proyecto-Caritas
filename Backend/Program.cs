@@ -33,7 +33,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(
     c =>
     {
-        c.SwaggerDoc("v1", new() { Title = "NEXO-Caritas", Version = "v1" });
+        c.SwaggerDoc("v1", new() { Title = "Tu API", Version = "v1" });
 
         c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
         {
@@ -154,25 +154,20 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Seed the database with initial data
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
-        // This is your existing code
         var dbContext = services.GetRequiredService<ApplicationDbContext>();
         await RoleInitializer.CreateRoles(services);
-        Console.WriteLine("Roles inicializados con éxito.");
-
-        // Add this line to seed the admin user right after roles
         await AdminUserSeeder.SeedAdminUserAsync(services);
-        Console.WriteLine("Usuario administrador inicializado con éxito.");
+        Console.WriteLine("Roles y usuario admin inicializados correctamente.");
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Se ha producido un error durante la inicialización de la base de datos.");
+        logger.LogError(ex, "Ocurrió un error durante la inicialización de roles.");
     }
 }
 

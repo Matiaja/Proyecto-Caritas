@@ -34,27 +34,29 @@ namespace ProyectoCaritas.Controllers
 
             var faker = new Faker("es");
 
-            // 1. Seed Categories
+            // 1. Seed Categories (with unique names)
             var categories = new Faker<Category>("es")
                 .RuleFor(c => c.Name, f => f.Commerce.Categories(1)[0])
                 .RuleFor(c => c.Description, f => f.Lorem.Sentence())
-                .Generate(5); // Reduced
+                .Generate(15)
+                .DistinctBy(c => c.Name)
+                .ToList();
             await _context.Categories.AddRangeAsync(categories);
             await _context.SaveChangesAsync();
 
-            // 2. Seed Centers
+            // 2. Seed Centers (with fixed capacity)
             var centers = new Faker<Center>("es")
                 .RuleFor(c => c.Name, f => f.Company.CompanyName())
                 .RuleFor(c => c.Location, f => f.Address.FullAddress())
                 .RuleFor(c => c.Manager, f => f.Name.FullName())
-                .RuleFor(c => c.CapacityLimit, f => f.Random.Int(50, 200))
+                .RuleFor(c => c.CapacityLimit, 1000) // Rule changed
                 .RuleFor(c => c.Phone, f => f.Phone.PhoneNumber())
                 .RuleFor(c => c.Email, f => f.Internet.Email())
-                .Generate(3); // Reduced
+                .Generate(3);
             await _context.Centers.AddRangeAsync(centers);
             await _context.SaveChangesAsync();
 
-            // 3. Seed Users (non-admin)
+            // 3. Seed Users
             var usersToCreate = new Faker<User>("es")
                 .RuleFor(u => u.UserName, (f, u) => f.Internet.UserName(u.FirstName, u.LastName))
                 .RuleFor(u => u.Email, (f, u) => f.Internet.Email(u.FirstName, u.LastName))
@@ -62,7 +64,7 @@ namespace ProyectoCaritas.Controllers
                 .RuleFor(u => u.LastName, f => f.Name.LastName())
                 .RuleFor(u => u.Role, "User")
                 .RuleFor(u => u.CenterId, f => f.Random.ListItem(centers).Id)
-                .Generate(10); // Reduced
+                .Generate(10);
 
             var createdUsers = new List<User>();
             foreach (var user in usersToCreate)
@@ -85,28 +87,29 @@ namespace ProyectoCaritas.Controllers
                 .RuleFor(p => p.Name, f => f.Commerce.ProductName())
                 .RuleFor(p => p.Code, f => f.Commerce.Ean13())
                 .RuleFor(p => p.CategoryId, f => f.Random.ListItem(categories).Id)
-                .Generate(10); // Reduced
+                .Generate(10);
             await _context.Products.AddRangeAsync(products);
             await _context.SaveChangesAsync();
 
-            // 5. Seed Requests & OrderLines
+            // 5. Seed Requests (with new rules)
             var orderLineFaker = new Faker<OrderLine>("es")
                 .RuleFor(ol => ol.ProductId, f => f.Random.ListItem(products).Id)
                 .RuleFor(ol => ol.Quantity, f => f.Random.Int(1, 5))
+                .RuleFor(ol => ol.Description, f => f.Lorem.Sentence()) // Rule added
                 .RuleFor(ol => ol.Status, "Pendiente");
 
             var requests = new Faker<Request>("es")
                 .RuleFor(r => r.RequestingCenterId, f => f.Random.ListItem(centers).Id)
-                .RuleFor(r => r.UrgencyLevel, f => f.Random.ListItem(new List<string> { "Baja", "Media", "Alta", "Crítica" }))
+                .RuleFor(r => r.UrgencyLevel, f => f.Random.ListItem(new List<string> { "Alto", "Bajo" })) // Rule changed
                 .RuleFor(r => r.RequestDate, f => f.Date.Past(2))
                 .RuleFor(r => r.OrderLines, f => orderLineFaker.Generate(f.Random.Int(1, 2)).ToList())
-                .Generate(10); // Reduced
+                .Generate(10);
             await _context.Requests.AddRangeAsync(requests);
             await _context.SaveChangesAsync();
 
             var allOrderLines = await _context.OrderLines.ToListAsync();
 
-            // 6. Seed DonationRequests & Status
+            // 6. Seed DonationRequests
             var donationRequestStatusFaker = new Faker<DonationRequestStatus>("es")
                 .RuleFor(s => s.Status, f => f.Random.ListItem(new List<string> { "Pendiente", "Aceptada", "Enviada", "Recibida" }))
                 .RuleFor(s => s.ChangeDate, f => f.Date.Recent());
@@ -118,11 +121,11 @@ namespace ProyectoCaritas.Controllers
                 .RuleFor(dr => dr.AssignmentDate, f => f.Date.Recent())
                 .RuleFor(dr => dr.Status, "Pendiente")
                 .RuleFor(dr => dr.StatusHistory, f => donationRequestStatusFaker.Generate(1).ToList())
-                .Generate(10); // Reduced
+                .Generate(10);
             await _context.DonationRequests.AddRangeAsync(donationRequests);
             await _context.SaveChangesAsync();
 
-            // 7. Seed Purchases and create corresponding 'Ingreso' Stock records
+            // 7. Seed Purchases (with new rules)
             var itemPurchaseFaker = new Faker<ItemPurchase>("es")
                 .RuleFor(ip => ip.ProductId, f => f.Random.ListItem(products).Id)
                 .RuleFor(ip => ip.Quantity, f => f.Random.Int(10, 50))
@@ -131,8 +134,9 @@ namespace ProyectoCaritas.Controllers
             var purchases = new Faker<Purchase>("es")
                 .RuleFor(p => p.PurchaseDate, f => f.Date.Past(1))
                 .RuleFor(p => p.CenterId, f => f.Random.ListItem(centers).Id)
-                .RuleFor(p => p.Items, f => itemPurchaseFaker.Generate(f.Random.Int(1, 3)).ToList())
-                .Generate(10); // Reduced
+                .RuleFor(p => p.Type, f => f.Random.ListItem(new List<string> { "PNUD", "Diocesana", "General" })) // Rule added
+                .RuleFor(p => p.Items, f => itemPurchaseFaker.Generate(f.Random.Int(2, 5)).ToList()) // Rule changed
+                .Generate(10);
 
             await _context.Purchases.AddRangeAsync(purchases);
             await _context.SaveChangesAsync();
@@ -158,15 +162,14 @@ namespace ProyectoCaritas.Controllers
             await _context.Stocks.AddRangeAsync(ingresoStocks);
             await _context.SaveChangesAsync();
 
-
-            // 8. Seed Distributions and create corresponding 'Egreso' Stock records
+            // 8. Seed Distributions (with new rules)
             var allItemPurchases = await _context.ItemsPurchase.AsNoTracking().ToListAsync();
             var remainingQuantities = allItemPurchases.ToDictionary(ip => ip.Id, ip => ip.Quantity);
             var distributions = new List<Distribution>();
 
-            for (int i = 0; i < 15; i++) // Reduced
+            for (int i = 0; i < 15; i++)
             {
-                var availableItems = remainingQuantities.Where(rq => rq.Value > 0).ToList();
+                var availableItems = remainingQuantities.Where(rq => rq.Value > 1).ToList(); // Only items with more than 1 left can be distributed
                 if (!availableItems.Any()) break;
 
                 var randomItemPurchaseEntry = faker.Random.ListItem(availableItems);
@@ -181,7 +184,9 @@ namespace ProyectoCaritas.Controllers
                     .RuleFor(d => d.PersonDNI, f => f.Random.Replace("########"))
                     .Generate();
 
-                var quantityToDistribute = faker.Random.Int(1, remainingQuantities[itemPurchaseId]);
+                // Quantity must be strictly less than remaining
+                var maxQuantity = remainingQuantities[itemPurchaseId] - 1;
+                var quantityToDistribute = faker.Random.Int(1, maxQuantity);
 
                 var itemDistribution = new ItemDistribution
                 {
@@ -234,11 +239,11 @@ namespace ProyectoCaritas.Controllers
                 .RuleFor(n => n.CreatedAt, f => f.Date.Past(1))
                 .RuleFor(n => n.IsRead, f => f.Random.Bool())
                 .RuleFor(n => n.Status, f => f.Random.ListItem(new List<string> { "Active", "Completed", "Expired" }));
-            var notifications = notificationFaker.Generate(10); // Reduced
+            var notifications = notificationFaker.Generate(10);
             await _context.Notifications.AddRangeAsync(notifications);
             await _context.SaveChangesAsync();
 
-            return Ok("Database seeded with a reduced volume of data (approx. 10 records per entity).");
+            return Ok("Database seeded with new validation rules applied.");
         }
     }
 }
