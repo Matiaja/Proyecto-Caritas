@@ -1,9 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PurchaseService } from '../../../services/purchase/purchase.service';
 import { ProductService } from '../../../services/product/product.service';
 import { GlobalStateService } from '../../../services/global/global-state.service';
+import { MatFormField, MatFormFieldModule, MatLabel } from '@angular/material/form-field';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-purchase-add',
@@ -12,9 +16,18 @@ import { GlobalStateService } from '../../../services/global/global-state.servic
     FormsModule,
     ReactiveFormsModule,
     CommonModule,
+    // Material Modules
+    MatFormField,
+    MatLabel,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatFormFieldModule,
+    MatInputModule,
+    FormsModule,
   ],
   templateUrl: './purchase-add.component.html',
-  styleUrl: './purchase-add.component.css'
+  styleUrl: './purchase-add.component.css',
+  encapsulation: ViewEncapsulation.None
 })
 export class PurchaseAddComponent implements OnInit {
   purchase: any = {

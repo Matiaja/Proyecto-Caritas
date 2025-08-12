@@ -7,12 +7,22 @@
   <form (ngSubmit)="submit()" #purchaseForm="ngForm">
     <div class="row mb-3 mt-3">
       <div class="col-md-4">
-        <span class="form-label">Fecha</span>
-        <input type="date" class="form-control" [(ngModel)]="purchase.purchaseDate" name="purchaseDate" required>
+        <mat-form-field appearance="outline" class="w-100 small-field">
+          <mat-label>Fecha</mat-label>
+          <input matInput [matDatepicker]="pickerDate" [(ngModel)]="purchase.purchaseDate" required>
+          <mat-datepicker-toggle matSuffix [for]="pickerDate"></mat-datepicker-toggle>
+          <mat-datepicker #pickerDate></mat-datepicker>
+        </mat-form-field>
+        <!-- <span class="form-label">Fecha</span>
+        <input type="date" class="form-control" [(ngModel)]="purchase.purchaseDate" name="purchaseDate" required> -->
       </div>
       <div class="col-md-4">
-        <span class="form-label">Tipo</span>
-        <input type="text" class="form-control" [(ngModel)]="purchase.type" name="type" required>
+        <mat-form-field appearance="outline" class="w-100 small-field">
+          <mat-label>Tipo</mat-label>
+          <input matInput type="text" [(ngModel)]="purchase.type" name="type" required>
+        </mat-form-field>
+        <!-- <span class="form-label">Tipo</span>
+        <input type="text" class="form-control" [(ngModel)]="purchase.type" name="type" required> -->
       </div>
       <!-- <div class="col-md-4">
         <label class="form-label">Centro</label>
@@ -21,32 +31,66 @@
         </select>
       </div> -->
     </div>
-    <div class="mt-3">
-    <h5>Productos Comprados</h5>
-    <div *ngFor="let item of purchase.items; let i = index" class="border rounded p-2 mb-2">
-      <div class="row g-2 align-items-end">
-        <div class="col-md-5">
-          <span class="form-label">Producto</span>
-          <select class="form-select" [(ngModel)]="item.productId" [name]="'productId' + i" required>
-            <option *ngFor="let p of products" [value]="p.id">{{ p.name }}</option>
-          </select>
-        </div>
-        <div class="col-md-2">
-          <span class="form-label">Cantidad</span>
-          <input type="number" class="form-control" [(ngModel)]="item.quantity" [name]="'quantity' + i" required>
-        </div>
-        <div class="col-md-4">
-          <span class="form-label">Descripción</span>
-          <input type="text" class="form-control" [(ngModel)]="item.description" [name]="'description' + i">
-        </div>
-        <div class="col-md-1 text-end">
-          <button type="button" class="btn btn-danger btn-sm" (click)="removeItem(i)">X</button>
-        </div>
+    <hr class="py-4">
+    <div class="mt-2">
+      <div class="card-header d-sm-flex justify-content-sm-between align-items-center">
+        <h6 class="mb-md-0">Detalle de la compra</h6>
       </div>
+    
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead class="table-light">
+            <tr>
+              <th style="width: 45%">Producto</th>
+              <th style="width: 15%">Cantidad</th>
+              <th style="width: 35%">Descripción</th>
+              <th style="width: 5%" class="text-center"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of purchase.items; let i = index">
+              <!-- Producto -->
+              <td>
+                <select class="form-select form-select-sm" [(ngModel)]="item.productId" [name]="'productId' + i" required>
+                  <option *ngFor="let p of products" [value]="p.id">{{ p.name }}</option>
+                </select>
+              </td>
+    
+              <!-- Cantidad -->
+              <td>
+                <input type="number" class="form-control form-control-sm" [(ngModel)]="item.quantity"
+                  [name]="'quantity' + i" required>
+              </td>
+    
+              <!-- Descripción -->
+              <td>
+                <input type="text" class="form-control form-control-sm" [(ngModel)]="item.description"
+                  [name]="'description' + i">
+              </td>
+    
+              <!-- Acción -->
+              <td class="text-center">
+                <button type="button" class="btn btn-sm btn-danger" (click)="removeItem(i)">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+    
+            <!-- Si no hay ítems -->
+            <tr *ngIf="purchase.items.length === 0">
+              <td colspan="4" class="text-center text-muted py-3">
+                No hay productos agregados
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    
+      <!-- Botón para agregar producto -->
+      <button type="button" class="btn btn-outline-primary btn-sm mt-2" (click)="addItem()">
+        + Agregar Producto
+      </button>
     </div>
-  </div>
-
-    <button type="button" class="btn btn-outline-primary" (click)="addItem()">+ Agregar Producto</button>
     <hr>
     <button type="submit" class="btn btn-success" [disabled]="!purchaseForm.form.valid">Guardar Compra</button>
   </form>

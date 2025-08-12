@@ -17,6 +17,7 @@
       <div class="col-md-8">
         <span class="form-label">Seleccionar Centro</span>
         <select class="form-select" [(ngModel)]="destinationValue">
+          <option value="" disabled selected>Seleccione un centro</option>
           <option *ngFor="let c of centers" [value]="c.id">{{ c.name }}</option>
         </select>
       </div>
@@ -58,7 +59,7 @@
    <div class="mt-3">
   <div class="card mb-3">
     <div class="card-header">
-      Ítems disponibles
+      Ítems de la compra
     </div>
     <div class="card-body p-0">
       <table class="table mb-0">
@@ -67,7 +68,7 @@
             <th class="fw-semibold" style="font-size: 14px;">Producto</th>
             <th class="fw-semibold text-center" style="font-size: 14px;">Disponible</th>
             <th class="fw-semibold text-center" style="font-size: 14px;">Cant. a entregar</th>
-            <th class="fw-semibold text-center" style="font-size: 14px;">Observaciones</th>
+            <th class="fw-semibold" style="font-size: 14px;">Observaciones</th>
           </tr>
         </thead>
         <tbody>
@@ -97,7 +98,7 @@
   <!-- Botones acción -->
   <div class="d-flex justify-content-end gap-2">
     <button class="btn btn-sm btn-secondary" (click)="cancel()">Cancelar</button>
-    <button class="btn btn-sm btn-primary" (click)="confirmDistribution()">Confirmar Entrega</button>
+    <button class="btn btn-sm btn-primary button-add" (click)="confirmDistribution()">Confirmar Entrega</button>
   </div>
 </div>
 </div>
