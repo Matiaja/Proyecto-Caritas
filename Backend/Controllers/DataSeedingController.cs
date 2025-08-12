@@ -146,6 +146,7 @@ namespace ProyectoCaritas.Controllers
                     ingresoStocks.Add(new Stock
                     {
                         CenterId = purchase.CenterId,
+                        Center = centers.First(c => c.Id == purchase.CenterId),
                         ProductId = item.ProductId,
                         Date = purchase.PurchaseDate,
                         Quantity = item.Quantity,
@@ -208,7 +209,8 @@ namespace ProyectoCaritas.Controllers
                     var originalItemPurchase = allItemPurchases.First(ip => ip.Id == item.ItemPurchaseId);
                     egresoStocks.Add(new Stock
                     {
-                        CenterId = dist.CenterId.Value, // Assuming destination center for the stock movement
+                        CenterId = dist.CenterId.Value,
+                        Center = centers.First(c => c.Id == dist.CenterId.Value),
                         ProductId = originalItemPurchase.ProductId,
                         Date = dist.DeliveryDate,
                         Quantity = item.Quantity,
