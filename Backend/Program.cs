@@ -154,20 +154,25 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Seed the database with initial data
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
+        // This is your existing code
         var dbContext = services.GetRequiredService<ApplicationDbContext>();
         await RoleInitializer.CreateRoles(services);
+        Console.WriteLine("Roles inicializados con éxito.");
+
+        // Add this line to seed the admin user right after roles
         await AdminUserSeeder.SeedAdminUserAsync(services);
-        Console.WriteLine("Roles y usuario admin inicializados correctamente.");
+        Console.WriteLine("Usuario administrador inicializado con éxito.");
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Ocurrió un error durante la inicialización de roles.");
+        logger.LogError(ex, "Se ha producido un error durante la inicialización de la base de datos.");
     }
 }
 

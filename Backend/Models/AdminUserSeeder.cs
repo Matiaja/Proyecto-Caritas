@@ -1,38 +1,45 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
 using ProyectoCaritas.Models.Entities;
-using System;
-using System.Threading.Tasks;
 
-namespace ProyectoCaritas.Models
+namespace ProyectoCaritas.Data
 {
     public static class AdminUserSeeder
     {
-        public static async Task SeedAdminUserAsync(IServiceProvider services)
+        public static async Task SeedAdminUserAsync(IServiceProvider serviceProvider)
         {
-            var userManager = services.GetRequiredService<UserManager<User>>();
+            var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-            // Check if the admin user already exists
-            if (await userManager.FindByNameAsync("admin") == null)
+            string adminRole = "Admin";
+            string adminUsername = "admin";
+            string adminPassword = "superadmin10";
+
+            // Step 1: Ensure the "Admin" role exists
+            if (!await roleManager.RoleExistsAsync(adminRole))
             {
-                // Create the admin user
-                var adminUser = new User
+                await roleManager.CreateAsync(new IdentityRole(adminRole));
+            }
+
+            // Step 2: Check if the admin user already exists
+            if (await userManager.FindByNameAsync(adminUsername) == null)
+            {
+                // Step 3: Create the new admin user
+                User adminUser = new User
                 {
-                    UserName = "admin",
-                    Email = "admin@example.com", // Bogus email, can be configured
+                    UserName = adminUsername,
+                    Email = "admin@caritas.com", // You can set a default email
                     FirstName = "Super",
                     LastName = "Admin",
-                    Role = "Admin",
-                    EmailConfirmed = true // Confirm email immediately
+                    Role = adminRole,
+                    EmailConfirmed = true // Automatically confirm the email
                 };
 
-                // Create the user with the specified password
-                var result = await userManager.CreateAsync(adminUser, "superadmin10");
+                IdentityResult result = await userManager.CreateAsync(adminUser, adminPassword);
 
+                // Step 4: Assign the "Admin" role to the new user
                 if (result.Succeeded)
                 {
-                    // Assign the 'Admin' role to the user
-                    await userManager.AddToRoleAsync(adminUser, "Admin");
+                    await userManager.AddToRoleAsync(adminUser, adminRole);
                 }
             }
         }
