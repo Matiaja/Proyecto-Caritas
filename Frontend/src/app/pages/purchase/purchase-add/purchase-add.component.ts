@@ -4,10 +4,13 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PurchaseService } from '../../../services/purchase/purchase.service';
 import { ProductService } from '../../../services/product/product.service';
 import { GlobalStateService } from '../../../services/global/global-state.service';
+import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
 
 @Component({
   selector: 'app-purchase-add',
   standalone: true,
+  providers: [{provide: MAT_DATE_LOCALE, useValue: 'es-AR'},
+  provideNativeDateAdapter()],
   imports: [
     FormsModule,
     ReactiveFormsModule,
@@ -47,7 +50,12 @@ export class PurchaseAddComponent implements OnInit {
   }
 
   submit() {
-    this.purchaseService.createPurchase(this.purchase).subscribe({
+    const purchaseToSend = {
+      ...this.purchase,
+      purchaseDate: this.purchase.purchaseDate
+    };
+
+    this.purchaseService.createPurchase(purchaseToSend).subscribe({
       next: res => {
         alert('Compra registrada correctamente');
         this.purchase = { purchaseDate: '', type: '', centerId: this.globalStateService.getCurrentCenterId(), items: [] };

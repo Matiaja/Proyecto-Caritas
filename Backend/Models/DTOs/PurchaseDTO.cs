@@ -5,7 +5,7 @@ namespace ProyectoCaritas.Models.DTOs;
 public class PurchaseDTO
 {
     public int Id { get; set; }
-    public DateTime PurchaseDate { get; set; }
+    public string PurchaseDate { get; set; }
     public string Type { get; set; }
     public int CenterId { get; set; }
     public string CenterName { get; set; }
@@ -15,7 +15,7 @@ public class PurchaseDTO
     public PurchaseDTO(Purchase purchase)
     {
         Id = purchase.Id;
-        PurchaseDate = purchase.PurchaseDate;
+        PurchaseDate = purchase.PurchaseDate.ToString("dd/MM/yyyy");
         Type = purchase.Type;
         CenterId = purchase.CenterId;
         CenterName = purchase.Center?.Name ?? "";
