@@ -8,10 +8,13 @@ import { MatFormField, MatFormFieldModule, MatLabel } from '@angular/material/fo
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
+import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
 
 @Component({
   selector: 'app-purchase-add',
   standalone: true,
+  providers: [{provide: MAT_DATE_LOCALE, useValue: 'es-AR'},
+  provideNativeDateAdapter()],
   imports: [
     FormsModule,
     ReactiveFormsModule,
@@ -60,7 +63,12 @@ export class PurchaseAddComponent implements OnInit {
   }
 
   submit() {
-    this.purchaseService.createPurchase(this.purchase).subscribe({
+    const purchaseToSend = {
+      ...this.purchase,
+      purchaseDate: this.purchase.purchaseDate
+    };
+
+    this.purchaseService.createPurchase(purchaseToSend).subscribe({
       next: res => {
         alert('Compra registrada correctamente');
         this.purchase = { purchaseDate: '', type: '', centerId: this.globalStateService.getCurrentCenterId(), items: [] };

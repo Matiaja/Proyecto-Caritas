@@ -56,9 +56,12 @@ public class PurchasesController : ControllerBase
         if (dto.Items == null || !dto.Items.Any())
             return BadRequest("La compra debe incluir al menos un ítem.");
 
+        if (!DateTime.TryParse(dto.PurchaseDate, out var parsedDate))
+            return BadRequest("Fecha inválida");
+
         var purchase = new Purchase
         {
-            PurchaseDate = dto.PurchaseDate,
+            PurchaseDate = parsedDate.Date,
             Type = dto.Type,
             CenterId = dto.CenterId,
             Items = dto.Items.Select(i => new ItemPurchase

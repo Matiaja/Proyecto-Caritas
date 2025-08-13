@@ -9,6 +9,7 @@ namespace ProyectoCaritas.Models.Entities
     public class Purchase
     {
         public int Id { get; set; }
+        [Column(TypeName = "date")]
         public DateTime PurchaseDate { get; set; } // Fecha de compra
         public string Type { get; set; } = "General"; // Tipo de compra (e.g., "PNUD", "Diocesana")
         public int CenterId { get; set; } // FK a Centro

@@ -42,14 +42,7 @@ export class PurchaseComponent implements OnInit {
 
   ngOnInit(): void {
     this.purchaseService.getAll().subscribe(purchases => {
-      this.purchases = purchases.map(purchase => ({
-        ...purchase,
-        purchaseDate: new Date(purchase.purchaseDate).toLocaleDateString('es-ES', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-          })
-      }));
+      this.purchases = purchases;
     });
   }
 
