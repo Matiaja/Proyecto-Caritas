@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CenterModel } from '../../models/center.model';
 import { CenterService } from '../../services/center/center.service';
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { UiTableComponent } from '../../shared/components/ui-table/ui-table.component';
 import { Router } from '@angular/router';
 import { ConfirmModalService } from '../../services/confirmModal/confirm-modal.service';
@@ -60,10 +61,22 @@ export class CenterComponent implements OnInit {
     );
 
     if (confirmed) {
-      this.centerService.deleteCenter(center.id).subscribe(() => {
+    this.centerService.deleteCenter(center.id).subscribe({
+      next: (response: any) => {
+        // --- THIS CODE RUNS ONLY ON SUCCESS (e.g., status 200 OK) ---
+        // The success toastr is now INSIDE the success block.
+        this.toastr.success(response.message || 'Centro eliminado correctamente', 'Éxito');
+        
+        // The list is updated only after a successful deletion.
         this.centers = this.centers.filter((p) => p.id !== center.id);
-      });
-      this.toastr.success('Centro eliminado correctamente');
+      },
+      error: (err: HttpErrorResponse) => {
+        // --- THIS CODE RUNS ONLY ON FAILURE (e.g., status 409, 500) ---
+        // We show the specific error message from the API.
+        const errorMessage = err.error?.message || 'Ocurrió un error al eliminar el centro.';
+        this.toastr.error(errorMessage, 'Error');
+      }
+    });
     }
   }
 

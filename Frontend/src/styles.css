@@ -35,3 +35,10 @@ table tr.bg-danger-light {
   --bs-table-bg: rgba(220, 53, 69, 0.1) !important;
   background-color: rgba(220, 53, 69, 0.1) !important;
 }
+
+/* This style will add a red asterisk after any label that has the 'required' class */
+label.required::after {
+  content: ' *'; /* The space before the asterisk is important */
+  color: #ae3336; /* Using the red color from your project's theme */
+  font-weight: bold;
+}

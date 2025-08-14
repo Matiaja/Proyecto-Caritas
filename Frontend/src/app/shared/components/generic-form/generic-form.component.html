@@ -5,7 +5,7 @@
     </div>
     <form [formGroup]="form" class="py-3 px-2" (ngSubmit)="onSubmit()">
       <div class="form-group mb-3" *ngFor="let field of data.fields">
-        <label [for]="field.name" class="form-label">{{ field.label }}</label>
+        <label [for]="field.name" [class.required]="isRequired(field)">{{ field.label }}</label>
         <ng-container [ngSwitch]="field.type">
           <!-- Campo de texto -->
           <input

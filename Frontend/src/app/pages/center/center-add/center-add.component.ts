@@ -23,7 +23,7 @@ export class CenterAddComponent {
         type: 'text',
         value: '',
         placeholder: 'Ingrese el nombre del centro',
-        validators: [Validators.required],
+        validators: [Validators.required, Validators.pattern(/\S/)],
         errorMessage: 'El nombre del centro es requerido',
       },
       {
@@ -32,7 +32,7 @@ export class CenterAddComponent {
         type: 'text',
         value: '',
         placeholder: 'Ingrese la ubicación',
-        validators: [Validators.required],
+        validators: [Validators.required, Validators.pattern(/\S/)],
         errorMessage: 'La ubicación es requerida',
       },
       {
@@ -41,7 +41,7 @@ export class CenterAddComponent {
         type: 'text',
         value: '',
         placeholder: 'Nombre del encargado',
-        validators: [Validators.required],
+        validators: [Validators.required, Validators.pattern(/\S/)],
         errorMessage: 'El nombre del encargado es requerido',
       },
       {
@@ -59,8 +59,8 @@ export class CenterAddComponent {
         type: 'text',
         value: '',
         placeholder: 'Ingrese el teléfono de contacto',
-        validators: [Validators.required],
-        errorMessage: 'El teléfono es requerido',
+        validators: [Validators.required, Validators.pattern(/^[0-9]+$/)],
+        errorMessage: 'El número de teléfono es requerido',
       },
       {
         name: 'email',
@@ -68,7 +68,7 @@ export class CenterAddComponent {
         type: 'email',
         value: '',
         placeholder: 'Ingrese el correo electrónico (opcional)',
-        validators: [Validators.email],
+        validators: [Validators.email, Validators.pattern(/\S/)],
         errorMessage: '',
       },
     ],
