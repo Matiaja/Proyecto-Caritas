@@ -69,16 +69,7 @@ git clone URL_DEL_REPOSITORIO_AQUÍ
 cd NOMBRE_DE_LA_CARPETA_DEL_PROYECTO
 ```
 
-**2. Configuración de la Base de Datos (MySQL)**
-
-1.  Abre MySQL Workbench y crea un nuevo *schema* (base de datos).
-    ```sql
-    CREATE SCHEMA `caritas_db`;
-    ```
-2.  Ejecuta el script SQL para crear la estructura de tablas de la aplicación. El script se encuentra en: `Backend/Data/Scripts/script.sql`.
-      * En MySQL Workbench, selecciona el schema `caritas_db`, ve a `File > Open SQL Script...`, abre el archivo y ejecútalo.
-
-**3. Configuración del Backend (.NET)**
+**2. Configuración del Backend (.NET)**
 
 1.  Abre la solución `ProyectoCaritas.sln` (ubicada en la carpeta `Backend/`) con Visual Studio 2022. Los paquetes NuGet deberían restaurarse automáticamente.
 
@@ -125,7 +116,7 @@ cd NOMBRE_DE_LA_CARPETA_DEL_PROYECTO
 
 4.  Ejecuta el backend desde Visual Studio (presionando F5 o el botón de Play). La API se iniciará y se abrirá una ventana de Swagger. Anota la URL (ej: `https://localhost:7185`).
 
-**4. Configuración del Frontend (Angular)**
+**3. Configuración del Frontend (Angular)**
 
 1.  Abre una terminal en la carpeta `Frontend/`.
 
