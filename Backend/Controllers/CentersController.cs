@@ -72,6 +72,25 @@ namespace ProyectoCaritas.Controllers
                     Message = "Center data is missing."
                 });
             }
+            if (string.IsNullOrWhiteSpace(addCenterDto.Name) || string.IsNullOrWhiteSpace(addCenterDto.Location) || string.IsNullOrWhiteSpace(addCenterDto.Manager))
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "Name, Location, and Manager cannot be empty or just spaces."
+                });
+            }
+            // This regex ensures the phone contains only digits (0-9)
+            if (!System.Text.RegularExpressions.Regex.IsMatch(addCenterDto.Phone, @"^[0-9]+$"))
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "Phone number must contain only digits."
+                });
+            }
             var center = new Center
             {
                 Name = addCenterDto.Name,
@@ -126,14 +145,23 @@ namespace ProyectoCaritas.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCenter(int id)
         {
-            var center = _context.Centers.Find(id);
+            var center = await _context.Centers.FindAsync(id);
             if (center == null)
             {
                 return NotFound();
             }
-            _context.Centers.Remove(center);
-            await _context.SaveChangesAsync();
-            return NoContent();
+
+            try
+            {
+                _context.Centers.Remove(center);
+                await _context.SaveChangesAsync();
+                return Ok(new { message = "Centro eliminado con éxito." });
+            }
+            catch (DbUpdateException)
+            {
+                // Catches errors from the database, like foreign key violations
+                return Conflict(new { message = "Este centro no se puede eliminar porque está asociado a usuarios o registros existentes." });
+            }
         }
 
 

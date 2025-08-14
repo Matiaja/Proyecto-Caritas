@@ -139,4 +139,9 @@ export class GenericFormComponent implements OnChanges {
   onCancel(): void {
     this.formCancel.emit();
   }
+  
+  public isRequired(field: any): boolean {
+    // Checks if the validators array exists and includes Validators.required
+    return field.validators && field.validators.includes(Validators.required);
+  }
 }
