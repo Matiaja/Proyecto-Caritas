@@ -7,6 +7,7 @@ import { UiTableComponent } from '../../shared/components/ui-table/ui-table.comp
 import { Router } from '@angular/router';
 import { ConfirmModalService } from '../../services/confirmModal/confirm-modal.service';
 import { ToastrService } from 'ngx-toastr';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-center',
@@ -17,6 +18,18 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class CenterComponent implements OnInit {
   title = 'Centros';
+
+  sortBy = '';
+  order = 'asc';
+  sortOptions = [
+    { key: 'name', label: 'Nombre' },
+    { key: 'location', label: 'Ubicación' },
+    { key: 'manager', label: 'Encargado' },
+  ];
+  canEdit: boolean = false;
+  canDelete: boolean = false;
+  canAdd: boolean = false;
+
   columnHeaders: Record<string, string> = {
     name: 'Nombre',
     location: 'Ubicación',
@@ -26,26 +39,46 @@ export class CenterComponent implements OnInit {
   };
   displayedColumns = ['name', 'location', 'manager', 'phone', 'email'];
   centers: CenterModel[] = [];
-  //modalService: any;
 
   constructor(
     private centerService: CenterService,
     private router: Router,
     private modalService: ConfirmModalService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
-    this.centerService.getCenters().subscribe({
+    this.checkRole();
+    this.loadCenters();
+  }
+  
+  checkRole() {
+    const userRole = this.authService.getUserRole();
+    this.canEdit = userRole === 'Admin';
+    this.canDelete = userRole === 'Admin';
+    this.canAdd = userRole === 'Admin';
+  }
+
+  loadCenters() {
+    // Pass sortBy and order parameters to the service
+    this.centerService.getFilteredCenters(this.sortBy, this.order).subscribe({
       next: (centers: CenterModel[]) => {
         this.centers = centers;
       },
       error: (err) => {
+        // Using toastr for user-facing errors is better than console.log
+        this.toastr.error('No se pudieron cargar los centros.', 'Error');
         console.log(err);
       },
     });
   }
-
+  
+  onFilterChange(filters: { sortBy?: string; order?: string }) {
+    this.sortBy = filters.sortBy || '';
+    this.order = filters.order || 'asc';
+    this.loadCenters();
+  }
   onAddCenter() {
     this.router.navigate(['/centers/add']);
   }

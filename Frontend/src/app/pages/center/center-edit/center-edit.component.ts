@@ -27,7 +27,7 @@ export class CenterEditComponent implements OnInit {
         type: 'text',
         value: '',
         placeholder: 'Ingrese el nombre del centro',
-        validators: [Validators.required],
+        validators: [Validators.required, Validators.pattern(/\S/)],
         errorMessage: 'El nombre del centro es requerido',
       },
       {
@@ -36,7 +36,7 @@ export class CenterEditComponent implements OnInit {
         type: 'text',
         value: '',
         placeholder: 'Ingrese la ubicación',
-        validators: [Validators.required],
+        validators: [Validators.required, Validators.pattern(/\S/)],
         errorMessage: 'La ubicación es requerida',
       },
       {
@@ -45,7 +45,7 @@ export class CenterEditComponent implements OnInit {
         type: 'text',
         value: '',
         placeholder: 'Nombre del encargado',
-        validators: [Validators.required],
+        validators: [Validators.required, Validators.pattern(/\S/)],
         errorMessage: 'El nombre del encargado es requerido',
       },
       {
@@ -63,8 +63,8 @@ export class CenterEditComponent implements OnInit {
         type: 'text',
         value: '',
         placeholder: 'Ingrese el teléfono de contacto',
-        validators: [Validators.required],
-        errorMessage: 'El teléfono es requerido',
+        validators: [Validators.required, Validators.pattern(/^[0-9]+$/)],
+        errorMessage: 'El teléfono es requerido y solo debe contener números.',
       },
       {
         name: 'email',
@@ -104,7 +104,7 @@ export class CenterEditComponent implements OnInit {
             type: 'text',
             value: this.centerData.name,
             placeholder: 'Ingrese el nombre del centro',
-            validators: [Validators.required],
+            validators: [Validators.required, Validators.pattern(/\S/)],
             errorMessage: 'El nombre del centro es requerido',
           },
           {
@@ -113,7 +113,7 @@ export class CenterEditComponent implements OnInit {
             type: 'text',
             value: this.centerData.location,
             placeholder: 'Ingrese la ubicación',
-            validators: [Validators.required],
+            validators: [Validators.required, Validators.pattern(/\S/)],
             errorMessage: 'La ubicación es requerida',
           },
           {
@@ -122,7 +122,7 @@ export class CenterEditComponent implements OnInit {
             type: 'text',
             value: this.centerData.manager,
             placeholder: 'Nombre del encargado',
-            validators: [Validators.required],
+            validators: [Validators.required, Validators.pattern(/\S/)],
             errorMessage: 'El nombre del encargado es requerido',
           },
           {
@@ -140,8 +140,8 @@ export class CenterEditComponent implements OnInit {
             type: 'text',
             value: this.centerData.phone,
             placeholder: 'Ingrese el teléfono de contacto',
-            validators: [Validators.required],
-            errorMessage: 'El teléfono es requerido',
+            validators: [Validators.required, Validators.pattern(/^[0-9]+$/)],
+            errorMessage: 'El teléfono es requerido y solo debe contener números.',
           },
           {
             name: 'email',

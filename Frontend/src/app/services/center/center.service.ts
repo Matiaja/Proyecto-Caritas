@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CenterModel } from '../../models/center.model';
 
@@ -14,6 +14,22 @@ export class CenterService {
 
   getCenters(): Observable<CenterModel[]> {
     return this.http.get<CenterModel[]>(this.baseUrl + 'centers');
+  }
+  
+  getFilteredCenters(sortBy?: string, order?: string): Observable<CenterModel[]> {
+    // We use HttpParams to build the query string if parameters are provided.
+    let params = new HttpParams();
+    if (sortBy) {
+      params = params.set('sortBy', sortBy);
+    }
+    if (order) {
+      params = params.set('order', order);
+    }
+
+    // This now calls your new endpoint.
+    // Make sure the endpoint route in your C# controller matches 'centers/GetCentersByFilter'
+    // or whatever convention you have established.
+    return this.http.get<CenterModel[]>(this.baseUrl + 'centers/GetCentersByFilter', { params });
   }
   getCenter(id: number): Observable<any> {
     const token = localStorage.getItem('authUser');
