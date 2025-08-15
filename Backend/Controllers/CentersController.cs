@@ -34,6 +34,38 @@ namespace ProyectoCaritas.Controllers
                 .ToListAsync();
         }
 
+        [HttpGet("GetCentersByFilter")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<GetCenterDTO>>> GetCentersByFilter([FromQuery] string? sortBy, [FromQuery] string? order)
+        {
+            // Start with IQueryable to build the query dynamically
+            var query = _context.Centers.AsQueryable();
+
+            // Apply sorting before fetching the data
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                var isAsc = string.IsNullOrEmpty(order) || order.ToLower() == "asc";
+                query = sortBy.ToLower() switch
+                {
+                    "name" => isAsc ? query.OrderBy(c => c.Name) : query.OrderByDescending(c => c.Name),
+                    "location" => isAsc ? query.OrderBy(c => c.Location) : query.OrderByDescending(c => c.Location),
+                    "manager" => isAsc ? query.OrderBy(c => c.Manager) : query.OrderByDescending(c => c.Manager),
+                    _ => query
+                };
+            }
+
+            // Now, include related entities and project to DTOs
+            // The database will execute a single, efficient query
+            var result = await query
+                .Include(c => c.DonationRequests)
+                .Include(c => c.Stocks)
+                .Include(c => c.Users)
+                .Select(c => CenterToDto(c))
+                .ToListAsync();
+
+            return result;
+        }
+
         // GET: api/Centers/{id}
         [HttpGet("{id}")]
         [Authorize]

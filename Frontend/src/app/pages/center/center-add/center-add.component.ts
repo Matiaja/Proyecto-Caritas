@@ -91,7 +91,7 @@ export class CenterAddComponent {
     };
 
     this.centerService.createCenter(payload).subscribe(() => {
-      this.toastr.success('Centro creado correctamente', 'Exito');
+      this.toastr.success('Centro creado correctamente', 'Éxito');
       this.router.navigate(['/centers']);
     });
   }
