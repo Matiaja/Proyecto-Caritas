@@ -97,6 +97,53 @@ namespace ProyectoCaritas.Services
                     }
                 }
 
+                if (request.ChartImages != null && request.ChartImages.Count > 0)
+                {
+                    foreach (var chart in request.ChartImages)
+                    {
+                        if (string.IsNullOrWhiteSpace(chart.Base64)) continue;
+
+                        var raw = chart.Base64;
+                        var commaIdx = raw.IndexOf(",", StringComparison.Ordinal);
+                        if (raw.StartsWith("data:") && commaIdx > 0)
+                        {
+                            raw = raw[(commaIdx + 1)..];
+                        }
+                        try
+                        {
+                            var bytes = Convert.FromBase64String(raw);
+                            using var ms = new MemoryStream(bytes);
+                            var img = XImage.FromStream(() => ms);
+
+                            double maxWidth = page.Width - (margin * 2);
+                            double targetWidth = maxWidth * ((chart.WidthPercent.HasValue && chart.WidthPercent.Value > 0 && chart.WidthPercent.Value <= 100) ? chart.WidthPercent.Value / 100.0 : 1.0);
+                            double scale = targetWidth / img.PixelWidth * 72.0 / img.HorizontalResolution; // approximate DPI scaling
+                            double drawWidth = targetWidth;
+                            double drawHeight = img.PixelHeight * scale * img.HorizontalResolution / 72.0;
+
+                            if (yPoint + drawHeight + 40 > page.Height - bottomMargin)
+                            {
+                                NewPage(document, request.Orientation, ref page, ref gfx);
+                                yPoint = topMargin;
+                            }
+
+                            if (!string.IsNullOrEmpty(chart.Title))
+                            {
+                                var (cTitle, cFont) = FitText(gfx, chart.Title!.ToUpperInvariant(), boldFont, maxWidth, minSize: 8);
+                                gfx.DrawString(cTitle, cFont, XBrushes.Black, new XRect(margin, yPoint, maxWidth, 16), XStringFormats.TopLeft);
+                                yPoint += 18;
+                            }
+
+                            gfx.DrawImage(img, margin, yPoint, drawWidth, drawHeight);
+                            yPoint += (int)drawHeight + 20;
+                        }
+                        catch
+                        {
+                            // ignore invalid image
+                        }
+                    }
+                }
+
                 // Firmas SOLO en la última página
                 if (request.SignatureAreas != null && request.SignatureAreas.Count > 0)
                 {

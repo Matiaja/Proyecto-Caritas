@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ProyectoCaritas.Data; // Added to resolve ApplicationDbContext
+using ProyectoCaritas.Data;
 using ProyectoCaritas.Models.DTOs;
 using ProyectoCaritas.Models.Entities;
 

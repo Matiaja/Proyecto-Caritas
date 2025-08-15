@@ -6,7 +6,9 @@ import { CategoryService } from '../../services/category/category.service';
 import { ProductService } from '../../services/product/product.service';
 import { CenterService } from '../../services/center/center.service';
 import { AuthService } from '../../auth/auth.service';
-import { ChartData, ChartOptions } from 'chart.js';
+import { ChartData, ChartOptions, Chart, Plugin } from 'chart.js';
+import DataLabelsPlugin from 'chartjs-plugin-datalabels';
+import { PdfService } from '../../services/pdf/pdf.service';
 import { NgChartsModule } from 'ng2-charts';
 import { forkJoin } from 'rxjs';
 
@@ -67,6 +69,15 @@ export class HomeComponent implements OnInit {
           boxWidth: 12,
           font: { size: 11 }
         }
+      },
+      // @ts-ignore
+      datalabels: {
+        color: '#fff',
+        font: { size: 11, weight: 'bold' },
+        formatter: (value: any, ctx: any) => {
+          const total = (ctx.chart.data.datasets[0].data as number[]).reduce((s: number, n: number) => s + n, 0) || 1;
+          return value + ' (' + ((value / total) * 100).toFixed(1) + '%)';
+        }
       }
     }
   };
@@ -75,7 +86,15 @@ export class HomeComponent implements OnInit {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { display: false }
+      legend: { display: false },
+      // @ts-ignore - plugin key added dynamically
+      datalabels: {
+        anchor: 'end',
+        align: 'end',
+        color: '#36337f',
+        font: { size: 10, weight: 'bold' },
+        formatter: (value: any) => value
+      }
     },
     scales: {
       y: {
@@ -98,6 +117,14 @@ export class HomeComponent implements OnInit {
       legend: {
         position: 'top',
         labels: { font: { size: 11 } }
+      },
+      // @ts-ignore
+      datalabels: {
+        align: 'top',
+        anchor: 'end',
+        color: '#36337f',
+        font: { size: 9 },
+        formatter: (value: any) => value
       }
     },
     scales: {
@@ -121,6 +148,15 @@ export class HomeComponent implements OnInit {
           boxWidth: 12,
           font: { size: 11 }
         }
+      },
+      // @ts-ignore
+      datalabels: {
+        color: '#fff',
+        font: { size: 11, weight: 'bold' },
+        formatter: (value: any, ctx: any) => {
+          const total = (ctx.chart.data.datasets[0].data as number[]).reduce((s: number, n: number) => s + n, 0) || 1;
+          return value + ' (' + ((value / total) * 100).toFixed(1) + '%)';
+        }
       }
     }
   };
@@ -130,10 +166,14 @@ export class HomeComponent implements OnInit {
     private categoryService: CategoryService,
     private productService: ProductService,
     private centerService: CenterService,
-    private authService: AuthService
+  private authService: AuthService,
+  private pdfService: PdfService
   ) {}
 
   ngOnInit(): void {
+    if (!(Chart as any).registeredDataLabels) {
+      Chart.register(DataLabelsPlugin as unknown as Plugin); (Chart as any).registeredDataLabels = true;
+    }
     this.checkAdminRole();
     this.loadInitialData();
   }
@@ -158,15 +198,12 @@ export class HomeComponent implements OnInit {
       next: (responses) => {
         this.categories = responses[0].map((cat: any) => ({ id: cat.id, name: cat.name }));
         this.products = responses[1].map((prod: any) => ({ id: prod.id, name: prod.name }));
-        
         if (this.isAdmin && responses[2]) {
           this.centers = responses[2].map((center: any) => ({ id: center.id, name: center.name }));
         } else if (this.isAdmin) {
-          // If centers failed to load, set empty array and continue
           this.centers = [];
           console.warn('Centers could not be loaded, but continuing with dashboard');
         }
-        
         this.loadData();
       },
       error: (error) => {
@@ -335,6 +372,33 @@ export class HomeComponent implements OnInit {
         borderColor: '#ffffff'
       }]
     };
+  }
+
+  exportChartsToPdf(): void {
+    // Capture canvases
+    const charts: { title?: string; base64: string }[] = [];
+    const capture = (selector: string, title: string) => {
+      const el = document.querySelector(selector) as HTMLCanvasElement | null;
+      if (el) {
+        charts.push({ title, base64: el.toDataURL('image/png') });
+      }
+    };
+    capture('.chart-container:nth-of-type(1) canvas', 'Stock por Categoría');
+    capture('.chart-container:nth-of-type(2) canvas', 'Top 10 Productos');
+    if (this.shouldShowTimeChart()) capture('.chart-container:nth-of-type(3) canvas', 'Evolución en el Tiempo');
+    capture('.chart-container:nth-of-type(4) canvas', 'Ingresos vs Egresos');
+
+    const req = {
+      title: this.viewType === 'stock' ? 'Reporte de Stock' : 'Reporte de Movimientos',
+      subtitle: new Date().toLocaleString('es-AR'),
+      chartImages: charts.map(c => ({ title: c.title, base64: c.base64, widthPercent: 100 })),
+      footer: 'Generado automáticamente'
+    };
+
+    this.pdfService.generatePdf(req).subscribe({
+      next: (blob: Blob) => this.pdfService.openPdfInNewTab(blob),
+      error: (err: any) => console.error('Error generating charts PDF', err)
+    });
   }
 
   generateTopProductsChart(): void {
