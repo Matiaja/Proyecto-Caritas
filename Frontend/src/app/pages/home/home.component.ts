@@ -47,6 +47,9 @@ export class HomeComponent implements OnInit {
   fromDate?: string;
   toDate?: string;
 
+  // Selector de tipo: 'stock' o 'movimientos'
+  viewType: 'stock' | 'movimientos' = 'stock';
+
   // Chart Data
   pieChartData: ChartData<'pie'> = { labels: [], datasets: [] };
   barChartData: ChartData<'bar'> = { labels: [], datasets: [] };
@@ -205,31 +208,54 @@ export class HomeComponent implements OnInit {
 
   loadData(): void {
     this.isLoading = true;
-    
-    // Clear undefined values to ensure proper filtering
+
     const cleanCenterId = this.centerId === undefined ? undefined : this.centerId;
     const cleanCategoryId = this.categoryId === undefined ? undefined : this.categoryId;
     const cleanProductId = this.productId === undefined ? undefined : this.productId;
-    const cleanFromDate = this.fromDate === undefined || this.fromDate === '' ? undefined : this.fromDate;
-    const cleanToDate = this.toDate === undefined || this.toDate === '' ? undefined : this.toDate;
-    
-    this.stockReportService.getStockReport(
-      cleanCenterId,
-      cleanCategoryId, 
-      cleanProductId,
-      cleanFromDate, 
-      cleanToDate
-    ).subscribe({
+    const cleanFromDate = !this.fromDate ? undefined : this.fromDate;
+    const cleanToDate = !this.toDate ? undefined : this.toDate;
+
+    const obs = this.viewType === 'stock'
+      ? this.stockReportService.getStockReport(
+          cleanCenterId,
+          cleanCategoryId,
+            cleanProductId,
+          cleanFromDate,
+          cleanToDate
+        )
+      : this.stockReportService.getPurchaseDistributionReport(
+          cleanCenterId,
+          cleanCategoryId,
+          cleanProductId,
+          cleanFromDate,
+          cleanToDate
+        );
+
+    obs.subscribe({
       next: (data) => {
-        this.stockData = data;
+        // Normalize potential missing fields (defensive)
+        this.stockData = (data || []).map(item => ({
+          ...item,
+          totalIngresos: item.totalIngresos ?? 0,
+          totalEgresos: item.totalEgresos ?? 0,
+          totalStock: item.totalStock ?? (item.totalIngresos ?? 0) - (item.totalEgresos ?? 0),
+          lastMovementDate: item.lastMovementDate ?? new Date().toISOString(),
+          movementCount: item.movementCount ?? ((item.totalIngresos ?? 0) + (item.totalEgresos ?? 0))
+        }));
         this.generateCharts();
         this.isLoading = false;
       },
       error: (error) => {
         console.error('Error loading data:', error);
+        this.stockData = [];
+        this.generateCharts();
         this.isLoading = false;
       }
     });
+  }
+
+  onViewTypeChange(): void {
+    this.loadData();
   }
 
   onCenterChange(): void {
@@ -284,7 +310,11 @@ export class HomeComponent implements OnInit {
   generateCharts(): void {
     this.generateCategoryChart();
     this.generateTopProductsChart();
-    this.generateStockOverTimeChart();
+    if (this.shouldShowTimeChart()) {
+      this.generateStockOverTimeChart();
+    } else {
+      this.lineChartData = { labels: [], datasets: [] };
+    }
     this.generateIngresoEgresoChart();
   }
 
@@ -327,59 +357,59 @@ export class HomeComponent implements OnInit {
   }
 
   generateStockOverTimeChart(): void {
-    // Usar el servicio de histórico para obtener datos más precisos
+    if (!this.shouldShowTimeChart()) {
+      this.lineChartData = { labels: [], datasets: [] };
+      return;
+    }
+
     const cleanCenterId = this.centerId === undefined ? undefined : this.centerId;
     const cleanCategoryId = this.categoryId === undefined ? undefined : this.categoryId;
     const cleanProductId = this.productId === undefined ? undefined : this.productId;
-    const cleanFromDate = this.fromDate === undefined || this.fromDate === '' ? undefined : this.fromDate;
-    const cleanToDate = this.toDate === undefined || this.toDate === '' ? undefined : this.toDate;
-    
-    this.stockReportService.getStockHistory(
-      cleanCenterId,
-      cleanCategoryId,
-      cleanProductId,
-      cleanFromDate,
-      cleanToDate
-    ).subscribe({
+    const cleanFromDate = !this.fromDate ? undefined : this.fromDate;
+    const cleanToDate = !this.toDate ? undefined : this.toDate;
+
+    const history$ = this.viewType === 'stock'
+      ? this.stockReportService.getStockHistory(
+          cleanCenterId,
+          cleanCategoryId,
+          cleanProductId,
+          cleanFromDate,
+          cleanToDate
+        )
+      : this.stockReportService.getPurchaseDistributionHistory(
+          cleanCenterId,
+          cleanCategoryId,
+          cleanProductId,
+          cleanFromDate,
+          cleanToDate
+        ); 
+
+    history$.subscribe({
       next: (historyData) => {
+  console.log('[DEBUG] History data for', this.viewType, historyData);
         const grouped = this.groupStockHistoryByDate(historyData);
         const sorted = Object.entries(grouped).sort((a, b) => a[0].localeCompare(b[0]));
-        
         this.lineChartData = {
           labels: sorted.map(x => new Date(x[0]).toLocaleDateString()),
-          datasets: [{
+            datasets: [{
             data: sorted.map(x => x[1] as number),
-            label: 'Stock Acumulado',
+            label: this.viewType === 'stock' ? 'Stock Acumulado' : 'Movimientos Acumulados',
             borderColor: '#36337f',
-            backgroundColor: 'rgba(54, 51, 127, 0.1)',
+            backgroundColor: 'rgba(54,51,127,0.1)',
             fill: true,
             tension: 0.4
           }]
         };
       },
       error: (error) => {
-        console.error('Error loading stock history:', error);
-        // Fallback al método original si falla
+        console.error('Error loading history:', error);
         this.generateStockOverTimeChartFallback();
       }
     });
   }
 
-  generateStockOverTimeChartFallback(): void {
-    const grouped = this.groupByDate(this.stockData);
-    const sorted = Object.entries(grouped).sort((a, b) => a[0].localeCompare(b[0]));
-    
-    this.lineChartData = {
-      labels: sorted.map(x => new Date(x[0]).toLocaleDateString()),
-      datasets: [{
-        data: sorted.map(x => x[1] as number),
-        label: 'Stock Total',
-        borderColor: '#36337f',
-        backgroundColor: 'rgba(54, 51, 127, 0.1)',
-        fill: true,
-        tension: 0.4
-      }]
-    };
+  shouldShowTimeChart(): boolean {
+    return !!this.productId && (!this.isAdmin || !!this.centerId) && !!this.viewType;
   }
 
   generateIngresoEgresoChart(): void {
@@ -423,15 +453,16 @@ export class HomeComponent implements OnInit {
   }
 
   private groupStockHistoryByDate(arr: StockHistory[]): Record<string, number> {
-    // Agrupar por fecha y tomar el stock acumulado más reciente para cada fecha
-    const grouped = arr.reduce((acc, item) => {
+    return arr.reduce((acc, item) => {
       const date = item.stockDate.split('T')[0];
       if (!acc[date] || acc[date] < item.stockAcumulado) {
         acc[date] = item.stockAcumulado;
       }
       return acc;
     }, {} as Record<string, number>);
-    
-    return grouped;
+  }
+
+  private generateStockOverTimeChartFallback(): void {
+    this.lineChartData = { labels: [], datasets: [] };
   }
 }

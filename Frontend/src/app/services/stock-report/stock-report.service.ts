@@ -95,5 +95,45 @@ export class StockReportService {
 
     return this.http.get<StockHistory[]>(`${this.baseUrl}Stocks/stock-history`, { params });
   }
+
+  getPurchaseDistributionReport(
+    centerId?: number,
+    categoryId?: number,
+    productId?: number,
+    fromDate?: string,
+    toDate?: string
+  ): Observable<ProductStockSummary[]> {
+    const params: any = {};
+    if (centerId !== undefined) params.centerId = centerId;
+    if (categoryId !== undefined) params.categoryId = categoryId;
+    if (productId !== undefined) params.productId = productId;
+    if (fromDate) params.fromDate = fromDate;
+    if (toDate) params.toDate = toDate;
+    return this.http.get<ProductStockSummary[]>(`${this.baseUrl}reports/movements-report`, { params })
+      .pipe(map(res => {
+        console.log('[DEBUG] movements-report response:', res);
+        return res;
+      }));
+  }
+
+  getPurchaseDistributionHistory(
+    centerId?: number,
+    categoryId?: number,
+    productId?: number,
+    fromDate?: string,
+    toDate?: string
+  ): Observable<StockHistory[]> {
+    const params: any = {};
+    if (centerId !== undefined) params.centerId = centerId;
+    if (categoryId !== undefined) params.categoryId = categoryId;
+    if (productId !== undefined) params.productId = productId;
+    if (fromDate) params.fromDate = fromDate;
+    if (toDate) params.toDate = toDate;
+    return this.http.get<StockHistory[]>(`${this.baseUrl}reports/movements-history`, { params })
+      .pipe(map(res => {
+        console.log('[DEBUG] movements-history response:', res);
+        return res;
+      }));
+  }
 }
 
