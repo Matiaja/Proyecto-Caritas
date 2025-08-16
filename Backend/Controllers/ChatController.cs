@@ -109,7 +109,95 @@ namespace ProyectoCaritas.Controllers
                     - Ofrecé el siguiente paso concreto (""¿Generamos el PDF ahora?"" / ""¿Querés asignar productos a esta solicitud?"").
                     - No repitas información ya confirmada.
 
-                    Respondé siempre breve, accionable y adaptado al contexto conversado."
+                    Respondé siempre breve, accionable y adaptado al contexto conversado.
+
+                    [CONTEXTO Y FUNCIONALIDADES DETALLADAS DEL SISTEMA]
+
+                    **--- Elementos Comunes a Todas las Pantallas ---**
+                    - **Barra de Navegación (Superior):** Contiene los botones: 'Inicio', 'Solicitudes', 'Almacenamiento' (desplegable), 'Movimientos', 'Configuración' (desplegable), 'Notificaciones' (ícono de campana) y 'Mi Cuenta' (ícono de persona).
+                    - **Chatbot:** Un botón en la esquina inferior derecha para hablar contigo.
+
+                    **1. Pantalla de Login:**
+                    - **Objetivo:** Acceder al sistema.
+                    - **Campos:** 'Nombre de usuario' y 'Contraseña'.
+                    - **Acciones:**
+                        - **Botón de visualización de contraseña:** Un ícono de ojo junto al campo de contraseña para ver lo que se escribe.
+                        - **Botón 'Ingresar':** Inicia sesión si las credenciales son correctas.
+
+                    **2. Pantalla de Inicio (Dashboard):**
+                    - **Objetivo:** Muestra un resumen visual del estado del stock.
+                    - **Elementos:**
+                        - **Gráficos:** Flujo de Ingresos vs. Egresos, Stock por Categoría, Top 10 Productos con Mayor Stock, Evolución del Stock por Fecha.
+                    - **Acciones:**
+                        - **Botón 'Mostrar Filtros':** Permite filtrar los datos de los gráficos por fecha.
+                        - **Botón 'Imprimir':** Imprime la vista actual de los gráficos.
+
+                    **3. Pantalla de Solicitudes:**
+                    - **Objetivo:** Ver y gestionar las solicitudes de productos de los centros.
+                    - **Elementos:**
+                        - **Tabla de Solicitudes:** Cada fila es una solicitud con las columnas: 'Fecha de Solicitud', 'Centro/Parroquia', 'Estado' y 'Nivel de Urgencia'.
+                    - **Acciones:**
+                        - **Botón 'Mostrar Filtros':** Permite filtrar la tabla.
+                        - **Botón 'Agregar Nuevo':** Lleva al formulario para crear una nueva solicitud.
+                        - **Por cada solicitud (fila):**
+                            - **Botón 'Ver':** Abre la vista de detalle de la solicitud. Muestra la lista de productos pedidos y permite asignar productos desde un centro que tenga stock.
+                            - **Botón 'Finalizar':** Permite marcar una solicitud como completada.
+
+                    **4. Pantalla de Almacenamiento (Menú Desplegable):**
+
+                    **4.1. Almacén de Artículos:**
+                    - **Objetivo:** Ver el inventario de productos del centro del usuario.
+                    - **Elementos:**
+                        - **Tabla de Stock:** Cada fila es un producto en el almacén con las columnas: 'Nombre de Producto', 'Código', 'Cantidad' y 'Cantidad Disponible'.
+                    - **Acciones:**
+                        - **Botón 'Mostrar Filtros':** Permite filtrar los artículos de la tabla.
+                        - **Por cada artículo (fila):**
+                            - **Botón 'Ver':** Muestra el detalle del producto, incluyendo un historial de todos sus ingresos y egresos.
+                            - **Botón 'Generar PDF':** Dentro del detalle, permite crear un PDF con el historial de movimientos del producto.
+
+                    **4.2. Compras y Bolsones:**
+                    - **Objetivo:** Gestionar las compras de productos, especialmente las de origen estatal (PNUD).
+                    - **Elementos:**
+                        - **Tabla de Compras:** Cada fila es una compra con las columnas: 'Fecha', 'Tipo', 'Centro'.
+                    - **Acciones:**
+                        - **Botón 'Agregar Compra':** Abre un formulario para registrar una nueva compra con campos como 'Fecha', 'Tipo', 'Producto', 'Cantidad' y 'Descripción'. Permite agregar múltiples productos a una misma compra.
+                        - **Por cada compra (fila):**
+                            - **Botón 'Visualizar':** Muestra el detalle completo de la compra, con opción de imprimir.
+                            - **Botón 'Entregar':** Abre un formulario para registrar la entrega de esa compra a una persona o familia, registrando datos del receptor, cantidad entregada y observaciones.
+
+                    **5. Pantalla de Movimientos:**
+                    - **Objetivo:** Rastrear la transferencia de productos entre centros.
+                    - **Elementos:**
+                        - **Tabla de Movimientos:** Cada fila es un movimiento con las columnas: 'Desde' (origen), 'Hacia' (destino), 'Cantidad', 'Estado', 'Fecha'.
+                    - **Acciones:**
+                        - **Botón 'Mostrar Filtros':** Permite filtrar los movimientos.
+                        - **Por cada movimiento (fila):**
+                            - **Botón 'Ver':** Muestra el detalle completo y el historial del movimiento.
+
+                    **6. Pantalla de Configuración (Menú Desplegable - Solo para Admin):**
+
+                    **6.1. Usuarios:**
+                    - **Tabla de Usuarios:** Muestra 'Nombre de Usuario', 'Correo Electrónico', 'Centro'.
+                    - **Acciones:** 'Agregar Nuevo', 'Ver en Detalle', 'Eliminar'.
+
+                    **6.2. Centros:**
+                    - **Tabla de Centros:** Muestra todos los centros registrados.
+                    - **Acciones:** 'Agregar Nuevo', 'Ver', 'Editar', 'Eliminar'.
+
+                    **6.3. Productos:**
+                    - **Tabla de Productos:** Muestra 'Nombre', 'Código', 'Categoría', 'Stock'.
+                    - **Acciones:** 'Agregar Nuevo', 'Ver', 'Editar', 'Eliminar'.
+
+                    **6.4. Categorías:**
+                    - **Tabla de Categorías:** Muestra todas las categorías existentes.
+                    - **Acciones:** 'Agregar Nuevo', 'Ver', 'Editar', 'Eliminar'.
+
+                    **7. Iconos de la Barra de Navegación (Esquina Superior Derecha):**
+                    - **Notificaciones (Campana):** Muestra avisos sobre movimientos o solicitudes.
+                    - **Mi Cuenta (Ícono de Persona):** Despliega dos opciones:
+                        - **'Mis Datos':** Permite ver y editar la información personal del usuario.
+                        - **'Cerrar Sesión':** Cierra la sesión activa.
+                "
                 }
             }.Concat(groqMessages),
                     temperature = 0.7,
