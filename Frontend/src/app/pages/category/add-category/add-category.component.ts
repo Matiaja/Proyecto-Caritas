@@ -42,9 +42,26 @@ export class AddCategoryComponent {
   ) {}
 
   onSubmit(formData: any): void {
-    this.categoryService.createCategory(formData).subscribe(() => {
-      this.toastr.success('Categoría creada con éxito', 'Exito');
-      this.router.navigate(['/categories']);
+    // Trim whitespace from form data
+    formData.name = formData.name.trim();
+    formData.description = formData.description?.trim();
+    if (!formData.name) {
+      this.toastr.error('El nombre no puede estar vacío');
+      return;
+    }
+    this.categoryService.createCategory(formData).subscribe({
+      next: () => {
+        this.toastr.success('Categoría creada con éxito', 'Exito');
+        this.router.navigate(['/categories']);
+      },
+      error: (error) => {
+        if(error.status === 400 && error.error?.message) {
+          this.toastr.error(error.error.message, 'Error');
+        } else {
+          this.toastr.error('Error al crear la categoría', 'Error');
+        }
+        console.error('Error al crear la categoría:', error);
+      },
     });
   }
 

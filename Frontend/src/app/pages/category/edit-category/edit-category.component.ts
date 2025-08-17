@@ -4,6 +4,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CategoryService } from '../../../services/category/category.service';
 import { FormGroup } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-edit-category',
@@ -41,6 +42,7 @@ export class EditCategoryComponent implements OnInit {
 
   constructor(
     private categoryService: CategoryService,
+    private toastr: ToastrService,
     private router: Router,
     private route: ActivatedRoute,
     private fb: FormBuilder
@@ -80,8 +82,26 @@ export class EditCategoryComponent implements OnInit {
   }
 
   onSubmit(formData: any): void {
-    this.categoryService.updateCategory(this.categoryId, formData).subscribe(() => {
-      this.router.navigate(['/categories']);
+    // Trim whitespace from form data
+    formData.name = formData.name.trim();
+    formData.description = formData.description?.trim();
+    if (!formData.name) {
+      this.toastr.error('El nombre no puede estar vacío');
+      return;
+    }
+    this.categoryService.updateCategory(this.categoryId, formData).subscribe({
+      next: () => {
+        this.toastr.success('Categoría editada con éxito', 'Exito!');
+        this.router.navigate(['/categories']);
+      },
+      error: (error) => {
+        if(error.status === 400 && error.error?.message) {
+          this.toastr.error(error.error.message, 'Error');
+        } else {
+          this.toastr.error('Error al editar la categoría', 'Error');
+        }
+        console.error('Error al editar la categoría:', error);
+      },
     });
   }
 

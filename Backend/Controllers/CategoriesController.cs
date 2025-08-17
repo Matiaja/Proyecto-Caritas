@@ -70,10 +70,32 @@ namespace ProyectoCaritas.Controllers
                 });
             }
 
+            // Validate the name exists and is only words from a to z
+            if (string.IsNullOrWhiteSpace(addCategoryDto.Name))
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "El nombre de la categoría es obligatorio."
+                });
+            }
+            if (!System.Text.RegularExpressions.Regex.IsMatch(addCategoryDto.Name, @"^[a-zA-Z\s]+$"))
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "El nombre de la categoría solo puede contener letras y espacios."
+                });
+            }
+
+            // capitalize name
+            addCategoryDto.Name = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(addCategoryDto.Name.ToLower());
             var category = new Category
             {
-                Name = addCategoryDto.Name,
-                Description = addCategoryDto.Description
+                Name = addCategoryDto.Name.Trim(),
+                Description = addCategoryDto.Description?.Trim()
             };
 
             _context.Categories.Add(category);
@@ -98,8 +120,30 @@ namespace ProyectoCaritas.Controllers
                     Message = "Category not found."
                 });
             }
-            category.Name = updateCategoryDto.Name;
-            category.Description = updateCategoryDto.Description;
+            // Validate the name exists and is only words from a to z
+            if (string.IsNullOrWhiteSpace(updateCategoryDto.Name))
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "El nombre de la categoría es obligatorio."
+                });
+            }
+            if (!System.Text.RegularExpressions.Regex.IsMatch(updateCategoryDto.Name, @"^[a-zA-Z\s]+$"))
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "El nombre de la categoría solo puede contener letras y espacios."
+                });
+            }
+
+            // capitalize name
+            updateCategoryDto.Name = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(updateCategoryDto.Name.ToLower());
+            category.Name = updateCategoryDto.Name.Trim();
+            category.Description = updateCategoryDto.Description?.Trim();
             await _context.SaveChangesAsync();
             return NoContent();
         }
@@ -109,7 +153,10 @@ namespace ProyectoCaritas.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCategory(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
+            var category = await _context.Categories
+                .Include(c => c.Products)
+                .FirstOrDefaultAsync(c => c.Id == id);
+
             if (category == null)
             {
                 return NotFound(new
@@ -119,6 +166,10 @@ namespace ProyectoCaritas.Controllers
                     Message = "Category not found."
                 });
             }
+
+            if (category.Products?.Count != 0)
+                return BadRequest("No se puede eliminar la categoría porque tiene productos asociados.");
+
             _context.Categories.Remove(category);
             await _context.SaveChangesAsync();
             return NoContent();
