@@ -14,7 +14,7 @@ import { ToastrService } from 'ngx-toastr';
   styleUrl: './edit-category.component.css',
 })
 export class EditCategoryComponent implements OnInit {
-  categoryData: any;
+  categoryData: any = null;
   categoryId!: number;
   form!: FormGroup;
 

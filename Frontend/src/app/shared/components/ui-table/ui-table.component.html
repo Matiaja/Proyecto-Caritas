@@ -18,7 +18,7 @@
           <label>Categoría:</label>
           <select class="form-select w-auto" [(ngModel)]="selectedCategory" (change)="filterData()">
             <option [ngValue]="null">Todas</option>
-            <option *ngFor="let opc of statusOptions" [value]="opc">{{ opc }}</option>
+            <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
           </select>
 
           <label>Ordenar por:</label>

@@ -8,6 +8,7 @@ import { ProductService } from '../../../services/product/product.service';
 import { GlobalStateService } from '../../../services/global/global-state.service';
 import { FormsModule } from '@angular/forms';
 import { PdfService } from '../../../services/pdf/pdf.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-storage-detail',
@@ -17,6 +18,7 @@ import { PdfService } from '../../../services/pdf/pdf.service';
   styleUrl: './storage-detail.component.css',
 })
 export class StorageDetailComponent implements OnInit {
+  product: any = null; // Para almacenar los datos del producto
   stock: any[] = [
     {
       id: 0,
@@ -47,6 +49,7 @@ export class StorageDetailComponent implements OnInit {
     private router: Router,
     private location: Location,
     private globalStateService: GlobalStateService,
+    private toastr: ToastrService,
     private pdfService: PdfService
   ) {}
 
@@ -56,9 +59,22 @@ export class StorageDetailComponent implements OnInit {
       this.route.queryParams.subscribe((queryParams) => {
         const queryCenterId = queryParams['centerId'];
         this.centerId = queryCenterId ? +queryCenterId : this.globalStateService.getCurrentCenterId();
-        
+        this.loadProduct(productId);
         this.loadProductStockDetails(productId);
       });
+    });
+  }
+
+  loadProduct(productId: number): void {
+    this.productService.getProductById(productId).subscribe({
+      next: (product) => {
+        this.product = product; // Asignar datos del producto
+      },
+      error: (error) => {
+        this.toastr.error('Producto no encontrado', 'Error');
+        console.error('Error al cargar el producto:', error);
+        this.goBack();
+      },
     });
   }
 

@@ -168,7 +168,12 @@ namespace ProyectoCaritas.Controllers
             }
 
             if (category.Products?.Count != 0)
-                return BadRequest("No se puede eliminar la categoría porque tiene productos asociados.");
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "No se puede eliminar la categoría porque tiene productos asociados."
+                });
 
             _context.Categories.Remove(category);
             await _context.SaveChangesAsync();

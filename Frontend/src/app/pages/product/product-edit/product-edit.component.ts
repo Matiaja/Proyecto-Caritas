@@ -1,22 +1,24 @@
 import { Component, OnInit } from '@angular/core';
-import { GenericFormComponent } from '../../../shared/components/generic-form/generic-form.component';
-import { Router } from '@angular/router';
 import { Validators } from '@angular/forms';
-import { BreadcrumbComponent } from '../../../shared/components/breadcrumbs/breadcrumbs.component';
-import { ProductService } from '../../../services/product/product.service';
-import { CategoryService } from '../../../services/category/category.service';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { CategoryService } from '../../../services/category/category.service';
+import { ProductService } from '../../../services/product/product.service';
+import { GenericFormComponent } from "../../../shared/components/generic-form/generic-form.component";
 
 @Component({
-  selector: 'app-product-add',
+  selector: 'app-product-edit',
   standalone: true,
-  imports: [GenericFormComponent, BreadcrumbComponent],
-  templateUrl: './product-add.component.html',
-  styleUrl: './product-add.component.css',
+  imports: [GenericFormComponent],
+  templateUrl: './product-edit.component.html',
+  styleUrl: './product-edit.component.css'
 })
-export class ProductAddComponent implements OnInit {
+export class ProductEditComponent implements OnInit {
+  productData: any = null;
+  productId!: number;
+
   formConfig = {
-    title: 'Agregar Producto',
+    title: 'Editar producto',
     fields: [
       {
         name: 'name',
@@ -53,11 +55,42 @@ export class ProductAddComponent implements OnInit {
     private categoryService: CategoryService,
     private productService: ProductService,
     private router: Router,
+    private route: ActivatedRoute,
     private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
+    this.productId = Number(this.route.snapshot.paramMap.get('id'));
     this.loadCategories();
+    this.loadProductData();
+  }
+
+  loadProductData(): void {
+    this.productService.getProductById(this.productId).subscribe({
+      next: (product) => {
+        this.productData = product;
+
+        // Create a new formConfig object with updated values
+        this.formConfig = {
+          ...this.formConfig,
+          fields: this.formConfig.fields.map((field: any) => ({
+            ...field,
+            value:
+              field.name === 'name'
+                ? this.productData.name
+                : field.name === 'code'
+                ? this.productData.code
+                : field.name === 'category'
+                ? this.productData.categoryId
+                : field.value,
+          }))};
+      },
+      error: (error) => {
+        this.toastr.error('Producto no encontrado', 'Error');
+        console.error('Error loading product data:', error);
+        this.onCancel();
+      }
+    });
   }
 
   loadCategories(): void {
@@ -84,18 +117,18 @@ export class ProductAddComponent implements OnInit {
       this.toastr.error('El nombre del producto es obligatorio');
       return;
     }
-    this.productService.createProduct(payload).subscribe({
+    this.productService.editProduct(this.productId, payload).subscribe({
       next: () => {
-        this.toastr.success('Producto creado con éxito', 'Exito');
+        this.toastr.success('Producto editado con éxito', 'Exito');
         this.router.navigate(['/products']);
       },
       error: (error) => {
         if (error.error && error.error.message) {
           this.toastr.error(error.error.message, 'Error');
         } else {
-          this.toastr.error('Error al crear el producto', 'Error');
+          this.toastr.error('Error al editar el producto', 'Error');
         }
-        console.error('Error creating product:', error);
+        console.error('Error on edit product:', error);
       },
     });
   }

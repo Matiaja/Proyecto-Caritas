@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using System.Globalization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -191,6 +192,17 @@ namespace ProyectoCaritas.Controllers
                 });
             }
 
+            // Validate the name exists and is only words from a to z
+            if (string.IsNullOrWhiteSpace(prod.Name))
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "El nombre del producto es obligatorio."
+                });
+            }
+
             // Verificar que la categoría exista
             var category = await context.Categories.FindAsync(prod.CategoryId);
             if (category == null)
@@ -203,13 +215,27 @@ namespace ProyectoCaritas.Controllers
                 });
             }
 
+            // Verificar que el código del producto sea único
+            if (!string.IsNullOrWhiteSpace(prod.Code) && await context.Products.AnyAsync(p => p.Code == prod.Code))
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "Ya existe un producto con el mismo código."
+                });
+            }
+
+            // Capitalize name
+            prod.Name = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(prod.Name.ToLower());
+
             // Crear la entidad Product a partir del DTO
             var product = new Product
             {
-                Name = prod.Name,
+                Name = prod.Name.Trim(),
                 CategoryId = prod.CategoryId,
                 Category = category,
-                Code = prod.Code
+                Code = prod.Code?.Trim()
             };
 
             // Agregar el producto al contexto
@@ -228,17 +254,6 @@ namespace ProyectoCaritas.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<ProductDTO>> UpdateProduct(int id, ProductDTO productDTO)
         {
-            // Validar que el ID del producto en el DTO coincida con el ID del parámetro
-            if (id != productDTO.Id)
-            {
-                return BadRequest(new
-                {
-                    Status = "400",
-                    Error = "Bad Request",
-                    Message = "IDs no coinciden en la solicitud."
-                });
-            }
-
             // Buscar el producto existente en la base de datos
             var product = await context.Products.FindAsync(id);
             if (product == null)
@@ -251,7 +266,27 @@ namespace ProyectoCaritas.Controllers
                 });
             }
 
-            // Validar que la categoría proporcionada exista
+            // Validate the name exists and is only words from a to z
+            if (string.IsNullOrWhiteSpace(productDTO.Name))
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "El nombre del producto es obligatorio."
+                });
+            }
+            if (!System.Text.RegularExpressions.Regex.IsMatch(productDTO.Name, @"^[a-zA-Z\s]+$"))
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "El nombre del producto solo puede contener letras y espacios."
+                });
+            }
+
+            // Verificar que la categoría exista
             var category = await context.Categories.FindAsync(productDTO.CategoryId);
             if (category == null)
             {
@@ -263,9 +298,23 @@ namespace ProyectoCaritas.Controllers
                 });
             }
 
+            // Verificar que el código del producto sea único
+            if (!string.IsNullOrWhiteSpace(productDTO.Code) && await context.Products.AnyAsync(p => p.Code == productDTO.Code && p.Id != id))
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "Ya existe un producto con el mismo código."
+                });
+            }
+
+            // Capitalize name
+            productDTO.Name = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(productDTO.Name.ToLower());
+
             // Actualizar las propiedades del producto
-            product.Name = productDTO.Name;
-            product.Code = productDTO.Code;
+            product.Name = productDTO.Name.Trim();
+            product.Code = productDTO.Code?.Trim();
             product.CategoryId = productDTO.CategoryId;
             product.Category = category;
 

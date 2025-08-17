@@ -73,6 +73,7 @@ export class ProductComponent implements OnInit {
 
   loadCategories() {
     this.categoryService.categories$.subscribe((categories) => {
+      console.log('Categorías recibidas:', categories);
       this.categories = categories;
     });
     this.categoryService.getCategories();
@@ -123,7 +124,9 @@ export class ProductComponent implements OnInit {
     this.router.navigate(['/products/add']);
   }
 
-  // onEditProduct(product: any) {}
+  onEditProduct(product: any) {
+    this.router.navigate(['/products/edit', product.id]);
+  }
 
   onSelectProduct(product: any) {
     this.router.navigate(['/storage/detail', product.id]);
