@@ -40,7 +40,13 @@
                 formControlName="product"
                 placeholder="Buscar producto..."
                 (input)="searchProduct($event)"
+                [class.is-invalid]="formGroup2.get('product')?.invalid && (formGroup2.get('product')?.touched || formGroup2.get('product')?.dirty)"
               />
+              <div
+                *ngIf="formGroup2.get('product')?.invalid && (formGroup2.get('product')?.touched || formGroup2.get('product')?.dirty)"
+                class="invalid-feedback d-block">
+                El producto es requerido.
+              </div>
               <ul
                 *ngIf="productSuggestions.length"
                 class="list-group position-absolute w-100 bg-white shadow mt-1"
@@ -57,7 +63,14 @@
             </div>
             <div class="col-md-4">
               <label for="quantity">Cantidad</label>
-              <input id="quantity" type="number" class="form-control" formControlName="quantity" />
+              <input id="quantity" type="number" class="form-control" formControlName="quantity" 
+              [class.is-invalid]="formGroup2.get('quantity')?.invalid && (formGroup2.get('quantity')?.touched || formGroup2.get('quantity')?.dirty)"/>
+              <div
+                *ngIf="formGroup2.get('quantity')?.errors && (formGroup2.get('quantity')?.touched || formGroup2.get('quantity')?.dirty)"
+                class="invalid-feedback d-block">
+                <span *ngIf="formGroup2.get('quantity')?.errors?.['required']">La cantidad es requerida.</span>
+                <span *ngIf="formGroup2.get('quantity')?.errors?.['min']">La cantidad debe ser mayor a 0.</span>
+              </div>
             </div>
             <div class="col-md-4">
               <label for="description">Descripción</label>

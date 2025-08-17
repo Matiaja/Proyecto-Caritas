@@ -138,7 +138,7 @@ export class RequestAddComponent implements OnInit {
     this.formGroup2 = this.fb.group({
       product: [null, Validators.required],
       quantity: [null, [Validators.required, Validators.min(1)]],
-      description: [null, Validators.required],
+      description: [null],
     });
     this.loadProducts();
     this.loadCenters();
@@ -204,6 +204,10 @@ export class RequestAddComponent implements OnInit {
 
   // Agregar un producto a la lista de pedidos
   addOrderLine(): void {
+    if (this.formGroup2.invalid) {
+      this.formGroup2.markAllAsTouched();
+      return;
+    }
     const productId = this.selectedProduct.id;
     const quantity = this.formGroup2.get('quantity')?.value;
     const description = this.formGroup2.get('description')?.value;
