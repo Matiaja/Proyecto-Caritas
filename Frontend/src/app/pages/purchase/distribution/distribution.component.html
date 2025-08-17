@@ -1,5 +1,5 @@
 <div class="d-flex justify-content-center my-5">
-  <div class="card container w-100 w-md-75 mx-auto p-1 p-md-3 shadow">
+  <div class="card container w-100 w-md-75 mx-auto p-2 p-md-3 shadow">
     <div class="card-header d-sm-flex justify-content-sm-between align-items-center">
       <h5 class="mb-md-0">Nueva entrega de compra #{{ purchase.id }}</h5>
     </div>
@@ -61,21 +61,21 @@
     <div class="card-header">
       Ítems de la compra
     </div>
-    <div class="card-body p-0">
+    <div class="card-body p-0 overflow-x-auto">
       <table class="table mb-0">
         <thead class="table-light">
           <tr>
-            <th class="fw-semibold" style="font-size: 14px;">Producto</th>
-            <th class="fw-semibold text-center" style="font-size: 14px;">Disponible</th>
-            <th class="fw-semibold text-center" style="font-size: 14px;">Cant. a entregar</th>
-            <th class="fw-semibold" style="font-size: 14px;">Observaciones</th>
+            <th class="fw-semibold mobile-header" style="font-size: 14px;">Producto</th>
+            <th class="fw-semibold mobile-header text-center" style="font-size: 14px;">Disponible</th>
+            <th class="fw-semibold mobile-header text-center" style="font-size: 14px;">Cant. a entregar</th>
+            <th class="fw-semibold mobile-header" style="font-size: 14px;">Observaciones</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let row of items" style="font-size: 14px;">
-            <td>{{ row.item.productName }}</td>
-            <td class="text-center">{{ row.item.remainingQuantity }}</td>
-            <td class="text-center d-flex justify-content-center align-items-center">
+            <td class="mobile-cell">{{ row.item.productName }}</td>
+            <td class="mobile-cell text-center">{{ row.item.remainingQuantity }}</td>
+            <td class="mobile-cell text-center d-flex justify-content-center align-items-center">
               <input type="number"
                      class="form-control form-control-sm text-center"
                      style="width: 70px;"
@@ -83,7 +83,7 @@
                      [min]="0"
                      [max]="row.item.remainingQuantity">
             </td>
-            <td class="text-center">
+            <td class="mobile-cell text-center">
               <input type="text"
                      class="form-control form-control-sm"
                      [(ngModel)]="row.description">

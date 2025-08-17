@@ -600,7 +600,8 @@ namespace ProyectoCaritas.Controllers
                 })
                 .ToListAsync();
 
-            return Ok(result);        }
+            return Ok(result);
+        }
 
         // GET: api/Stocks/stock-history
         [Authorize]
@@ -627,7 +628,7 @@ namespace ProyectoCaritas.Controllers
             {
                 if (!user.CenterId.HasValue)
                     return BadRequest("Usuario no tiene un centro asignado.");
-                
+
                 query = query.Where(sr => sr.CenterId == user.CenterId.Value);
             }
             else if (centerId.HasValue)
@@ -712,8 +713,8 @@ namespace ProyectoCaritas.Controllers
             Id = stock.Id,
             CenterId = stock.CenterId,
             ProductId = stock.ProductId,
-            Date = stock.Date,
-            ExpirationDate = stock.ExpirationDate,
+            Date = stock.Date.ToString("dd/MM/yyyy"),
+            ExpirationDate = stock.ExpirationDate?.ToString("dd/MM/yyyy"),
             Description = stock.Description,
             Quantity = stock.Quantity,
             Weight = stock.Weight,

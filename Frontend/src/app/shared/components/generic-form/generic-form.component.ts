@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output, SimpleChanges, OnChanges } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ProductService } from '../../../services/product/product.service';
@@ -7,11 +7,24 @@ import { StockService } from '../../../services/stock/stock.service';
 import { catchError, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { GlobalStateService } from '../../../services/global/global-state.service';
+import { MAT_DATE_LOCALE, MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormField, MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'generic-form',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  providers: [{provide: MAT_DATE_LOCALE, useValue: 'es-AR'},
+  provideNativeDateAdapter()
+  ],
+  imports: [ReactiveFormsModule, CommonModule,
+    MatFormField,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatFormFieldModule,
+    MatInputModule,
+    FormsModule,],
   templateUrl: './generic-form.component.html',
   styleUrl: './generic-form.component.css',
 })

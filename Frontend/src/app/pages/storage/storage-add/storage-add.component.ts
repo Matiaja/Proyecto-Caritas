@@ -111,8 +111,8 @@ export class StorageAddComponent {
     const payload = {
       productId: data.productSearch?.id,
       type: data.type,
-      date: data.date,
-      expirationDate: data.expirationDate !== "" ? data.expirationDate : null,
+      date: data.date ? data.date.toISOString().split('T')[0] : undefined,
+      expirationDate: data.expirationDate !== "" ? data.expirationDate.toISOString().split('T')[0] : null,
       description: data.description ? data.description : '',
       origin: data.origin ? data.origin : null, 
       quantity: data.quantity,

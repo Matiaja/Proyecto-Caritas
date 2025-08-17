@@ -84,8 +84,8 @@
             <td>{{ item.quantity }}</td>
             <td>{{ item.description || '-' }}</td>
             <td>{{ item.origin || '-' }}</td>
-            <td>{{ item.date | date:'dd/MM/yyyy' }}</td>
-            <td>{{ item.expirationDate ? (item.expirationDate | date:'dd/MM/yyyy') : '-' }}</td>
+            <td>{{ item.date }}</td>
+            <td>{{ item.expirationDate ? (item.expirationDate) : '-' }}</td>
             <td>{{ item.weight && item.weight > 0 ? item.weight : '-' }}</td>
           </tr>
           <tr *ngIf="filteredStock.length === 0">
