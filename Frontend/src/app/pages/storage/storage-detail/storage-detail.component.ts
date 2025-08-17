@@ -159,8 +159,8 @@ export class StorageDetailComponent implements OnInit {
           item.quantity?.toString() || '-',
           item.description || '-',
           item.origin || '-',
-          new Date(item.date).toLocaleDateString('es-AR'),
-          item.expirationDate ? new Date(item.expirationDate).toLocaleDateString('es-AR') : '-',
+          item.date,
+          item.expirationDate ? item.expirationDate : '-',
           item.weight && item.weight > 0 ? item.weight.toString() : '-'
         ])
       }],

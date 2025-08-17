@@ -317,8 +317,8 @@ namespace ProyectoCaritas.Controllers
                    Type = x.Type,
                    //Status = x.Status,
                    Description = x.Description,
-                   Date = x.Date,
-                   ExpirationDate = x.ExpirationDate
+                   Date = x.Date.ToString("dd/MM/yyyy"),
+                   ExpirationDate = x.ExpirationDate?.ToString("dd/MM/yyyy")
                }).ToList() ?? new List<GetStockDTO>(),
                OrderLines = p.OrderLines?.Select(x => new OrderLineDTO
                {

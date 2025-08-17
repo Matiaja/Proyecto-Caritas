@@ -8,14 +8,16 @@
         <label [for]="field.name" [class.required]="isRequired(field)">{{ field.label }}</label>
         <ng-container [ngSwitch]="field.type">
           <!-- Campo de texto -->
-          <input
-            *ngSwitchCase="'date'"
-            [id]="field.name"
-            [formControlName]="field.name"
-            class="form-control"
-            [type]="field.type"
-            [placeholder]="field.placeholder || ''"
-          />
+          <mat-form-field *ngSwitchCase="'date'" appearance="outline" class="w-100 small-field">
+            <input matInput [matDatepicker]="pickerDate"
+              [id]="field.name"
+              name="{{ field.name }}"
+              [formControlName]="field.name"
+              [placeholder]="field.placeholder || ''"
+            >
+            <mat-datepicker-toggle matSuffix [for]="pickerDate"></mat-datepicker-toggle>
+            <mat-datepicker #pickerDate></mat-datepicker>
+          </mat-form-field>
           <input
             *ngSwitchCase="'text'"
             [id]="field.name"

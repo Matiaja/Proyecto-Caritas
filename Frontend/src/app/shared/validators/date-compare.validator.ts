@@ -9,7 +9,7 @@ export function expirationDateValidator(creationDateControlName: string) {
     const creationDateControl = control?.parent?.get(creationDateControlName);
     const creationDate = creationDateControl ? new Date(creationDateControl.value) : null;
 
-    if (!control.value) {
+    if (control.value == '' || !control.value) {
       return null;
     }
 

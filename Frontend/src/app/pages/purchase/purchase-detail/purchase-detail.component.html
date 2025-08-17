@@ -6,12 +6,13 @@
               <button type="button" class="btn btn-outline-secondary btn-sm" (click)="printPurchase()">
                 <i class="bi bi-printer me-1"></i> Imprimir compra
               </button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" (click)="goBack()">Ver compras</button>
             </div>
         </div>
         <div class="row align-items-center py-4 g-4 px-3">
             <div class="col-sm-6">
                 <span class="fw-medium">Fecha:</span>
-                <span class="ps-2">{{ purchase.purchaseDate | date: 'dd/MM/yyyy' }}</span>
+                <span class="ps-2">{{ purchase.purchaseDate }}</span>
             </div>
             <div class="col-sm-6">
                 <span class="fw-medium">Origen:</span>
@@ -87,16 +88,16 @@
                                 <table class="table table-sm mt-2">
                                     <thead>
                                         <tr>
-                                            <th>Producto</th>
-                                            <th class="text-center">Cant.</th>
-                                            <th class="text-center">Observaciones</th>
+                                            <th class="fw-semibold mobile-header" style="font-size: 14px;">Producto</th>
+                                            <th class="fw-semibold mobile-header text-center" style="font-size: 14px;">Cant.</th>
+                                            <th class="fw-semibold mobile-header" style="font-size: 14px;">Observaciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr *ngFor="let item of dist.items">
-                                            <td>{{ item.productName }}</td>
-                                            <td class="text-center">{{ item.quantity }}</td>
-                                            <td class="text-center">{{ item.description || '—' }}</td>
+                                            <td class="mobile-cell" style="font-size: 14px;">{{ item.productName }}</td>
+                                            <td class="mobile-cell text-center" style="font-size: 14px;">{{ item.quantity }}</td>
+                                            <td class="mobile-cell" style="font-size: 14px;">{{ item.description || '—' }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
