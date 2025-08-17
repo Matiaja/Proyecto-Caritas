@@ -1,3 +1,160 @@
+@media (max-width: 575.98px) {
+    .mobile-table {
+        font-size: 0.85rem;
+    }
+
+    .mobile-header {
+        font-size: 0.75rem;
+        font-weight: 600 !important;
+        top: 0;
+        white-space: normal;
+    }
+
+    .mobile-cell {
+        font-size: 0.7rem;
+        --webkit-line-clamp: 3;
+        --webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: normal;
+        word-break: break-word;
+        line-height: 1.2rem;
+        max-height: 3.6rem;
+    }
+}
+
+table {
+    overflow: visible !important;
+}
+
+.table-responsive {
+    overflow: visible !important;
+}
+
+/* Estilo por defecto: mismo ancho que el input */
+.suggestion-wrapper {
+    position: relative;
+}
+
+.product-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    z-index: 1050;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+@media (max-width: 575.98px) {
+    .suggestion-wrapper {
+        position: relative;
+        width: 100%;
+        /* Ensure the wrapper matches the input's container */
+    }
+
+    .product-suggestions {
+        position: absolute;
+        top: 100%;
+        /* Position just below the input */
+        left: 0;
+        /* Center the list horizontally */
+        transform: translateX(-2%);
+        /* Adjust for centering */
+        width: 97vw;
+        /* Full viewport width */
+        max-height: 200px;
+        /* Limit height */
+        overflow-y: auto;
+        z-index: 2000;
+        /* Ensure it stays above other elements */
+        margin-top: 2px;
+        /* Small gap below the input */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        /* Optional: Add shadow for separation */
+    }
+
+    .mobile-cell {
+        overflow: visible !important;
+        /* Prevent clipping */
+        position: relative;
+        /* Ensure proper stacking context */
+    }
+}
+
+/* @media (max-width: 575.98px) {
+    .mobile-cell {
+        overflow: visible !important;
+    }
+
+    .product-suggestions {
+        z-index: 2000;
+    }
+} */
+
+.dropdown-suggestions .list-group-item-action:hover {
+  background-color: #f8f9fa;
+}
+
+.btn-additem {
+    border-color: #36337f;
+    color: #36337f;
+}
+
+.btn-additem:hover {
+    background-color: #36337f;
+    color: #ffffff;
+    border-color: #36337f;
+}
+
+.btn-save {
+    background-color: #36337f;
+    border-color: #36337f;
+}
+
+.btn-save:hover {
+    background-color: #27246f;
+    border-color: #27246f;
+}
+
+/* Ajusta el alto de las celdas */
+.table td,
+.table th {
+    vertical-align: middle;
+    padding: 0.5rem;
+}
+
+/* Estilo para inputs y selects dentro de la tabla */
+.table input.form-control-sm,
+.table select.form-select-sm {
+    min-height: 32px;
+    padding: 0.25rem 0.5rem;
+}
+
+/* Texto del mensaje cuando no hay ítems */
+.table .text-muted {
+    font-style: italic;
+}
+
+/* Botón eliminar */
+.table button.btn-danger.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
 /* ESTILOS PARA ANGULAR MATERIAL */
 /* Ajustes generales para los campos de formulario MDC */
 .mat-mdc-text-field-wrapper {

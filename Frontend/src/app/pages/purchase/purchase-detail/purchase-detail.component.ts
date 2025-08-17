@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PurchaseService } from '../../../services/purchase/purchase.service';
 import { CommonModule } from '@angular/common';
 import { UiTableComponent } from "../../../shared/components/ui-table/ui-table.component";
@@ -36,6 +36,7 @@ export class PurchaseDetailComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private purchaseService: PurchaseService,
     private pdfService: PdfService
   ) {}
@@ -64,7 +65,7 @@ export class PurchaseDetailComponent implements OnInit {
         {
           title: 'Datos de la Compra',
           keyValuePairs: [
-            { key: 'Fecha', value: this.purchase.purchaseDate ? new Date(this.purchase.purchaseDate).toLocaleDateString('es-AR') : '-' },
+            { key: 'Fecha', value: this.purchase.purchaseDate ? this.purchase.purchaseDate : '-' },
             { key: 'Origen', value: this.purchase.centerName || '-' },
             { key: 'Tipo', value: this.purchase.type || '-' }
           ]
@@ -121,7 +122,7 @@ export class PurchaseDetailComponent implements OnInit {
         {
           title: 'Datos de la Compra',
           keyValuePairs: [
-            { key: 'Fecha de Compra', value: this.purchase.purchaseDate ? new Date(this.purchase.purchaseDate).toLocaleDateString('es-AR') : '-' },
+            { key: 'Fecha de Compra', value: this.purchase.purchaseDate ? this.purchase.purchaseDate : '-' },
             { key: 'Origen', value: this.purchase.centerName || '-' },
             { key: 'Tipo', value: this.purchase.type || '-' }
           ],
@@ -163,5 +164,9 @@ export class PurchaseDetailComponent implements OnInit {
     };
 
     this.pdfService.generatePdf(req).subscribe(blob => this.pdfService.openPdfInNewTab(blob));
+  }
+
+  goBack(): void {
+    this.router.navigate(['/purchases']);
   }
 }

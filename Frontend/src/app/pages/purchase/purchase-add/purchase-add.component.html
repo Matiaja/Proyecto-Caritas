@@ -5,11 +5,11 @@
   </div>
 
   <form (ngSubmit)="submit()" #purchaseForm="ngForm">
-    <div class="row mb-3 mt-3">
+    <div class="row mb-3 mt-3 py-3 gap-2">
       <div class="col-md-4">
         <mat-form-field appearance="outline" class="w-100 small-field">
           <mat-label>Fecha</mat-label>
-          <input matInput [matDatepicker]="pickerDate" [(ngModel)]="purchase.purchaseDate" required>
+          <input matInput [matDatepicker]="pickerDate" [(ngModel)]="purchase.purchaseDate" name="purchaseDate" required>
           <mat-datepicker-toggle matSuffix [for]="pickerDate"></mat-datepicker-toggle>
           <mat-datepicker #pickerDate></mat-datepicker>
         </mat-form-field>
@@ -31,47 +31,68 @@
         </select>
       </div> -->
     </div>
-    <hr class="py-4">
-    <div class="mt-2">
+    <hr>
+    <div class="mb-3 mt-3 py-3">
       <div class="card-header d-sm-flex justify-content-sm-between align-items-center">
         <h6 class="mb-md-0">Detalle de la compra</h6>
       </div>
     
-      <div class="table-responsive">
+      <div>
         <table class="table align-middle">
           <thead class="table-light">
             <tr>
-              <th style="width: 45%">Producto</th>
-              <th style="width: 15%">Cantidad</th>
-              <th style="width: 35%">Descripción</th>
-              <th style="width: 5%" class="text-center"></th>
+              <th class="fw-semibold mobile-header" style="font-size: 14px; width: 45%">Producto</th>
+              <th class="fw-semibold mobile-header" style="font-size: 14px; width: 10%">Cant.</th>
+              <th class="fw-semibold mobile-header" style="font-size: 14px; width: 40%">Descripción</th>
+              <th class="fw-semibold mobile-header" style="font-size: 14px; width: 5%" class="text-center"></th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let item of purchase.items; let i = index">
               <!-- Producto -->
-              <td>
-                <select class="form-select form-select-sm" [(ngModel)]="item.productId" [name]="'productId' + i" required>
-                  <option *ngFor="let p of products" [value]="p.id">{{ p.name }}</option>
-                </select>
+              <td class="mobile-cell position-relative" style="font-size: 14px;">
+                <div class="suggestion-wrapper">
+                  <input type="text" class="form-control form-control-sm" [(ngModel)]="item.productName" [name]="'productName' + i"
+                    (input)="filterProducts(i)" placeholder="Escriba para buscar..." autocomplete="off" />
+                  <ul *ngIf="filteredProducts[i]?.length" class="list-group bg-white shadow mt-1 product-suggestions"
+                    style="z-index: 1050; max-height: 200px; overflow-y: auto;">
+                    <li *ngFor="let p of filteredProducts[i]" class="list-group-item p-0">
+                      <button type="button" class="list-group-item list-group-item-action border-0 w-100 text-start"
+                        (click)="selectProduct(i, p)">
+                        {{ p.name }}
+                      </button>
+                    </li>
+                  </ul>
+                  <ul *ngIf="filteredProducts[i]?.length === 0 && item.productName.length > 2 && !purchase.items[i].productId"
+                    class="list-group bg-white shadow mt-1 product-suggestions"
+                    style="z-index: 1050; max-height: 200px; overflow-y: auto;">
+                    <li class="list-group-item p-0">
+                      <button type="button" class="list-group-item list-group-item-action border-0 w-100 text-start disabled">
+                        No se encontraron sugerencias
+                      </button>
+                    </li>
+                  </ul>
+                </div>
               </td>
     
               <!-- Cantidad -->
-              <td>
-                <input type="number" class="form-control form-control-sm" [(ngModel)]="item.quantity"
+              <td class="mobile-cell text-center" style="font-size: 14px;">
+                <input type="number" class="form-control form-control-sm text-center user-select-all" [(ngModel)]="item.quantity"
                   [name]="'quantity' + i" required>
               </td>
     
               <!-- Descripción -->
-              <td>
+              <td class="mobile-cell" style="font-size: 14px;">
                 <input type="text" class="form-control form-control-sm" [(ngModel)]="item.description"
                   [name]="'description' + i">
               </td>
     
               <!-- Acción -->
-              <td class="text-center">
+              <td class="mobile-cell text-center" style="font-size: 14px;">
                 <button type="button" class="btn btn-sm btn-danger" (click)="removeItem(i)">
-                  <i class="bi bi-trash"></i>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M9 17h2V8H9zm4 0h2V8h-2zm-8 4V6H4V4h5V3h6v1h5v2h-1v15z" />
+                  </svg>
                 </button>
               </td>
             </tr>
@@ -82,17 +103,22 @@
                 No hay productos agregados
               </td>
             </tr>
+            <tr>
+              <td colspan="4" class="text-center">
+                <button type="button" class="btn btn-outline-primary btn-sm w-100 btn-additem" (click)="addItem()">
+                  + Agregar item
+                </button>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
-    
-      <!-- Botón para agregar producto -->
-      <button type="button" class="btn btn-outline-primary btn-sm mt-2" (click)="addItem()">
-        + Agregar Producto
-      </button>
     </div>
     <hr>
-    <button type="submit" class="btn btn-success" [disabled]="!purchaseForm.form.valid">Guardar Compra</button>
+    <div class="d-flex justify-content-end gap-2 pt-3">
+      <button type="button" class="btn btn-sm btn-secondary" (click)="cancel()">Cancelar</button>
+      <button type="submit" class="btn btn-sm btn-primary btn-save" [disabled]="!purchaseForm.form.valid">Guardar Compra</button>
+    </div>
   </form>
 </div>
 </div>

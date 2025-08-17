@@ -9,12 +9,15 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
+import { ToastrService } from 'ngx-toastr';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-purchase-add',
   standalone: true,
   providers: [{provide: MAT_DATE_LOCALE, useValue: 'es-AR'},
-  provideNativeDateAdapter()],
+  provideNativeDateAdapter()
+  ],
   imports: [
     FormsModule,
     ReactiveFormsModule,
@@ -33,8 +36,13 @@ import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/cor
   encapsulation: ViewEncapsulation.None
 })
 export class PurchaseAddComponent implements OnInit {
-  purchase: any = {
-    purchaseDate: '',
+  purchase: {
+    purchaseDate: Date | null;
+    type: string;
+    centerId: number;
+    items: { productId: number; productName: string; quantity: number, description?: string }[];
+  } = {
+    purchaseDate: null,
     type: '',
     centerId: 0,
     items: []
@@ -42,10 +50,14 @@ export class PurchaseAddComponent implements OnInit {
 
   centers: any[] = [];
   products: any[] = [];
+  filteredProducts: any[][] = [];
+  selectedProduct: any = null;
 
   constructor(
     private purchaseService: PurchaseService,
     private productService: ProductService,
+    private toastr: ToastrService,
+    private router: Router,
     private globalStateService: GlobalStateService
   ) {}
 
@@ -54,29 +66,59 @@ export class PurchaseAddComponent implements OnInit {
     this.productService.getProducts().subscribe(data => this.products = data);
   }
 
+  // Buscar producto
+  filterProducts(index: number) {
+    const searchTerm = this.purchase.items[index].productName?.toLowerCase() || '';
+    if (!searchTerm.trim() || searchTerm.length < 3) {
+      this.filteredProducts[index] = [];
+      return;
+    }
+    this.filteredProducts[index] = this.products.filter(p =>
+      p.name.toLowerCase().includes(searchTerm)
+    );
+  }
+
+  selectProduct(index: number, product: any) {
+    this.purchase.items[index].productId = product.id;
+    this.purchase.items[index].productName = product.name;
+    this.filteredProducts[index] = [];
+  }
+
   addItem() {
-    this.purchase.items.push({ productId: 0, quantity: 1 });
+    this.purchase.items.push({ productId: 0, productName: '', quantity: 1 });
+    this.filteredProducts.push([]);
   }
 
   removeItem(index: number) {
     this.purchase.items.splice(index, 1);
+    this.filteredProducts.splice(index, 1);
   }
 
   submit() {
-    const purchaseToSend = {
-      ...this.purchase,
-      purchaseDate: this.purchase.purchaseDate
-    };
+      const purchase = {
+        ...this.purchase,
+        purchaseDate: this.purchase.purchaseDate ? this.purchase.purchaseDate.toISOString().split('T')[0] : undefined,
+      };
 
-    this.purchaseService.createPurchase(purchaseToSend).subscribe({
-      next: res => {
-        alert('Compra registrada correctamente');
-        this.purchase = { purchaseDate: '', type: '', centerId: this.globalStateService.getCurrentCenterId(), items: [] };
-      },
-      error: err => {
-        console.error(err);
-        alert('Error al guardar la compra');
-      }
-    });
+      console.log('Purchase data to submit:', purchase);
+    // this.purchaseService.createPurchase(purchase).subscribe({
+    //   next: (res: any) => {
+    //     this.toastr.success('Compra registrada correctamente', 'Exito');
+    //     this.router.navigate(['/purchases/' + res.id]);
+    //   },
+    //   error: (err) => {
+    //     console.error(err);
+    //     if(err.error && err.error.message) {
+    //       this.toastr.error(err.error.message, 'Error');
+    //     }
+    //     else {
+    //       this.toastr.error('Error al guardar la compra', 'Error');
+    //     }
+    //   }
+    // });
+  }
+
+  cancel(): void {
+    this.router.navigate(['/purchases']);
   }
 }
