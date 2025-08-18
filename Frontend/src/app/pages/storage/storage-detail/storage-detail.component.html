@@ -28,7 +28,7 @@
     <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label">Tipo de movimiento</label>
-        <select class="form-select" [(ngModel)]="filters.type">
+        <select class="form-select" [(ngModel)]="filters.type" (ngModelChange)="applyFilters()">
           <option value="">Todos</option>
           <option value="Ingreso">Ingreso</option>
           <option value="Egreso">Egreso</option>
@@ -36,11 +36,11 @@
       </div>
       <div class="col-md-4">
         <label class="form-label">Fecha desde</label>
-        <input type="date" class="form-control" [(ngModel)]="filters.fromDate" />
+        <input type="date" class="form-control" [(ngModel)]="filters.fromDate" (ngModelChange)="applyFilters()" />
       </div>
       <div class="col-md-4">
         <label class="form-label">Fecha hasta</label>
-        <input type="date" class="form-control" [(ngModel)]="filters.toDate" />
+        <input type="date" class="form-control" [(ngModel)]="filters.toDate" (ngModelChange)="applyFilters()" />
       </div>
     </div>
   </div>

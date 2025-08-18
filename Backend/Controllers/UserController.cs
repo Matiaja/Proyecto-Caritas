@@ -65,6 +65,7 @@ namespace ProyectoCaritas.Controllers
 
         {
             var users = await _context.Users
+                .Include(u => u.Center)
                 .Select(u => new UserDTO
                 {
                     Id = u.Id,
@@ -74,7 +75,8 @@ namespace ProyectoCaritas.Controllers
                     LastName = u.LastName,
                     Role = u.Role,
                     PhoneNumber = u.PhoneNumber ?? string.Empty,
-                    CenterId = u.CenterId
+                    CenterId = u.CenterId,
+                    CenterName = u.Center.Name ?? string.Empty
                 }).
                 Where(u => u.Role != "Admin")
                 .ToListAsync();
@@ -232,23 +234,50 @@ namespace ProyectoCaritas.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddUser(UserRegisterDTO userRegisterDTO)
         {
+            // Trim para limpiar espacios
+            userRegisterDTO.Email = userRegisterDTO.Email.Trim();
+            userRegisterDTO.FirstName = userRegisterDTO.FirstName.Trim();
+            userRegisterDTO.LastName = userRegisterDTO.LastName.Trim();
+            userRegisterDTO.Role = userRegisterDTO.Role.Trim();
+            userRegisterDTO.PhoneNumber = userRegisterDTO.PhoneNumber.Trim();
+            userRegisterDTO.UserName = userRegisterDTO.UserName.Trim();
+            userRegisterDTO.Password = userRegisterDTO.Password.Trim();
+
+            if (string.IsNullOrWhiteSpace(userRegisterDTO.UserName))
+                return BadRequest(new { message = "El nombre de usuario es requerido." });
+
             if (string.IsNullOrWhiteSpace(userRegisterDTO.Email))
-            {
-                return BadRequest(new { message = "Email is required." });
-            }
-            if (string.IsNullOrWhiteSpace(userRegisterDTO.FirstName) || string.IsNullOrWhiteSpace(userRegisterDTO.LastName) || string.IsNullOrWhiteSpace(userRegisterDTO.Role) || string.IsNullOrWhiteSpace(userRegisterDTO.PhoneNumber))
-            {
-                return BadRequest(new { message = "FirstName, LastName, Role, and Phone are required fields." });
-            }
+                return BadRequest(new { message = "El email es requerido." });
+
+            if (string.IsNullOrWhiteSpace(userRegisterDTO.FirstName))
+                return BadRequest(new { message = "El nombre es requerido." });
+
+            if (string.IsNullOrWhiteSpace(userRegisterDTO.LastName))
+                return BadRequest(new { message = "El apellido es requerido." });
+
+            if (string.IsNullOrWhiteSpace(userRegisterDTO.Role))
+                return BadRequest(new { message = "El rol es requerido." });
+
+            if (string.IsNullOrWhiteSpace(userRegisterDTO.PhoneNumber))
+                return BadRequest(new { message = "El teléfono es requerido." });
+
+            if (string.IsNullOrWhiteSpace(userRegisterDTO.Password))
+                return BadRequest(new { message = "La contraseña es requerida." });
+
+            if (userRegisterDTO.Password.Length < 8 || !userRegisterDTO.Password.Any(char.IsDigit))
+                return BadRequest(new { message = "La contraseña debe tener al menos 8 caracteres y un número." });
+
             if (!await _roleManager.RoleExistsAsync(userRegisterDTO.Role))
-            {
-                return BadRequest(new { message = "Specified role does not exist." });
-            }
+                return BadRequest(new { message = "El rol especificado no existe." });
+
             if (userRegisterDTO.CenterId.HasValue && !await _context.Centers.AnyAsync(c => c.Id == userRegisterDTO.CenterId.Value))
-            {
-                return BadRequest(new { message = "Specified Center does not exist." });
-            }
-            userRegisterDTO.Role = char.ToUpper(userRegisterDTO.Role[0]) + userRegisterDTO.Role.Substring(1).ToLower(); // Normalize role name
+                return BadRequest(new { message = "El centro especificado no existe." });
+
+            if (await _userManager.FindByNameAsync(userRegisterDTO.UserName) != null)
+                return BadRequest(new { message = $"El nombre de usuario \'{userRegisterDTO.UserName}\' no está disponible." });
+
+            // Normalizar role
+            userRegisterDTO.Role = char.ToUpper(userRegisterDTO.Role[0]) + userRegisterDTO.Role.Substring(1).ToLower();
 
             var user = new User
             {
@@ -263,19 +292,13 @@ namespace ProyectoCaritas.Controllers
 
             var result = await _userManager.CreateAsync(user, userRegisterDTO.Password);
             if (!result.Succeeded)
-            {
-                return BadRequest(result.Errors);
-            }
+                return BadRequest(new { message = string.Join("; ", result.Errors.Select(e => e.Description)) });
 
-            // Normalizar el nombre del rol antes de asignarlo
-            //var normalizedRole = _roleManager.NormalizeKey(userRegisterDTO.Role);
             var rolassign = await _userManager.AddToRoleAsync(user, userRegisterDTO.Role);
             if (!rolassign.Succeeded)
-            {
-                return BadRequest(rolassign.Errors);
-            }
+                return BadRequest(new { message = string.Join("; ", rolassign.Errors.Select(e => e.Description)) });
 
-            return Ok(new { message = "User registered successfully" });
+            return Ok(new { message = "Usuario registrado correctamente." });
         }
 
         // POST: api/User/login

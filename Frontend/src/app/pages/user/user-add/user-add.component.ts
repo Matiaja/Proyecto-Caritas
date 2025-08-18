@@ -38,10 +38,14 @@ export class UserAddComponent implements OnInit {
       {
         name: 'password',
         label: 'Contraseña',
-        type: 'text',
+        type: 'password',
         value: '',
         placeholder: 'Ingrese la contraseña',
-        validators: [Validators.required, Validators.minLength(8), Validators.pattern('.*\\d.*')],
+        validators: [
+          Validators.required,
+          Validators.minLength(8),
+          Validators.pattern('.*\\d.*'),
+        ],
       },
       {
         name: 'FirstName',
@@ -80,7 +84,7 @@ export class UserAddComponent implements OnInit {
         options: [
           { value: 'Admin', label: 'Administrador' },
           { value: 'User', label: 'Usuario' },
-        ] as { value: any; label: string }[],
+        ],
       },
       {
         name: 'center',
@@ -90,7 +94,7 @@ export class UserAddComponent implements OnInit {
         placeholder: 'Seleccione un centro',
         validators: [Validators.required],
         errorMessage: 'El centro es requerido',
-        options: [] as { value: any; label: string }[],
+        options: [],
       },
     ],
   };
@@ -111,7 +115,7 @@ export class UserAddComponent implements OnInit {
       const centerField = this.formConfig.fields.find((field) => field.name === 'center');
       if (centerField) {
         centerField.options = centers.map((center) => ({
-          value: center.id,
+          value: String(center.id),
           label: center.name,
         }));
       }
@@ -129,9 +133,28 @@ export class UserAddComponent implements OnInit {
       role: formData.role,
       centerId: formData.center,
     };
-    this.userService.registerUser(payload).subscribe(() => {
-      this.toastr.success('Usuario creado correctamente', 'Exito');
-      this.router.navigate(['/users']);
+
+    this.userService.registerUser(payload).subscribe({
+      next: () => {
+        this.toastr.success('Usuario creado correctamente', 'Exito');
+        this.router.navigate(['/users']);
+      },
+      error: (err) => {
+        console.error('Error al registrar usuario:', err);
+
+        if (err.error?.message) {
+          // Caso: Backend devolvió { message: "..." }
+          this.toastr.error(err.error.message, 'Error');
+        } else if (Array.isArray(err.error)) {
+          // Caso: Backend devolvió lista de errores (Identity)
+          this.toastr.error(err.error.map((e: any) => e.description).join('<br>'), 'Error', {
+            enableHtml: true,
+          });
+        } else {
+          // Caso genérico
+          this.toastr.error('Ocurrió un error inesperado. Inténtelo nuevamente.', 'Error');
+        }
+      }
     });
   }
 

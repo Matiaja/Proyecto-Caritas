@@ -101,21 +101,21 @@ export class PurchaseAddComponent implements OnInit {
       };
 
       console.log('Purchase data to submit:', purchase);
-    // this.purchaseService.createPurchase(purchase).subscribe({
-    //   next: (res: any) => {
-    //     this.toastr.success('Compra registrada correctamente', 'Exito');
-    //     this.router.navigate(['/purchases/' + res.id]);
-    //   },
-    //   error: (err) => {
-    //     console.error(err);
-    //     if(err.error && err.error.message) {
-    //       this.toastr.error(err.error.message, 'Error');
-    //     }
-    //     else {
-    //       this.toastr.error('Error al guardar la compra', 'Error');
-    //     }
-    //   }
-    // });
+    this.purchaseService.createPurchase(purchase).subscribe({
+      next: (res: any) => {
+        this.toastr.success('Compra registrada correctamente', 'Exito');
+        this.router.navigate(['/purchases/' + res.id]);
+      },
+      error: (err) => {
+        console.error(err);
+        if(err.error && err.error.message) {
+          this.toastr.error(err.error.message, 'Error');
+        }
+        else {
+          this.toastr.error('Error al guardar la compra', 'Error');
+        }
+      }
+    });
   }
 
   cancel(): void {

@@ -48,10 +48,10 @@ export class CenterAddComponent {
         name: 'capacityLimit',
         label: 'Capacidad Máxima',
         type: 'number',
-        value: '',
-        placeholder: 'Ingrese la capacidad máxima',
-        validators: [Validators.required, Validators.min(1)],
-        errorMessage: 'La capacidad máxima es requerida y debe ser mayor a 0',
+        value: null,
+        placeholder: 'Ingrese la capacidad máxima (opcional)',
+        validators: [Validators.min(1)],
+        errorMessage: 'La capacidad máxima debe ser mayor a 0',
       },
       {
         name: 'phone',
@@ -85,7 +85,7 @@ export class CenterAddComponent {
       name: formData.name,
       location: formData.location,
       manager: formData.manager,
-      capacityLimit: formData.capacityLimit,
+      capacityLimit: formData.capacityLimit ? formData.capacityLimit : null,
       phone: formData.phone,
       email: formData.email,
     };
