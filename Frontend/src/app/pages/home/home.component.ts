@@ -11,6 +11,7 @@ import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import { PdfService } from '../../services/pdf/pdf.service';
 import { NgChartsModule } from 'ng2-charts';
 import { forkJoin } from 'rxjs';
+import { GlobalStateService } from '../../services/global/global-state.service'; // OPCIONAL si existe
 
 interface Category {
   id: number;
@@ -166,8 +167,9 @@ export class HomeComponent implements OnInit {
     private categoryService: CategoryService,
     private productService: ProductService,
     private centerService: CenterService,
-  private authService: AuthService,
-  private pdfService: PdfService
+    private authService: AuthService,
+    private pdfService: PdfService,
+    private globalStateService?: GlobalStateService // opcional
   ) {}
 
   ngOnInit(): void {
@@ -374,25 +376,109 @@ export class HomeComponent implements OnInit {
     };
   }
 
+  private getCenterNameForPdf(): string {
+    if (this.isAdmin) {
+      if (this.centerId === undefined) return 'Todos';
+      const c = this.centers.find(c => c.id === this.centerId);
+      return c ? c.name : `Centro #${this.centerId}`;
+    }
+    // Usuario no admin: intentar obtener del estado global si se dispone
+    if (this.centerId !== undefined) {
+      const c = this.centers.find(c => c.id === this.centerId);
+      if (c) return c.name;
+    }
+    const gsCenterName = (this.globalStateService as any)?.getCurrentCenterName?.();
+    return gsCenterName || 'Asignado';
+  }
+
+  private getCategoryName(): string {
+    if (this.categoryId === undefined) return 'Todas';
+    const cat = this.categories.find(c => c.id === this.categoryId);
+    return cat ? cat.name : `Cat #${this.categoryId}`;
+  }
+
+  private getProductName(): string {
+    if (this.productId === undefined) return 'Todos';
+    const prod = this.products.find(p => p.id === this.productId);
+    return prod ? prod.name : `Prod #${this.productId}`;
+  }
+
+  private buildFiltersSummaryKeyValue(): { key: string; value: string }[] {
+    const result: { key: string; value: string }[] = [];
+
+    // Tipo
+    result.push({
+      key: 'Tipo',
+      value: this.viewType === 'stock' ? 'Stock' : 'Compras y Distribuciones'
+    });
+
+    // Centro
+    const center = this.getCenterNameForPdf();
+    result.push({
+      key: 'Centro',
+      value: center ? center : 'todos los centros'
+    });
+
+    // Categoría
+    const category = this.getCategoryName();
+    result.push({
+      key: 'Categoría',
+      value: category && category !== 'Todas' ? category : 'todas las categorías'
+    });
+
+    // Producto
+    const product = this.getProductName();
+    result.push({
+      key: 'Producto',
+      value: product && product !== 'Todos' ? product : 'todos los productos'
+    });
+
+    // Fechas
+    const from = this.fromDate ? new Date(this.fromDate).toLocaleDateString('es-AR') : null;
+    const to = this.toDate ? new Date(this.toDate).toLocaleDateString('es-AR') : null;
+
+    let fechaDesc = '';
+    if (!from && !to) {
+      fechaDesc = 'histórico';
+    } else if (from && !to) {
+      fechaDesc = `a partir del ${from}`;
+    } else if (!from && to) {
+      fechaDesc = `hasta el ${to}`;
+    } else if (from && to) {
+      fechaDesc = `entre el ${from} y el ${to}`;
+    }
+
+    result.push({
+      key: 'Período',
+      value: fechaDesc
+    });
+
+    return result;
+  }
+
   exportChartsToPdf(): void {
-    // Capture canvases
     const charts: { title?: string; base64: string }[] = [];
     const capture = (selector: string, title: string) => {
       const el = document.querySelector(selector) as HTMLCanvasElement | null;
-      if (el) {
-        charts.push({ title, base64: el.toDataURL('image/png') });
-      }
+      if (el) charts.push({ title, base64: el.toDataURL('image/png') });
     };
     capture('.chart-container:nth-of-type(1) canvas', 'Stock por Categoría');
     capture('.chart-container:nth-of-type(2) canvas', 'Top 10 Productos');
     if (this.shouldShowTimeChart()) capture('.chart-container:nth-of-type(3) canvas', 'Evolución en el Tiempo');
     capture('.chart-container:nth-of-type(4) canvas', 'Ingresos vs Egresos');
 
-    const req = {
+    const filtersKeyValue = this.buildFiltersSummaryKeyValue();
+
+    const req: any = {
       title: this.viewType === 'stock' ? 'Reporte de Stock' : 'Reporte de Movimientos',
-      subtitle: new Date().toLocaleString('es-AR'),
+      sections: [
+        {
+          title: 'Filtros Aplicados',
+            keyValuePairs: filtersKeyValue
+        }
+      ],
       chartImages: charts.map(c => ({ title: c.title, base64: c.base64, widthPercent: 100 })),
-      footer: 'Generado automáticamente'
+      footer: 'Generado automáticamente por Sistema Cáritas'
     };
 
     this.pdfService.generatePdf(req).subscribe({
