@@ -127,10 +127,16 @@
         </canvas>
       </div>
       <ng-template #timeChartMessage>
-        <div class="d-flex flex-column align-items-center justify-content-center text-muted p-4" style="height:100%;min-height:220px;">
+        <div *ngIf="isAdmin" class="d-flex flex-column align-items-center justify-content-center text-muted p-4" style="height:100%;min-height:220px;">
           <i class="fas fa-filter fa-2x mb-2"></i>
           <p class="mb-0 text-center" style="font-size: 0.9rem;">
-            Para mostrar el grafico de linea de tiempo, filtra por producto, centro (Caso superadmin sino no mostrar) y tipo.
+            Para mostrar el grafico de linea de tiempo, filtra por producto, centro y tipo.
+          </p>
+        </div>
+        <div *ngIf="!isAdmin" class="d-flex flex-column align-items-center justify-content-center text-muted p-4" style="height:100%;min-height:220px;">
+          <i class="fas fa-filter fa-2x mb-2"></i>
+          <p class="mb-0 text-center" style="font-size: 0.9rem;">
+            Para mostrar el grafico de linea de tiempo, filtra por producto y tipo.
           </p>
         </div>
       </ng-template>
