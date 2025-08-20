@@ -2,123 +2,124 @@
   <div class="card container w-100 w-md-75 mx-auto p-1 p-md-3 shadow">
     <div class="card-header d-sm-flex justify-content-sm-between align-items-center">
       <h5 class="mb-md-0">Registrar nueva compra</h5>
-  </div>
+    </div>
 
-  <form (ngSubmit)="submit()" #purchaseForm="ngForm">
-    <div class="row mb-3 mt-3 py-3 gap-2">
-      <div class="col-md-4">
-        <mat-form-field appearance="outline" class="w-100 small-field">
-          <mat-label>Fecha</mat-label>
-          <input matInput [matDatepicker]="pickerDate" [(ngModel)]="purchase.purchaseDate" name="purchaseDate" required>
-          <mat-datepicker-toggle matSuffix [for]="pickerDate"></mat-datepicker-toggle>
-          <mat-datepicker #pickerDate></mat-datepicker>
-        </mat-form-field>
-        <!-- <span class="form-label">Fecha</span>
-        <input type="date" class="form-control" [(ngModel)]="purchase.purchaseDate" name="purchaseDate" required> -->
+    <form [formGroup]="purchaseForm" (ngSubmit)="submit()">
+      <div class="row mb-3 mt-3 py-3 gap-2">
+        <div class="col-md-4">
+          <mat-form-field appearance="outline" class="w-100 small-field">
+            <mat-label>Fecha</mat-label>
+            <input matInput [matDatepicker]="pickerDate" formControlName="purchaseDate" [max]="today" placeholder="DD/MM/AAAA"
+              (input)="onDateInput($event)">
+            <mat-datepicker-toggle matSuffix [for]="pickerDate"></mat-datepicker-toggle>
+            <mat-datepicker #pickerDate></mat-datepicker>
+          
+            <mat-error *ngIf="purchaseForm.get('purchaseDate')?.hasError('required')">
+              La fecha es obligatoria
+            </mat-error>
+            <mat-error *ngIf="purchaseForm.get('purchaseDate')?.hasError('invalidDate')">
+              Formato de fecha inválido. Use DD/MM/AAAA
+            </mat-error>
+            <mat-error *ngIf="purchaseForm.get('purchaseDate')?.value && 
+                              purchaseForm.get('purchaseDate')?.value > today">
+              La fecha no puede ser futura
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-md-4">
+          <mat-form-field appearance="outline" class="w-100 small-field">
+            <mat-label>Tipo</mat-label>
+            <input matInput formControlName="type">
+            <mat-error *ngIf="purchaseForm.get('type')?.hasError('required')">
+              El tipo es obligatorio
+            </mat-error>
+          </mat-form-field>
+        </div>
       </div>
-      <div class="col-md-4">
-        <mat-form-field appearance="outline" class="w-100 small-field">
-          <mat-label>Tipo</mat-label>
-          <input matInput type="text" [(ngModel)]="purchase.type" name="type" required>
-        </mat-form-field>
-        <!-- <span class="form-label">Tipo</span>
-        <input type="text" class="form-control" [(ngModel)]="purchase.type" name="type" required> -->
+      <hr>
+      <div class="mb-3 mt-3 py-3">
+        <div class="card-header d-sm-flex justify-content-sm-between align-items-center">
+          <h6 class="mb-md-0">Detalle de la compra</h6>
+        </div>
+
+        <div>
+          <table class="table align-middle">
+            <thead class="table-light">
+              <tr>
+                <th class="fw-semibold mobile-header" style="font-size: 14px; width: 45%">Producto</th>
+                <th class="fw-semibold mobile-header" style="font-size: 14px; width: 10%">Cant.</th>
+                <th class="fw-semibold mobile-header" style="font-size: 14px; width: 40%">Descripción</th>
+                <th class="fw-semibold mobile-header" style="font-size: 14px; width: 5%" class="text-center"></th>
+              </tr>
+            </thead>
+            <tbody formArrayName="items">
+              <tr *ngFor="let item of items.controls; let i = index">
+                <ng-container [formGroupName]="i">
+                  <td class="mobile-cell position-relative" style="font-size: 14px;">
+                    <div class="suggestion-wrapper">
+                      <input type="text" class="form-control form-control-sm" formControlName="productName"
+                        (input)="filterProducts(i)" placeholder="Escriba para buscar..." autocomplete="off" />
+                      <ul *ngIf="filteredProducts[i]?.length"
+                        class="list-group bg-white shadow mt-1 product-suggestions"
+                        style="z-index: 1050; max-height: 200px; overflow-y: auto;">
+                        <li *ngFor="let p of filteredProducts[i]" class="list-group-item p-0">
+                          <button type="button" class="list-group-item list-group-item-action border-0 w-100 text-start"
+                            (click)="selectProduct(i, p)">
+                            {{ p.name }}
+                          </button>
+                        </li>
+                      </ul>
+                      <ul
+                        *ngIf="filteredProducts[i]?.length === 0 && items.at(i).get('productName')?.value?.length > 2 && !items.at(i).get('productId')?.value"
+                        class="list-group bg-white shadow mt-1 product-suggestions"
+                        style="z-index: 1050; max-height: 200px; overflow-y: auto;">
+                        <li class="list-group-item p-0">
+                          <button type="button"
+                            class="list-group-item list-group-item-action border-0 w-100 text-start disabled">
+                            No se encontraron sugerencias
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  </td>
+                  <td class="mobile-cell text-center" style="font-size: 14px;">
+                    <input type="number" class="form-control form-control-sm text-center user-select-all"
+                      formControlName="quantity">
+                  </td>
+                  <td class="mobile-cell" style="font-size: 14px;">
+                    <input type="text" class="form-control form-control-sm" formControlName="description">
+                  </td>
+                  <td class="mobile-cell text-center" style="font-size: 14px;">
+                    <button type="button" class="btn btn-sm btn-danger" (click)="removeItem(i)">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M9 17h2V8H9zm4 0h2V8h-2zm-8 4V6H4V4h5V3h6v1h5v2h-1v15z" />
+                      </svg>
+                    </button>
+                  </td>
+                </ng-container>
+              </tr>
+              <tr *ngIf="items.length === 0">
+                <td colspan="4" class="text-center text-muted py-3">
+                  No hay productos agregados
+                </td>
+              </tr>
+              <tr>
+                <td colspan="4" class="text-center">
+                  <button type="button" class="btn btn-outline-primary btn-sm w-100 btn-additem" (click)="addItem()">
+                    + Agregar item
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <!-- <div class="col-md-4">
-        <label class="form-label">Centro</label>
-        <select class="form-select" [(ngModel)]="purchase.centerId" name="centerId" required>
-          <option *ngFor="let c of centers" [value]="c.id">{{ c.name }}</option>
-        </select>
-      </div> -->
-    </div>
-    <hr>
-    <div class="mb-3 mt-3 py-3">
-      <div class="card-header d-sm-flex justify-content-sm-between align-items-center">
-        <h6 class="mb-md-0">Detalle de la compra</h6>
+      <hr>
+      <div class="d-flex justify-content-end gap-2 pt-3">
+        <button type="button" class="btn btn-sm btn-secondary" (click)="cancel()">Cancelar</button>
+        <button type="submit" class="btn btn-sm btn-primary btn-save" [disabled]="purchaseForm.invalid">Guardar
+          Compra</button>
       </div>
-    
-      <div>
-        <table class="table align-middle">
-          <thead class="table-light">
-            <tr>
-              <th class="fw-semibold mobile-header" style="font-size: 14px; width: 45%">Producto</th>
-              <th class="fw-semibold mobile-header" style="font-size: 14px; width: 10%">Cant.</th>
-              <th class="fw-semibold mobile-header" style="font-size: 14px; width: 40%">Descripción</th>
-              <th class="fw-semibold mobile-header" style="font-size: 14px; width: 5%" class="text-center"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of purchase.items; let i = index">
-              <!-- Producto -->
-              <td class="mobile-cell position-relative" style="font-size: 14px;">
-                <div class="suggestion-wrapper">
-                  <input type="text" class="form-control form-control-sm" [(ngModel)]="item.productName" [name]="'productName' + i"
-                    (input)="filterProducts(i)" placeholder="Escriba para buscar..." autocomplete="off" />
-                  <ul *ngIf="filteredProducts[i]?.length" class="list-group bg-white shadow mt-1 product-suggestions"
-                    style="z-index: 1050; max-height: 200px; overflow-y: auto;">
-                    <li *ngFor="let p of filteredProducts[i]" class="list-group-item p-0">
-                      <button type="button" class="list-group-item list-group-item-action border-0 w-100 text-start"
-                        (click)="selectProduct(i, p)">
-                        {{ p.name }}
-                      </button>
-                    </li>
-                  </ul>
-                  <ul *ngIf="filteredProducts[i]?.length === 0 && item.productName.length > 2 && !purchase.items[i].productId"
-                    class="list-group bg-white shadow mt-1 product-suggestions"
-                    style="z-index: 1050; max-height: 200px; overflow-y: auto;">
-                    <li class="list-group-item p-0">
-                      <button type="button" class="list-group-item list-group-item-action border-0 w-100 text-start disabled">
-                        No se encontraron sugerencias
-                      </button>
-                    </li>
-                  </ul>
-                </div>
-              </td>
-    
-              <!-- Cantidad -->
-              <td class="mobile-cell text-center" style="font-size: 14px;">
-                <input type="number" class="form-control form-control-sm text-center user-select-all" [(ngModel)]="item.quantity"
-                  [name]="'quantity' + i" required>
-              </td>
-    
-              <!-- Descripción -->
-              <td class="mobile-cell" style="font-size: 14px;">
-                <input type="text" class="form-control form-control-sm" [(ngModel)]="item.description"
-                  [name]="'description' + i">
-              </td>
-    
-              <!-- Acción -->
-              <td class="mobile-cell text-center" style="font-size: 14px;">
-                <button type="button" class="btn btn-sm btn-danger" (click)="removeItem(i)">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M9 17h2V8H9zm4 0h2V8h-2zm-8 4V6H4V4h5V3h6v1h5v2h-1v15z" />
-                  </svg>
-                </button>
-              </td>
-            </tr>
-    
-            <!-- Si no hay ítems -->
-            <tr *ngIf="purchase.items.length === 0">
-              <td colspan="4" class="text-center text-muted py-3">
-                No hay productos agregados
-              </td>
-            </tr>
-            <tr>
-              <td colspan="4" class="text-center">
-                <button type="button" class="btn btn-outline-primary btn-sm w-100 btn-additem" (click)="addItem()">
-                  + Agregar item
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <hr>
-    <div class="d-flex justify-content-end gap-2 pt-3">
-      <button type="button" class="btn btn-sm btn-secondary" (click)="cancel()">Cancelar</button>
-      <button type="submit" class="btn btn-sm btn-primary btn-save" [disabled]="!purchaseForm.form.valid">Guardar Compra</button>
-    </div>
-  </form>
-</div>
+    </form>
+  </div>
 </div>

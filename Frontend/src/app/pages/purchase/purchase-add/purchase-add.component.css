@@ -82,16 +82,6 @@ table {
     }
 }
 
-/* @media (max-width: 575.98px) {
-    .mobile-cell {
-        overflow: visible !important;
-    }
-
-    .product-suggestions {
-        z-index: 2000;
-    }
-} */
-
 .dropdown-suggestions .list-group-item-action:hover {
   background-color: #f8f9fa;
 }
@@ -155,6 +145,10 @@ input[type=number] {
     appearance: textfield;
 }
 
+mat-error {
+    display: block !important;
+    color: red !important;
+}
 /* ESTILOS PARA ANGULAR MATERIAL */
 /* Ajustes generales para los campos de formulario MDC */
 .mat-mdc-text-field-wrapper {
@@ -267,11 +261,4 @@ input[type=number] {
 /* Ajuste para el espacio del icono (si lo hay) */
 .mdc-text-field--with-leading-icon .mat-mdc-form-field-infix {
     padding-left: 4px !important;
-}
-
-/* Elimina completamente el espacio del subscript */
-.mat-mdc-form-field-subscript-wrapper {
-    display: none !important;
-    height: 0 !important;
-    min-height: 0 !important;
 }
