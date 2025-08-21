@@ -148,7 +148,7 @@ public class ReportsController : ControllerBase
             {
                 ProductId = ing?.ProductId ?? egr!.ProductId,
                 ProductName = ing?.ProductName ?? egr!.ProductName,
-                ProductCode = ing?.ProductCode ?? egr!.ProductCode ?? productCodeLookup.GetValueOrDefault(ing?.ProductId ?? egr!.ProductId, string.Empty),
+                ProductCode = ing?.ProductCode ?? egr?.ProductCode ?? productCodeLookup.GetValueOrDefault(ing?.ProductId ?? egr?.ProductId ?? 0, string.Empty) ?? string.Empty,
                 CategoryId = ing?.CategoryId ?? egr!.CategoryId,
                 CategoryName = ing?.CategoryName ?? egr!.CategoryName,
                 CenterId = centerId ?? 0,
@@ -204,7 +204,8 @@ public class ReportsController : ControllerBase
         }
 
         var ingresoEvents = purchases
-            .SelectMany(p => p.Items.Select(i => new {
+            .SelectMany(p => p.Items.Select(i => new
+            {
                 Date = p.PurchaseDate.Date,
                 Qty = i.Quantity,
                 ProductId = i.ProductId,
@@ -212,7 +213,8 @@ public class ReportsController : ControllerBase
             }));
 
         var egresoEvents = distributions
-            .SelectMany(d => d.Items.Select(i => new {
+            .SelectMany(d => d.Items.Select(i => new
+            {
                 Date = d.DeliveryDate.Date,
                 Qty = i.Quantity,
                 ProductId = i.ItemPurchase.ProductId,
@@ -236,7 +238,8 @@ public class ReportsController : ControllerBase
                 egresoEvents.Select(e => new { e.Date, Ingreso = 0, Egreso = e.Qty })
             )
             .GroupBy(x => x.Date)
-            .Select(g => new {
+            .Select(g => new
+            {
                 Date = g.Key,
                 Ingresos = g.Sum(z => z.Ingreso),
                 Egresos = g.Sum(z => z.Egreso)
@@ -246,10 +249,12 @@ public class ReportsController : ControllerBase
 
         int runIng = 0;
         int runEgr = 0;
-        var history = consolidated.Select(c => {
+        var history = consolidated.Select(c =>
+        {
             runIng += c.Ingresos;
             runEgr += c.Egresos;
-            return new StockHistoryDTO {
+            return new StockHistoryDTO
+            {
                 StockDate = c.Date,
                 IngresosAcumulados = runIng,
                 EgresosAcumulados = runEgr,
