@@ -234,7 +234,8 @@ namespace ProyectoCaritas.Controllers
             [FromQuery] DateTime? dateTo = null,
             [FromQuery] string status = null,
             [FromQuery] string productName = null,
-            [FromQuery] int? centerId = null
+            [FromQuery] int? centerId = null,
+            [FromQuery] string typeCenter = null
         )
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -268,11 +269,21 @@ namespace ProyectoCaritas.Controllers
                 query = query.Where(dr => dr.Status == status);
 
             if (!string.IsNullOrEmpty(productName))
-                query = query.Where(dr => dr.OrderLine.Product.Name.Contains(productName, StringComparison.OrdinalIgnoreCase));
+            {
+                var productNameLower = productName.ToLower();
+                query = query.Where(dr => dr.OrderLine.Product.Name.ToLower().Contains(productNameLower));
+            }
 
             if (centerId.HasValue)
-                query = query.Where(dr => dr.AssignedCenterId == centerId.Value ||
-                    dr.OrderLine.Request.RequestingCenterId == centerId.Value);
+            {
+                if (typeCenter == "from")
+                    query = query.Where(dr => dr.AssignedCenterId == centerId);
+                else if (typeCenter == "to")
+                    query = query.Where(dr => dr.OrderLine.Request.RequestingCenterId == centerId);
+                else
+                    query = query.Where(dr => dr.AssignedCenterId == centerId ||
+                        dr.OrderLine.Request.RequestingCenterId == centerId);
+            }
 
             // Filtro por centro si no es admin
             if (!User.IsInRole("Admin") && user.CenterId != null)

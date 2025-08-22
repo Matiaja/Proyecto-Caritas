@@ -14,6 +14,16 @@
         <div class="row gx-3 gy-3 align-items-end">
             <div class="col-12 col-md-6 col-lg-3">
                 <mat-form-field appearance="outline" class="w-100 small-field">
+                    <mat-label>Tipo de movimiento</mat-label>
+                    <mat-select [(ngModel)]="movementType" (ngModelChange)="applyFilters()">
+                        <mat-option value="donations">Donaciones</mat-option>
+                        <mat-option value="distributions">Compras / Bolsones</mat-option>
+                        <!-- <mat-option value="direct">De almacén directo</mat-option> -->
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="col-12 col-md-6 col-lg-3">
+                <mat-form-field appearance="outline" class="w-100 small-field">
                     <mat-label>Desde</mat-label>
                     <input matInput [matDatepicker]="pickerFrom" [(ngModel)]="dateFrom" (ngModelChange)="applyFilters()">
                     <mat-datepicker-toggle matSuffix [for]="pickerFrom"></mat-datepicker-toggle>
@@ -33,11 +43,17 @@
                     <mat-label>Estado</mat-label>
                     <mat-select [(ngModel)]="status" (ngModelChange)="applyFilters()">
                         <mat-option value="">Todos</mat-option>
-                        <mat-option value="Asignada">Asignada</mat-option>
-                        <mat-option value="Aceptada">Aceptada</mat-option>
-                        <mat-option value="Rechazada">Rechazada</mat-option>
-                        <mat-option value="En camino">En camino</mat-option>
-                        <mat-option value="Recibida">Recibida</mat-option>
+                        @if (movementType === 'donations') {
+                            <mat-option value="Asignada">Asignada</mat-option>
+                            <mat-option value="Aceptada">Aceptada</mat-option>
+                            <mat-option value="Rechazada">Rechazada</mat-option>
+                            <mat-option value="En camino">En camino</mat-option>
+                            <mat-option value="Recibida">Recibida</mat-option>
+                        }
+                        @if (movementType === 'distributions') {
+                            <mat-option value="Pendiente">Pendiente</mat-option>
+                            <mat-option value="Entregado">Entregado</mat-option>
+                        }
                     </mat-select>
                 </mat-form-field>
             </div>
@@ -47,6 +63,29 @@
                     <input matInput type="text" [(ngModel)]="productName" (ngModelChange)="applyFilters()">
                 </mat-form-field>
             </div>
+            <div class="col-12 col-md-6 col-lg-3">
+                <mat-form-field appearance="outline" class="w-100 small-field">
+                    <mat-label>Centro</mat-label>
+                    <mat-select [(ngModel)]="centerId" (ngModelChange)="applyFilters()">
+                        <mat-option value="">Todos</mat-option>
+                        <mat-option *ngFor="let center of centers" [value]="center.id">
+                            {{ center.name }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            @if (centerId !== null) {
+                <div class="col-12 col-md-6 col-lg-3">
+                    <mat-form-field appearance="outline" class="w-100 small-field">
+                        <mat-label>Tipo de centro</mat-label>
+                        <mat-select [(ngModel)]="typeCenter" (ngModelChange)="applyFilters()">
+                            <mat-option value="">Todos</mat-option>
+                            <mat-option value="from">Emisor</mat-option>
+                            <mat-option value="to">Receptor</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            }
         </div>
         <div class="row pt-3">
             <div class="col-12 text-end">
@@ -89,7 +128,7 @@
     [dataSource]="movements"
     [columnHeaders]="columnHeaders"
     [mobileHeaders]="mobileHeaders"
-    [showSelectButton]="true"
+    [showSelectButton]="showDetail"
     [showFilterButton]="false"
     [rowClass]="getRowClass"
     (selectElement)="onSelectMovement($event)"
