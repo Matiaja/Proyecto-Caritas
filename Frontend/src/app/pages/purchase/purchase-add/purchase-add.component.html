@@ -5,7 +5,7 @@
     </div>
 
     <form [formGroup]="purchaseForm" (ngSubmit)="submit()">
-      <div class="row mb-3 mt-3 py-3 gap-2">
+      <div class="row mb-3 mt-3 py-3">
         <div class="col-md-4">
           <mat-form-field appearance="outline" class="w-100 small-field">
             <mat-label>Fecha</mat-label>
@@ -33,6 +33,12 @@
             <mat-error *ngIf="purchaseForm.get('type')?.hasError('required')">
               El tipo es obligatorio
             </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-md-4">
+          <mat-form-field appearance="outline" class="w-100 small-field">
+            <mat-label>Comprado por</mat-label>
+            <input matInput formControlName="buyerName" placeholder="Nombre y apellido del comprador">
           </mat-form-field>
         </div>
       </div>

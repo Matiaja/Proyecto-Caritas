@@ -80,6 +80,7 @@ export class PurchaseAddComponent implements OnInit {
     this.purchaseForm = this.fb.group({
       purchaseDate: [null, [Validators.required]],
       type: ['', [Validators.required]],
+      buyerName: [''],
       centerId: [0],
       items: this.fb.array([])
     });
@@ -166,8 +167,8 @@ export class PurchaseAddComponent implements OnInit {
 
     this.purchaseService.createPurchase(purchase).subscribe({
       next: (res: any) => {
-        this.toastr.success('Compra registrada correctamente', 'Éxito');
         this.router.navigate(['/purchases/' + res.id]);
+        this.toastr.success('Compra registrada correctamente', 'Éxito');
       },
       error: (err) => {
         console.error(err);

@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using ProyectoCaritas.Data;
 using ProyectoCaritas.Models.Entities;
 using ProyectoCaritas.Models.DTOs;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace ProyectoCaritas.Controllers;
 
@@ -11,10 +13,12 @@ namespace ProyectoCaritas.Controllers;
 public class PurchasesController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
+    private readonly UserManager<User> _userManager;
 
-    public PurchasesController(ApplicationDbContext context)
+    public PurchasesController(ApplicationDbContext context, UserManager<User> userManager)
     {
         _context = context;
+        _userManager = userManager;
     }
 
     // === COMPRAS ===
@@ -22,10 +26,25 @@ public class PurchasesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<PurchaseDTO>>> GetPurchases()
     {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        // Si el token no tiene ID, devuelve un error 401
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized(new { message = "Invalid token." });
+        }
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            return NotFound(new { message = "User not found." });
+        }
+
         var purchases = await _context.Purchases
             .Include(p => p.Center)
             .Include(p => p.Items).ThenInclude(i => i.ItemsDistribution)
             .Include(p => p.Items).ThenInclude(i => i.Product)
+            .Where(p => p.CenterId == user.CenterId)
             .OrderByDescending(p => p.PurchaseDate)
             .ToListAsync();
 
@@ -36,12 +55,28 @@ public class PurchasesController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<PurchaseDTO>> GetPurchase(int id)
     {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        // Si el token no tiene ID, devuelve un error 401
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized(new { message = "Invalid token." });
+        }
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            return NotFound(new { message = "User not found." });
+        }
+
         var purchase = await _context.Purchases
             .Include(p => p.Center)
+            .Include(p => p.OriginalCenter)
             .Include(p => p.Distributions).ThenInclude(d => d.Items)
             .Include(p => p.Distributions).ThenInclude(d => d.Center)
             .Include(p => p.Items).ThenInclude(i => i.ItemsDistribution)
             .Include(p => p.Items).ThenInclude(i => i.Product)
+            .Where(p => p.CenterId == user.CenterId)
             .FirstOrDefaultAsync(p => p.Id == id);
 
         if (purchase == null)
@@ -97,6 +132,8 @@ public class PurchasesController : ControllerBase
             PurchaseDate = parsedDate.Date,
             Type = dto.Type.Trim(),
             CenterId = dto.CenterId,
+            OriginalCenterId = dto.CenterId, // El origen es el mismo Centro que compra
+            BuyerName = string.IsNullOrWhiteSpace(dto.BuyerName) ? null : dto.BuyerName.Trim(),
             Items = dto.Items.Select(i => new ItemPurchase
             {
                 ProductId = i.ProductId,

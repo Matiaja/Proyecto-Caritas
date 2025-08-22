@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProyectoCaritas.Data;
 
@@ -11,9 +12,11 @@ using ProyectoCaritas.Data;
 namespace ProyectoCaritas.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250822035626_AddOriginalCenterPurchase")]
+    partial class AddOriginalCenterPurchase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -500,7 +503,7 @@ namespace ProyectoCaritas.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("OriginalCenterId")
+                    b.Property<int?>("OriginalCenterId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("PurchaseDate")
@@ -910,9 +913,7 @@ namespace ProyectoCaritas.Migrations
 
                     b.HasOne("ProyectoCaritas.Models.Entities.Center", "OriginalCenter")
                         .WithMany()
-                        .HasForeignKey("OriginalCenterId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("OriginalCenterId");
 
                     b.Navigation("Center");
 

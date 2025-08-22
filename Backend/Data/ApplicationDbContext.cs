@@ -32,6 +32,12 @@ namespace ProyectoCaritas.Data
                         // Configurar StockReport como vista
                         modelBuilder.Entity<StockReport>()
                             .ToView("stockreport");
+
+                        modelBuilder.Entity<Purchase>()
+                                .HasOne(p => p.OriginalCenter)
+                                .WithMany()
+                                .HasForeignKey(p => p.OriginalCenterId)
+                                .OnDelete(DeleteBehavior.Restrict);
                 }
 
         }

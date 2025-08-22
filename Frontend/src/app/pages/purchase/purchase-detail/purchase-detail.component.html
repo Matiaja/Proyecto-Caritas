@@ -16,11 +16,15 @@
             </div>
             <div class="col-sm-6">
                 <span class="fw-medium">Origen:</span>
-                <span class="ps-2">{{ purchase.centerName }}</span>
+                <span class="ps-2">{{ purchase.originalCenterName }}</span>
             </div>
             <div class="col-sm-6">
                 <span class="fw-medium">Tipo:</span>
                 <span class="ps-2">{{ purchase.type  }}</span>
+            </div>
+            <div class="col-sm-6">
+                <span class="fw-medium">{{ purchase.originalCenterId === purchase.centerId ? 'Comprado por:' : 'Recibido por:'}}</span>
+                <span class="ps-2">{{ purchase.buyerName }}</span>
             </div>
         </div>
     </div>
