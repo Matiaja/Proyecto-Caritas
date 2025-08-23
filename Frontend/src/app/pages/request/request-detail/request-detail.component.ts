@@ -31,14 +31,14 @@ export class RequestDetailComponent implements OnInit {
 
   title = 'Lista de pedidos';
   columnHeaders: Record<string, string> = {
-    id: 'Cod.',
+    id: '#',
     productName: 'Producto',
     quantity: 'Cantidad',
     description: 'Descripción',
     status: 'Estado',
   };
   mobileHeaders: Record<string, string> = {
-    id: 'Cod.',
+    id: '#',
     productName: 'Producto',
     quantity: 'Cant.',
     status: 'Estado',

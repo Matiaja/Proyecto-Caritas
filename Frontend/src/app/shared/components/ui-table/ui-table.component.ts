@@ -30,6 +30,9 @@ export class UiTableComponent<T extends Record<string, any>> implements OnChange
   @Input() showStatusFilter = false;
   @Input() statusOptions: string[] = [];
 
+  @Input() showUrgencyFilter = false;
+  @Input() urgencyOptions: string[] = [];
+
   @Input() sortOptions: { key: string; label: string }[] = [];
   @Input() showCommonFilters = false;
 
@@ -53,6 +56,7 @@ export class UiTableComponent<T extends Record<string, any>> implements OnChange
   @Output() filterChange = new EventEmitter<{
     categoryId?: number;
     status?: string;
+    urgencyLevel?: string;
     sortBy?: string;
     order?: string;
     centerId?: number;
@@ -75,6 +79,7 @@ export class UiTableComponent<T extends Record<string, any>> implements OnChange
   searchTerm = '';
   selectedCategory: number | null = null;
   selectedStatus: string | null = null;
+  selectedUrgency: string | null = null;
   selectedOption: number | null = null;
   selectedCenter: number | null = null;
   selectedSortBy: string | null = null;
@@ -103,6 +108,7 @@ export class UiTableComponent<T extends Record<string, any>> implements OnChange
       this.filterChange.emit({
         categoryId: this.selectedCategory || undefined,
         status: this.selectedStatus || undefined,
+        urgencyLevel: this.selectedUrgency || undefined,
         centerId: this.selectedCenter || undefined,
         sortBy: this.selectedSortBy || undefined,
         order: this.selectedOrder,

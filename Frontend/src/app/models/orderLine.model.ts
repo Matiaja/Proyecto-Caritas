@@ -9,6 +9,7 @@ export interface OrderLine {
   productId: number;
   quantity: number;
   description: string;
+  status?: string;
   productName?: string;
   product?: Product;
   request?: RequestModel;

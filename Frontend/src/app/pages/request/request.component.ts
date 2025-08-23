@@ -7,34 +7,38 @@ import { Router } from '@angular/router';
 import { ResponsiveService } from '../../services/responsive/responsive.service';
 import { ConfirmModalService } from '../../services/confirmModal/confirm-modal.service';
 import { ToastrService } from 'ngx-toastr';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-request',
   standalone: true,
-  imports: [CommonModule, UiTableComponent],
+  imports: [CommonModule, UiTableComponent, FormsModule],
   templateUrl: './request.component.html',
   styleUrl: './request.component.css',
 })
 export class RequestComponent implements OnInit {
   title = 'Solicitudes';
   columnHeaders: Record<string, string> = {
+    id: '#',
     requestDate: 'Fecha de solicitud',
     centerName: 'Centro/Parroquia',
     status: 'Estado',
     urgencyLevel: 'Urgencia',
   };
-  displayedColumns = ['requestDate', 'centerName', 'status', 'urgencyLevel'];
+  displayedColumns = ['id','requestDate', 'centerName', 'status', 'urgencyLevel'];
   mobileHeaders: Record<string, string> = {
+    id: '#',
     requestDate: 'Fecha',
     centerName: 'Centro',
     urgencyLevel: 'Urgencia',
   };
-  mobileColumns = ['requestDate', 'centerName', 'urgencyLevel'];
+  mobileColumns = ['id','requestDate', 'centerName', 'urgencyLevel'];
   requests: RequestModel[] = [];
 
   // filters
 
   selectedStatus: string | null = null;
+  selectedUrgency: string | null = null;
   sortBy = '';
   sortOptions = [
     { key: 'requestDate', label: 'Fecha' },
@@ -43,6 +47,7 @@ export class RequestComponent implements OnInit {
   order = 'asc';
   searchColumns = ['centerName', 'requestDate'];
   statusOptions = ['Pendiente', 'Finalizada'];
+  urgencyOptions = ['Alto', 'Bajo'];
 
   page = 1;
   itemsPerPage = 10;
@@ -65,8 +70,9 @@ export class RequestComponent implements OnInit {
     this.loadRequests();
   }
 
-  onFilterChange(filters: { status?: string; sortBy?: string; order?: string }) {
+  onFilterChange(filters: { status?: string; urgencyLevel?: string; sortBy?: string; order?: string }) {
     this.selectedStatus = filters.status || null;
+    this.selectedUrgency = filters.urgencyLevel || null;
     this.sortBy = filters.sortBy || '';
     this.order = filters.order || 'asc';
     this.loadRequests();
@@ -80,6 +86,11 @@ export class RequestComponent implements OnInit {
         // Filtro por estado
         if (this.selectedStatus) {
           filtered = filtered.filter((r) => r.status === this.selectedStatus);
+        }
+
+        // Filtro por urgencia
+        if (this.selectedUrgency) {
+          filtered = filtered.filter((r) => r.urgencyLevel === this.selectedUrgency);
         }
 
         // Ordenamiento
@@ -100,9 +111,6 @@ export class RequestComponent implements OnInit {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric',
-          }) + '<br>' + new Date(req.requestDate).toLocaleTimeString('es-ES', {
-            hour: '2-digit',
-            minute: '2-digit',
           }),
           centerName: req.requestingCenter?.name,
         }));

@@ -134,7 +134,10 @@ export class RequestAddComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.formGroup1 = new FormGroup({});
+    this.formGroup1 = this.fb.group({
+      requestingCenterId: ['', Validators.required],
+      urgencyLevel: ['', Validators.required],
+    });
     this.formGroup2 = this.fb.group({
       product: [null, Validators.required],
       quantity: [null, [Validators.required, Validators.min(1)]],
@@ -272,7 +275,8 @@ export class RequestAddComponent implements OnInit {
     };
     this.requestService.addRequest(requestDTO).subscribe({
       next: (response) => {
-        this.toastr.success('Solicitud creada con éxito', 'Éxito');
+        const id = response.id;
+        this.toastr.success('Solicitud ' + (id != null ? `#${id}` : '') + ' creada con éxito', 'Éxito');
         this.router.navigate(['requests/']);
       },
       error: (err) => {

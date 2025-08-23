@@ -5,18 +5,41 @@
   (selectionChange)="makeRequest($event)"
 >
   <mat-step [stepControl]="formGroup1" label="Solicitud" [completed]="false" [editable]="true">
-    @if (centers) {
-      <generic-form
-        [data]="formConfig"
-        [showButtons]="false"
-        (formSubmit)="onSubmit()"
-        (formCancel)="onCancel()"
-        (formChange)="formGroup1 = $event"
-      >
-      </generic-form>
-    }
-    <div class="d-flex justify-content-end gap-4 mt-2 me-lg-5">
-      <button mat-button type="button" class="me-lg-5" (click)="next(formGroup1)">Sig.</button>
+    <div class="d-flex justify-content-center mt-5 mb-1 mb-sm-3">
+      <div class="card container p-md-3 shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h4 class="text-center mb-0">Nueva solicitud</h4>
+        </div>
+    <form [formGroup]="formGroup1" class="px-2 pt-2">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="requestingCenterId" class="form-label">Centro solicitante</label>
+          <select id="requestingCenterId" class="form-select" formControlName="requestingCenterId">
+            <option value="">Seleccione el centro</option>
+            <option *ngFor="let center of centers" [value]="center.value">{{ center.label }}</option>
+          </select>
+          <div *ngIf="formGroup1.get('requestingCenterId')?.invalid && (formGroup1.get('requestingCenterId')?.touched || formGroup1.get('requestingCenterId')?.dirty)" class="invalid-feedback d-block">
+            El centro es requerido.
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="urgencyLevel" class="form-label">Nivel de urgencia</label>
+          <select id="urgencyLevel" class="form-select" formControlName="urgencyLevel">
+            <option value="">Seleccione la urgencia</option>
+            <option value="Bajo">Bajo</option>
+            <option value="Alto">Alto</option>
+          </select>
+          <div *ngIf="formGroup1.get('urgencyLevel')?.invalid && (formGroup1.get('urgencyLevel')?.touched || formGroup1.get('urgencyLevel')?.dirty)" class="invalid-feedback d-block">
+            Este campo es requerido.
+          </div>
+        </div>
+      </div>
+      <div class="d-flex justify-content-end gap-4 mt-2 me-lg-5">
+        <button mat-button type="button" class="me-lg-2" (click)="onCancel()">Cancelar</button>
+        <button mat-button type="button" class="me-lg-5" (click)="next(formGroup1)">Sig.</button>
+      </div>
+    </form>
+    </div>
     </div>
   </mat-step>
   <mat-step label="Pedidos" [completed]="false" [editable]="true">

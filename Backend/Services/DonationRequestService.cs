@@ -17,7 +17,7 @@ public class DonationRequestService
         var dr = await _context.DonationRequests
                 .Include(dr => dr.OrderLine)
                 .Where(dr => dr.AssignedCenterId == centerId && dr.OrderLine.ProductId == productId &&
-                             (dr.Status == "Aceptada" || dr.Status == "Enviada"))
+                             (dr.Status == "Aceptada" || dr.Status == "En camino"))
                 .ToListAsync();
 
         return dr;

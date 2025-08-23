@@ -19,6 +19,7 @@ export class OrderlineComponent  implements OnInit {
   orderLine: OrderLine | null = null;
   assignedQuantity = 0;
   pendingQuantity = 0;
+  receivedQuantity = 0;
 
   // Variables para la tabla
   title = 'Donaciones asignadas';
@@ -50,9 +51,10 @@ export class OrderlineComponent  implements OnInit {
       this.orderLineService.getOrderLineById(this.orderLineId).subscribe({
         next: (data) => {
           this.orderLine = data;
-          this.assignedQuantity = data.donationRequests?.reduce((sum: number, dr) => sum + dr.quantity, 0) ?? 0;
+          this.assignedQuantity = data.donationRequests?.reduce((sum: number, dr) => sum + (dr.status !== 'Rechazada' ? dr.quantity : 0), 0) ?? 0;
           this.pendingQuantity = data.quantity - this.assignedQuantity;
-          
+          this.receivedQuantity = data.donationRequests?.reduce((sum: number, dr) => sum + (dr.status === 'Recibida' ? dr.quantity : 0), 0) ?? 0;
+
           // Asignar los datos a donationsData para la tabla
           this.donationsData = (data.donationRequests || []).map(dr => ({
             centerName: dr.assignedCenter?.name || 'Sin nombre',

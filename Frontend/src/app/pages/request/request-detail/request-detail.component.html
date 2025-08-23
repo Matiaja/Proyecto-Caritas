@@ -11,12 +11,16 @@
           <span class="ps-2">{{ request.requestingCenter?.name }}</span>
         </div>
         <div class="col-sm-6">
+          <span class="fw-medium">Nivel de urgencia:</span>
+          <span class="ps-2">{{ request.urgencyLevel }}</span>
+        </div>
+        <div class="col-sm-6">
           <span class="fw-medium">Fecha:</span>
           <span class="ps-2">{{ request.requestDate | date: 'dd/MM/yyyy' }}</span>
         </div>
         <div class="col-sm-6">
-          <span class="fw-medium">Nivel de urgencia:</span>
-          <span class="ps-2">{{ request.urgencyLevel }}</span>
+          <span class="fw-medium">Hora:</span>
+          <span class="ps-2">{{ request.requestDate | date: 'HH:mm' }}</span>
         </div>
       </div>
     </div>
@@ -46,7 +50,7 @@
     <ng-template #actionTemplate let-row>
       <button class="btn btn-assign"
         [ngClass]="isMobile ? 'btn-outline-primary btn-xs mobile-action-btn' : 'btn-outline-primary btn-sm'"
-        (click)="assign(row)">
+        (click)="assign(row)" [disabled]="request.status !== 'Pendiente' || (row.status !== 'Pendiente' && row.status !== 'Parcial')">
         <svg xmlns="http://www.w3.org/2000/svg" [ngClass]="isMobile ? 'mobile-btn-icon' : ''"  [attr.width]="isMobile ? '16' : '24'" [attr.height]="isMobile ? '16' : '24'"
           viewBox="0 0 24 24">
           <path fill="currentColor"

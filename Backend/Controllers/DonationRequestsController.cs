@@ -118,7 +118,7 @@ namespace ProyectoCaritas.Controllers
                 {
                     Status = "400",
                     Error = "Bad Request",
-                    Message = "User is not assigned to the center assigned."
+                    Message = "User is not included to the center assigned."
                 });
             }
 

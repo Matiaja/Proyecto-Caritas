@@ -4,6 +4,7 @@ import { environment } from '../../../environments/environment';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 import { AuthService } from '../../auth/auth.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,7 @@ export class NotificationService implements OnDestroy {
   private notificationsSubject = new BehaviorSubject<any[]>([]);
   public notifications$ = this.notificationsSubject.asObservable();
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  constructor(private http: HttpClient, private authService: AuthService, private toast: ToastrService) {}
 
   public initializeConnection() {
     const token = this.authService.getToken();
@@ -55,7 +56,9 @@ export class NotificationService implements OnDestroy {
     this.hubConnection.on('ReceiveNotification', (notification: any) => {
       const currentNotifications = this.notificationsSubject.value;
       if (!currentNotifications.some(n => n.id === notification.id)) {
+        notification.hasOpenedOnce = false;
         this.notificationsSubject.next([notification, ...currentNotifications]);
+        this.toast.success('Nueva notificación recibida');
       }
     });
 

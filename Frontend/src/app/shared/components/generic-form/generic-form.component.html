@@ -8,7 +8,7 @@
         <label [for]="field.name" [class.required]="isRequired(field)">{{ field.label }}</label>
         <ng-container [ngSwitch]="field.type">
           <!-- Campo de texto -->
-          <mat-form-field *ngSwitchCase="'date'" appearance="outline" class="w-100 small-field">
+          <mat-form-field *ngSwitchCase="'date'" appearance="outline" class="w-100 small-field pb-0 mb-0">
             <input matInput [matDatepicker]="pickerDate"
               [id]="field.name"
               name="{{ field.name }}"

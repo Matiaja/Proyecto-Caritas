@@ -99,7 +99,7 @@ export class RequestAssignComponent implements OnInit {
         const ol = request.orderLines.find((line) => line.id === this.orderLineId);
         if (ol) {
           this.orderLine = ol;
-          const assigned = ol.donationRequests?.reduce((sum, dr) => sum + dr.quantity, 0) ?? 0;
+          const assigned = ol.donationRequests?.reduce((sum, dr) => sum + (dr.status !== 'Rechazada' ? dr.quantity : 0), 0) ?? 0;
           this.pendingQuantity = ol.quantity - assigned;
         }
         this.loadProduct();

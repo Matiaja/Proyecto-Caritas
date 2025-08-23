@@ -58,12 +58,11 @@
         <thead class="table-light">
           <tr>
             <th>Tipo</th>
-            <th>Cantidad</th>
-            <th>Descripción</th>
-            <th>Origen</th>
+            <th>Cant.</th>
+            <th>Desc.</th>
+            <th>Origen/Destino</th>
             <th>Fecha</th>
-            <th>Fecha de expiración</th>
-            <th>Peso</th>
+            <th>Fecha de exp.</th>
           </tr>
         </thead>
         <tbody>
@@ -81,7 +80,6 @@
             <td>{{ item.origin || '-' }}</td>
             <td>{{ item.date }}</td>
             <td>{{ item.expirationDate ? item.expirationDate : '-' }}</td>
-            <td>{{ item.weight && item.weight > 0 ? item.weight : '-' }}</td>
           </tr>
           <tr *ngIf="filteredStock.length === 0">
             <td colspan="7" class="text-muted">No hay movimientos con esos filtros.</td>
