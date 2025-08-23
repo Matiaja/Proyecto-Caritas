@@ -14,6 +14,7 @@ export interface PdfGenerationRequest {
   orientation?: 'portrait' | 'landscape';
   signatureAreas?: string[];
   rightNotes?: string[];
+  chartImages?: { title?: string; base64: string; widthPercent?: number }[];
 }
 
 export interface PdfSection {

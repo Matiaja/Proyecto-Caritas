@@ -8,6 +8,7 @@ import { ProductService } from '../../../services/product/product.service';
 import { GlobalStateService } from '../../../services/global/global-state.service';
 import { FormsModule } from '@angular/forms';
 import { PdfService } from '../../../services/pdf/pdf.service';
+import { CenterService } from '../../../services/center/center.service';
 
 @Component({
   selector: 'app-storage-detail',
@@ -33,6 +34,7 @@ export class StorageDetailComponent implements OnInit {
   ];
 
   centerId: number | null = null;
+  centerName: string = '';
 
     filters = {
       type: '',
@@ -47,7 +49,8 @@ export class StorageDetailComponent implements OnInit {
     private router: Router,
     private location: Location,
     private globalStateService: GlobalStateService,
-    private pdfService: PdfService
+    private pdfService: PdfService,
+    private centerService: CenterService // NUEVO
   ) {}
 
   ngOnInit(): void {
@@ -56,7 +59,9 @@ export class StorageDetailComponent implements OnInit {
       this.route.queryParams.subscribe((queryParams) => {
         const queryCenterId = queryParams['centerId'];
         this.centerId = queryCenterId ? +queryCenterId : this.globalStateService.getCurrentCenterId();
-        
+        if (this.centerId !== null) {
+          this.fetchCenterName(this.centerId);
+        }
         this.loadProductStockDetails(productId);
       });
     });
@@ -75,6 +80,18 @@ export class StorageDetailComponent implements OnInit {
         console.error('Error al cargar los detalles del stock', error);
       }
     );
+  }
+
+  private fetchCenterName(centerId: number) {
+    this.centerService.getCenters().subscribe({
+      next: (centers: any[]) => {
+        const c = centers.find(c => c.id === centerId);
+        this.centerName = c ? c.name : `Centro #${centerId}`;
+      },
+      error: () => {
+        this.centerName = `Centro #${centerId}`;
+      }
+    });
   }
 
   get dateRangeInvalid(): boolean {
@@ -113,16 +130,13 @@ export class StorageDetailComponent implements OnInit {
       console.error('No hay datos de stock para generar PDF');
       return;
     }
-
     const productData = {
       name: this.stock[0].product.name,
       code: this.stock[0].product.code
     };
-
     const centerData = {
-      name: 'Traer nombre del centro'
+      name: this.centerName || 'Centro no disponible'
     };
-
     this.pdfService.generateStockDetailPdfWithData(productData, centerData, this.filteredStock).subscribe({
       next: (blob) => {
         const filename = `detalle_stock_${this.stock[0].product.name}_${new Date().toISOString().split('T')[0]}.pdf`;

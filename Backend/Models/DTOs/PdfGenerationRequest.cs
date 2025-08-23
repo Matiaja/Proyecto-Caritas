@@ -9,11 +9,12 @@ namespace ProyectoCaritas.Models.DTOs
         public List<PdfTableData>? TableData { get; set; }
         public string? Footer { get; set; }
 
-        public string? Orientation { get; set; } // "portrait" | "landscape"
-        public List<string>? SignatureAreas { get; set; } // labels for signature lines
+        public string? Orientation { get; set; } 
+        public List<string>? SignatureAreas { get; set; }
 
-        // NEW: notes at right under the title
         public List<string>? RightNotes { get; set; }
+
+        public List<PdfChartImage>? ChartImages { get; set; }
     }
 
     public class PdfSection
@@ -34,5 +35,12 @@ namespace ProyectoCaritas.Models.DTOs
         {
             throw new NotImplementedException();
         }
+    }
+
+    public class PdfChartImage
+    {
+        public string? Title { get; set; }
+        public string Base64 { get; set; } = string.Empty;
+        public double? WidthPercent { get; set; }
     }
 }

@@ -6,9 +6,12 @@ import { CategoryService } from '../../services/category/category.service';
 import { ProductService } from '../../services/product/product.service';
 import { CenterService } from '../../services/center/center.service';
 import { AuthService } from '../../auth/auth.service';
-import { ChartData, ChartOptions } from 'chart.js';
+import { ChartData, ChartOptions, Chart, Plugin } from 'chart.js';
+import DataLabelsPlugin from 'chartjs-plugin-datalabels';
+import { PdfService } from '../../services/pdf/pdf.service';
 import { NgChartsModule } from 'ng2-charts';
 import { forkJoin } from 'rxjs';
+import { GlobalStateService } from '../../services/global/global-state.service'; // OPCIONAL si existe
 
 interface Category {
   id: number;
@@ -47,6 +50,9 @@ export class HomeComponent implements OnInit {
   fromDate?: string;
   toDate?: string;
 
+  // Selector de tipo: 'stock' o 'movimientos'
+  viewType: 'stock' | 'movimientos' = 'stock';
+
   // Chart Data
   pieChartData: ChartData<'pie'> = { labels: [], datasets: [] };
   barChartData: ChartData<'bar'> = { labels: [], datasets: [] };
@@ -64,6 +70,15 @@ export class HomeComponent implements OnInit {
           boxWidth: 12,
           font: { size: 11 }
         }
+      },
+      // @ts-ignore
+      datalabels: {
+        color: '#fff',
+        font: { size: 11, weight: 'bold' },
+        formatter: (value: any, ctx: any) => {
+          const total = (ctx.chart.data.datasets[0].data as number[]).reduce((s: number, n: number) => s + n, 0) || 1;
+          return value + ' (' + ((value / total) * 100).toFixed(1) + '%)';
+        }
       }
     }
   };
@@ -72,7 +87,15 @@ export class HomeComponent implements OnInit {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { display: false }
+      legend: { display: false },
+      // @ts-ignore - plugin key added dynamically
+      datalabels: {
+        anchor: 'end',
+        align: 'end',
+        color: '#36337f',
+        font: { size: 10, weight: 'bold' },
+        formatter: (value: any) => value
+      }
     },
     scales: {
       y: {
@@ -95,6 +118,14 @@ export class HomeComponent implements OnInit {
       legend: {
         position: 'top',
         labels: { font: { size: 11 } }
+      },
+      // @ts-ignore
+      datalabels: {
+        align: 'top',
+        anchor: 'end',
+        color: '#36337f',
+        font: { size: 9 },
+        formatter: (value: any) => value
       }
     },
     scales: {
@@ -118,6 +149,15 @@ export class HomeComponent implements OnInit {
           boxWidth: 12,
           font: { size: 11 }
         }
+      },
+      // @ts-ignore
+      datalabels: {
+        color: '#fff',
+        font: { size: 11, weight: 'bold' },
+        formatter: (value: any, ctx: any) => {
+          const total = (ctx.chart.data.datasets[0].data as number[]).reduce((s: number, n: number) => s + n, 0) || 1;
+          return value + ' (' + ((value / total) * 100).toFixed(1) + '%)';
+        }
       }
     }
   };
@@ -127,10 +167,15 @@ export class HomeComponent implements OnInit {
     private categoryService: CategoryService,
     private productService: ProductService,
     private centerService: CenterService,
-    private authService: AuthService
+    private authService: AuthService,
+    private pdfService: PdfService,
+    private globalStateService?: GlobalStateService // opcional
   ) {}
 
   ngOnInit(): void {
+    if (!(Chart as any).registeredDataLabels) {
+      Chart.register(DataLabelsPlugin as unknown as Plugin); (Chart as any).registeredDataLabels = true;
+    }
     this.checkAdminRole();
     this.loadInitialData();
   }
@@ -155,15 +200,12 @@ export class HomeComponent implements OnInit {
       next: (responses) => {
         this.categories = responses[0].map((cat: any) => ({ id: cat.id, name: cat.name }));
         this.products = responses[1].map((prod: any) => ({ id: prod.id, name: prod.name }));
-        
         if (this.isAdmin && responses[2]) {
           this.centers = responses[2].map((center: any) => ({ id: center.id, name: center.name }));
         } else if (this.isAdmin) {
-          // If centers failed to load, set empty array and continue
           this.centers = [];
           console.warn('Centers could not be loaded, but continuing with dashboard');
         }
-        
         this.loadData();
       },
       error: (error) => {
@@ -205,31 +247,54 @@ export class HomeComponent implements OnInit {
 
   loadData(): void {
     this.isLoading = true;
-    
-    // Clear undefined values to ensure proper filtering
+
     const cleanCenterId = this.centerId === undefined ? undefined : this.centerId;
     const cleanCategoryId = this.categoryId === undefined ? undefined : this.categoryId;
     const cleanProductId = this.productId === undefined ? undefined : this.productId;
-    const cleanFromDate = this.fromDate === undefined || this.fromDate === '' ? undefined : this.fromDate;
-    const cleanToDate = this.toDate === undefined || this.toDate === '' ? undefined : this.toDate;
-    
-    this.stockReportService.getStockReport(
-      cleanCenterId,
-      cleanCategoryId, 
-      cleanProductId,
-      cleanFromDate, 
-      cleanToDate
-    ).subscribe({
+    const cleanFromDate = !this.fromDate ? undefined : this.fromDate;
+    const cleanToDate = !this.toDate ? undefined : this.toDate;
+
+    const obs = this.viewType === 'stock'
+      ? this.stockReportService.getStockReport(
+          cleanCenterId,
+          cleanCategoryId,
+            cleanProductId,
+          cleanFromDate,
+          cleanToDate
+        )
+      : this.stockReportService.getPurchaseDistributionReport(
+          cleanCenterId,
+          cleanCategoryId,
+          cleanProductId,
+          cleanFromDate,
+          cleanToDate
+        );
+
+    obs.subscribe({
       next: (data) => {
-        this.stockData = data;
+        // Normalize potential missing fields (defensive)
+        this.stockData = (data || []).map(item => ({
+          ...item,
+          totalIngresos: item.totalIngresos ?? 0,
+          totalEgresos: item.totalEgresos ?? 0,
+          totalStock: item.totalStock ?? (item.totalIngresos ?? 0) - (item.totalEgresos ?? 0),
+          lastMovementDate: item.lastMovementDate ?? new Date().toISOString(),
+          movementCount: item.movementCount ?? ((item.totalIngresos ?? 0) + (item.totalEgresos ?? 0))
+        }));
         this.generateCharts();
         this.isLoading = false;
       },
       error: (error) => {
         console.error('Error loading data:', error);
+        this.stockData = [];
+        this.generateCharts();
         this.isLoading = false;
       }
     });
+  }
+
+  onViewTypeChange(): void {
+    this.loadData();
   }
 
   onCenterChange(): void {
@@ -284,7 +349,11 @@ export class HomeComponent implements OnInit {
   generateCharts(): void {
     this.generateCategoryChart();
     this.generateTopProductsChart();
-    this.generateStockOverTimeChart();
+    if (this.shouldShowTimeChart()) {
+      this.generateStockOverTimeChart();
+    } else {
+      this.lineChartData = { labels: [], datasets: [] };
+    }
     this.generateIngresoEgresoChart();
   }
 
@@ -307,6 +376,117 @@ export class HomeComponent implements OnInit {
     };
   }
 
+  private getCenterNameForPdf(): string {
+    if (this.isAdmin) {
+      if (this.centerId === undefined) return 'Todos';
+      const c = this.centers.find(c => c.id === this.centerId);
+      return c ? c.name : `Centro #${this.centerId}`;
+    }
+    // Usuario no admin: intentar obtener del estado global si se dispone
+    if (this.centerId !== undefined) {
+      const c = this.centers.find(c => c.id === this.centerId);
+      if (c) return c.name;
+    }
+    const gsCenterName = (this.globalStateService as any)?.getCurrentCenterName?.();
+    return gsCenterName || 'Asignado';
+  }
+
+  private getCategoryName(): string {
+    if (this.categoryId === undefined) return 'Todas';
+    const cat = this.categories.find(c => c.id === this.categoryId);
+    return cat ? cat.name : `Cat #${this.categoryId}`;
+  }
+
+  private getProductName(): string {
+    if (this.productId === undefined) return 'Todos';
+    const prod = this.products.find(p => p.id === this.productId);
+    return prod ? prod.name : `Prod #${this.productId}`;
+  }
+
+  private buildFiltersSummaryKeyValue(): { key: string; value: string }[] {
+    const result: { key: string; value: string }[] = [];
+
+    // Tipo
+    result.push({
+      key: 'Tipo',
+      value: this.viewType === 'stock' ? 'Stock' : 'Compras y Distribuciones'
+    });
+
+    // Centro
+    const center = this.getCenterNameForPdf();
+    result.push({
+      key: 'Centro',
+      value: center ? center : 'todos los centros'
+    });
+
+    // Categoría
+    const category = this.getCategoryName();
+    result.push({
+      key: 'Categoría',
+      value: category && category !== 'Todas' ? category : 'todas las categorías'
+    });
+
+    // Producto
+    const product = this.getProductName();
+    result.push({
+      key: 'Producto',
+      value: product && product !== 'Todos' ? product : 'todos los productos'
+    });
+
+    // Fechas
+    const from = this.fromDate ? new Date(this.fromDate).toLocaleDateString('es-AR') : null;
+    const to = this.toDate ? new Date(this.toDate).toLocaleDateString('es-AR') : null;
+
+    let fechaDesc = '';
+    if (!from && !to) {
+      fechaDesc = 'histórico';
+    } else if (from && !to) {
+      fechaDesc = `a partir del ${from}`;
+    } else if (!from && to) {
+      fechaDesc = `hasta el ${to}`;
+    } else if (from && to) {
+      fechaDesc = `entre el ${from} y el ${to}`;
+    }
+
+    result.push({
+      key: 'Período',
+      value: fechaDesc
+    });
+
+    return result;
+  }
+
+  exportChartsToPdf(): void {
+    const charts: { title?: string; base64: string }[] = [];
+    const capture = (selector: string, title: string) => {
+      const el = document.querySelector(selector) as HTMLCanvasElement | null;
+      if (el) charts.push({ title, base64: el.toDataURL('image/png') });
+    };
+    capture('.chart-container:nth-of-type(1) canvas', 'Stock por Categoría');
+    capture('.chart-container:nth-of-type(2) canvas', 'Top 10 Productos');
+    if (this.shouldShowTimeChart()) capture('.chart-container:nth-of-type(3) canvas', 'Evolución en el Tiempo');
+    capture('.chart-container:nth-of-type(4) canvas', 'Ingresos vs Egresos');
+
+    const filtersKeyValue = this.buildFiltersSummaryKeyValue();
+
+    const req: any = {
+      title: this.viewType === 'stock' ? 'Reporte de Stock' : 'Reporte de Movimientos',
+      sections: [
+        {
+          title: 'Filtros Aplicados',
+            keyValuePairs: filtersKeyValue
+        }
+      ],
+      chartImages: charts.map(c => ({ title: c.title, base64: c.base64, widthPercent: 100 })),
+      footer: 'Generado automáticamente por Sistema Cáritas'
+    };
+
+    this.pdfService.generatePdf(req).subscribe({
+      next: (blob: Blob) => this.pdfService.openPdfInNewTab(blob),
+      error: (err: any) => console.error('Error generating charts PDF', err)
+    });
+  }
+
   generateTopProductsChart(): void {
     const grouped = this.groupSum(this.stockData, item => item.productName);
     const top = Object.entries(grouped)
@@ -327,59 +507,59 @@ export class HomeComponent implements OnInit {
   }
 
   generateStockOverTimeChart(): void {
-    // Usar el servicio de histórico para obtener datos más precisos
+    if (!this.shouldShowTimeChart()) {
+      this.lineChartData = { labels: [], datasets: [] };
+      return;
+    }
+
     const cleanCenterId = this.centerId === undefined ? undefined : this.centerId;
     const cleanCategoryId = this.categoryId === undefined ? undefined : this.categoryId;
     const cleanProductId = this.productId === undefined ? undefined : this.productId;
-    const cleanFromDate = this.fromDate === undefined || this.fromDate === '' ? undefined : this.fromDate;
-    const cleanToDate = this.toDate === undefined || this.toDate === '' ? undefined : this.toDate;
-    
-    this.stockReportService.getStockHistory(
-      cleanCenterId,
-      cleanCategoryId,
-      cleanProductId,
-      cleanFromDate,
-      cleanToDate
-    ).subscribe({
+    const cleanFromDate = !this.fromDate ? undefined : this.fromDate;
+    const cleanToDate = !this.toDate ? undefined : this.toDate;
+
+    const history$ = this.viewType === 'stock'
+      ? this.stockReportService.getStockHistory(
+          cleanCenterId,
+          cleanCategoryId,
+          cleanProductId,
+          cleanFromDate,
+          cleanToDate
+        )
+      : this.stockReportService.getPurchaseDistributionHistory(
+          cleanCenterId,
+          cleanCategoryId,
+          cleanProductId,
+          cleanFromDate,
+          cleanToDate
+        ); 
+
+    history$.subscribe({
       next: (historyData) => {
+  console.log('[DEBUG] History data for', this.viewType, historyData);
         const grouped = this.groupStockHistoryByDate(historyData);
         const sorted = Object.entries(grouped).sort((a, b) => a[0].localeCompare(b[0]));
-        
         this.lineChartData = {
           labels: sorted.map(x => new Date(x[0]).toLocaleDateString()),
-          datasets: [{
+            datasets: [{
             data: sorted.map(x => x[1] as number),
-            label: 'Stock Acumulado',
+            label: this.viewType === 'stock' ? 'Stock Acumulado' : 'Movimientos Acumulados',
             borderColor: '#36337f',
-            backgroundColor: 'rgba(54, 51, 127, 0.1)',
+            backgroundColor: 'rgba(54,51,127,0.1)',
             fill: true,
             tension: 0.4
           }]
         };
       },
       error: (error) => {
-        console.error('Error loading stock history:', error);
-        // Fallback al método original si falla
+        console.error('Error loading history:', error);
         this.generateStockOverTimeChartFallback();
       }
     });
   }
 
-  generateStockOverTimeChartFallback(): void {
-    const grouped = this.groupByDate(this.stockData);
-    const sorted = Object.entries(grouped).sort((a, b) => a[0].localeCompare(b[0]));
-    
-    this.lineChartData = {
-      labels: sorted.map(x => new Date(x[0]).toLocaleDateString()),
-      datasets: [{
-        data: sorted.map(x => x[1] as number),
-        label: 'Stock Total',
-        borderColor: '#36337f',
-        backgroundColor: 'rgba(54, 51, 127, 0.1)',
-        fill: true,
-        tension: 0.4
-      }]
-    };
+  shouldShowTimeChart(): boolean {
+    return !!this.productId && (!this.isAdmin || !!this.centerId) && !!this.viewType;
   }
 
   generateIngresoEgresoChart(): void {
@@ -423,15 +603,16 @@ export class HomeComponent implements OnInit {
   }
 
   private groupStockHistoryByDate(arr: StockHistory[]): Record<string, number> {
-    // Agrupar por fecha y tomar el stock acumulado más reciente para cada fecha
-    const grouped = arr.reduce((acc, item) => {
+    return arr.reduce((acc, item) => {
       const date = item.stockDate.split('T')[0];
       if (!acc[date] || acc[date] < item.stockAcumulado) {
         acc[date] = item.stockAcumulado;
       }
       return acc;
     }, {} as Record<string, number>);
-    
-    return grouped;
+  }
+
+  private generateStockOverTimeChartFallback(): void {
+    this.lineChartData = { labels: [], datasets: [] };
   }
 }

@@ -12,5 +12,7 @@ namespace ProyectoCaritas.Models.DTOs
         public int CategoryId { get; set; }
         public string CategoryName { get; set; }
         public int StockAcumulado { get; set; }
+        public int IngresosAcumulados { get; set; }
+        public int EgresosAcumulados { get; set; }
     }
 }
