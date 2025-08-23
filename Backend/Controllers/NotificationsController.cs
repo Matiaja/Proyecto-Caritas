@@ -416,6 +416,7 @@ namespace ProyectoCaritas.Controllers
                     Type = "Ingreso",
                     Description = orderLine?.Description,
                     Quantity = donationRequest.Quantity,
+                    Origin = donationRequest.AssignedCenter?.Name
                 });
                 // actualizar el stock de egreso
                 _ = await _stockService.AddStock(new StockDTO
@@ -426,6 +427,7 @@ namespace ProyectoCaritas.Controllers
                     Type = "Egreso",
                     Description = "Donación enviada a " + orderLine?.Request?.RequestingCenter?.Name,
                     Quantity = donationRequest.Quantity,
+                    Origin = orderLine?.Request?.RequestingCenter?.Name
                 });
 
                 // Crear nuevas notificaciones

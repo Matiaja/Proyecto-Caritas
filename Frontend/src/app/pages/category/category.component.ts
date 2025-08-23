@@ -86,10 +86,20 @@ export class CategoryComponent implements OnInit {
     );
 
     if (confirmed) {
-      this.categoryService.deleteCategory(category.id).subscribe(() => {
-        this.categories = this.categories.filter((c) => c.id !== category.id);
+      this.categoryService.deleteCategory(category.id).subscribe({
+        next: () => {
+          this.categories = this.categories.filter((c) => c.id !== category.id);
+          this.toastr.success('Categoría eliminada con éxito', 'Exito');
+        },
+        error: (error) => {
+          if( error.error && error.error.message) {
+            this.toastr.error(error.error.message, 'Error');
+          } else {
+            this.toastr.error('Error al eliminar la categoría', 'Error');
+          }
+          console.error('Error al eliminar la categoría:', error);
+        },
       });
-      this.toastr.success('Categoría eliminada con éxito', 'Exito');
     }
   }
 }

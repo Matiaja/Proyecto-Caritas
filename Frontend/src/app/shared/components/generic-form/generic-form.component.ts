@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, SimpleChanges, OnChanges } from '@angular/core';
+import { Component, EventEmitter, Input, Output, SimpleChanges, OnChanges, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -27,6 +27,7 @@ import { MatInputModule } from '@angular/material/input';
     FormsModule,],
   templateUrl: './generic-form.component.html',
   styleUrl: './generic-form.component.css',
+  encapsulation: ViewEncapsulation.None
 })
 export class GenericFormComponent implements OnChanges {
   @Input() data!: {
@@ -40,6 +41,7 @@ export class GenericFormComponent implements OnChanges {
       validators?: any[];
       errorMessage?: string;
       options?: { value: any; label: string }[];
+      onValueChange?: (value: any) => void;
     }[];
   };
 
@@ -76,6 +78,15 @@ export class GenericFormComponent implements OnChanges {
       ];
     });
     this.form = this.fb.group(controls);
+
+    // Suscribirse a valueChanges de los campos con onValueChange
+    this.data.fields.forEach((field) => {
+      if (this.form.get(field.name)) {
+        this.form.get(field.name)!.valueChanges.subscribe((value: any) => {
+          field.onValueChange?.(value);
+        });
+      }
+    });
   }
 
   private addAsyncValidatorsForEgreso(): void {

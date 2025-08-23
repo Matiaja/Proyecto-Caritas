@@ -8,7 +8,7 @@
         <label [for]="field.name" [class.required]="isRequired(field)">{{ field.label }}</label>
         <ng-container [ngSwitch]="field.type">
           <!-- Campo de texto -->
-          <mat-form-field *ngSwitchCase="'date'" appearance="outline" class="w-100 small-field">
+          <mat-form-field *ngSwitchCase="'date'" appearance="outline" class="w-100 small-field pb-0 mb-0">
             <input matInput [matDatepicker]="pickerDate"
               [id]="field.name"
               name="{{ field.name }}"
@@ -20,6 +20,14 @@
           </mat-form-field>
           <input
             *ngSwitchCase="'text'"
+            [id]="field.name"
+            [formControlName]="field.name"
+            class="form-control"
+            [type]="field.type"
+            [placeholder]="field.placeholder || ''"
+          />
+          <input
+            *ngSwitchCase="'password'"
             [id]="field.name"
             [formControlName]="field.name"
             class="form-control"
@@ -207,7 +215,7 @@
           "
           class="text-danger"
         >
-          La contraseña debe tener al menos 8 caracteres.
+          La contraseña debe tener al menos 8 caracteres y un número.
         </div>
 
         <div

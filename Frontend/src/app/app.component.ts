@@ -7,11 +7,13 @@ import { GlobalStateService } from './services/global/global-state.service';
 import { FooterComponent } from './shared/footer/footer.component';
 import { CommonModule } from '@angular/common';
 import { ChatbotComponent } from './shared/components/chatbot/chatbot.component';
+import { SpinnerService } from './services/spinner/spinner.service';
+import { SpinnerComponent } from "./shared/components/spinner/spinner.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent, FooterComponent, BreadcrumbComponent, CommonModule, ChatbotComponent],
+  imports: [RouterOutlet, NavbarComponent, FooterComponent, BreadcrumbComponent, CommonModule, ChatbotComponent, SpinnerComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
@@ -24,6 +26,7 @@ export class AppComponent implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
+    public spinnerService: SpinnerService,
     private globalStateService: GlobalStateService
   ) {
     this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {

@@ -123,14 +123,34 @@ namespace ProyectoCaritas.Controllers
                     Message = "Phone number must contain only digits."
                 });
             }
+            // validate if capacity limit exists and is a positive integer
+            if (addCenterDto.CapacityLimit != null && addCenterDto.CapacityLimit <= 0)
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "Capacity limit must be a positive integer."
+                });
+            }
+            // if email exists validate it
+            if (!string.IsNullOrWhiteSpace(addCenterDto.Email) && !System.Text.RegularExpressions.Regex.IsMatch(addCenterDto.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "Email format is invalid."
+                });
+            }
             var center = new Center
             {
-                Name = addCenterDto.Name,
-                Location = addCenterDto.Location,
-                Manager = addCenterDto.Manager,
-                CapacityLimit = addCenterDto.CapacityLimit,
+                Name = addCenterDto.Name.Trim(),
+                Location = addCenterDto.Location.Trim(),
+                Manager = addCenterDto.Manager.Trim(),
+                CapacityLimit = addCenterDto.CapacityLimit ?? null,
                 Phone = addCenterDto.Phone,
-                Email = addCenterDto.Email
+                Email = addCenterDto.Email?.Trim()
             };
             _context.Centers.Add(center);
             await _context.SaveChangesAsync();

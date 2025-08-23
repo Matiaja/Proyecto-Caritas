@@ -16,7 +16,7 @@ import { CenterService } from '../../services/center/center.service';
 })
 export class UserComponent implements OnInit {
   title = 'Usuarios';
-  displayedColumns = ['userName', 'email', 'centerName'];
+  displayedColumns = ['userName', 'email', 'centerName', 'role'];
   users: any[] = [];
   selectedCenter: number | null = null;
   sortBy = '';
@@ -25,6 +25,7 @@ export class UserComponent implements OnInit {
     userName: 'Nombre de usuario',
     email: 'Correo electrónico',
     centerName: 'Centro',
+    role: 'Rol'
   };
   centers: any[] = [];
   showSearchBar = true;

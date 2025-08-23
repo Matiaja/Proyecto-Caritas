@@ -38,6 +38,12 @@ export class CenterComponent implements OnInit {
     email: 'Correo Electrónico',
   };
   displayedColumns = ['name', 'location', 'manager', 'phone', 'email'];
+  mobileColumns = ['name', 'location', 'manager'];
+  mobileHeaders = {
+    name: 'Nombre',
+    location: 'Ubicación',
+    manager: 'Encargado'
+  };
   centers: CenterModel[] = [];
 
   constructor(

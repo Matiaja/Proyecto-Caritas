@@ -7,6 +7,10 @@
     @if(showBreadcrumbs) {
       <app-breadcrumbs></app-breadcrumbs>
     }
+    <app-spinner *ngIf="(spinnerService.loading$ | async)"
+                     [message]="'Cargando...'"
+                     [useImage]="true">
+    </app-spinner>
     <router-outlet></router-outlet>
   </main>
 

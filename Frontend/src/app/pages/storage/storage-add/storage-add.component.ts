@@ -40,6 +40,7 @@ export class StorageAddComponent {
           { value: 'Ingreso', label: 'Ingreso' },
           { value: 'Egreso', label: 'Egreso' },
         ],
+        onValueChange: (value: string) => this.updateOriginLabel(value),
       },
       {
         name: 'date',
@@ -70,10 +71,10 @@ export class StorageAddComponent {
       },
       {
         name: 'origin',
-        label: 'Origen',
+        label: 'Origen/Destino', // Se actualizará dinámicamente
         type: 'text',
         value: '',
-        placeholder: 'Ingrese el origen del stock',
+        placeholder: 'Ingrese el origen o destino del stock',
         validators: [],
         errorMessage: '',
       },
@@ -105,6 +106,15 @@ export class StorageAddComponent {
     private globalStateService: GlobalStateService,
     private toastr: ToastrService
   ) {}
+
+
+  updateOriginLabel(typeValue: string): void {
+    const originField = this.formConfig.fields.find(field => field.name === 'origin');
+    if (originField) {
+      originField.label = typeValue === 'Ingreso' ? 'Origen' : 'Destino';
+      originField.placeholder = typeValue === 'Ingreso' ? 'Ingrese el origen del stock' : 'Ingrese el destino del stock';
+    }
+  }
 
   onSubmit(data: any): void {
     const centerId = this.globalStateService.getCurrentCenterId();

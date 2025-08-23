@@ -35,6 +35,18 @@ export class ProductService {
     );
   }
 
+  editProduct(productId: number, product: any): Observable<Product> {
+    return this.http.put<Product>(this.baseUrl + '/' + productId, product).pipe(
+      tap((updatedProduct) => {
+        const currentProducts = this.productsSubject.getValue();
+        const updatedProducts = currentProducts.map((p) =>
+          p.id === productId ? updatedProduct : p
+        );
+        this.productsSubject.next(updatedProducts);
+      })
+    );
+  }
+
   deleteProduct(productId: number) {
     return this.http.delete(this.baseUrl + '/' + productId).pipe(
       tap(() => {

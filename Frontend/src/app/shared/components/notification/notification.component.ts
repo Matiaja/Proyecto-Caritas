@@ -30,7 +30,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
     this.notificationService.notifications$
       .pipe(takeUntil(this.destroy$))
       .subscribe(notifs => {
-        this.notifications = notifs;
+        this.notifications = notifs.map(n => ({ ...n, hasOpenedOnce: n.hasOpenedOnce ?? false }));
         this.unreadCount = notifs.filter((n: any) => !n.isRead).length;
     });
 
@@ -61,22 +61,22 @@ export class NotificationComponent implements OnInit, OnDestroy {
 
   acceptAssignment(notification: any) {
     const originalNotifications = [...this.notifications];
-    
     notification.isRead = true; // Marcar como leída inmediatamente
     this.unreadCount--;
     this.notificationService.acceptAssignment(notification).subscribe({
       next: () => {
+        // Actualizar el array de notificaciones para refrescar la UI
+        this.updateNotificationInList(notification);
         this.toastrService.success('Asignación aceptada correctamente');
       },
       error: (err) => {
         console.error('Error al aceptar:', err);
-        // Restaurar las notificaciones originales en caso de error
         notification.isRead = false; 
         this.notifications = originalNotifications;
         this.unreadCount = originalNotifications.filter((n: any) => !n.isRead).length;
         this.toastrService.error(err.error.message ?? 'Error al aceptar la asignación');
       }
-    })
+    });
   }
 
   rejectAssignment(notification: any) {
@@ -85,42 +85,51 @@ export class NotificationComponent implements OnInit, OnDestroy {
   
   markAsShipped(notification: any) {
     const originalNotifications = [...this.notifications];
-    
     notification.isRead = true; // Marcar como leída inmediatamente
     this.unreadCount--;
     this.notificationService.markAsShipped(notification).subscribe({
       next: () => {
+        this.updateNotificationInList(notification);
         this.toastrService.success('Se notificará al solicitante que el pedido está en camino.', 'Donación enviada!');
       },
       error: (err) => {
         console.error('Error al marcar como enviado:', err);
         notification.isRead = false; // Restaurar el estado de lectura
-        // Restaurar las notificaciones originales en caso de error
         this.notifications = originalNotifications;
         this.unreadCount = originalNotifications.filter((n: any) => !n.isRead).length;
         this.toastrService.error(err.error.message ??'Error al marcar el pedido como enviado');
       }
-    })
+    });
   }
 
   confirmReceipt(notification: any) {
     const originalNotifications = [...this.notifications];
-    
     notification.isRead = true; // Marcar como leída inmediatamente
     this.unreadCount--;
     this.notificationService.confirmReceipt(notification).subscribe({
       next: (donation: any) => {
+        this.updateNotificationInList(notification);
         this.toastrService.success(`Recepción de ${donation.quantity} ${this.formatProductName(donation.productName, donation.quantity)} confirmada.`, '¡Solicitud recibida!');
       },
       error: (err) => {
         console.error('Error al confirmar recepción:', err);
         notification.isRead = false; // Restaurar el estado de lectura
-        // Restaurar las notificaciones originales en caso de error
         this.notifications = originalNotifications;
         this.unreadCount = originalNotifications.filter((n: any) => !n.isRead).length;
         this.toastrService.error(err.error.message ??'Error al confirmar la recepción del pedido');
       }
-    })
+    });
+  }
+  /**
+   * Actualiza la notificación en la lista local y en el servicio para refrescar la UI
+   */
+  updateNotificationInList(notification: any) {
+    const idx = this.notifications.findIndex(n => n.id === notification.id);
+    if (idx > -1) {
+      this.notifications[idx] = { ...notification };
+      // Actualizar el observable del servicio para forzar refresco
+      this.notificationService["notificationsSubject"].next([...this.notifications]);
+    }
   }
 
   shouldShowActions(notification: any): boolean {
@@ -135,10 +144,14 @@ export class NotificationComponent implements OnInit, OnDestroy {
   markAsRead() {
     this.notifications.forEach(notification => {
       if (!notification.isRead && notification.type == 'System') {
+        if (!notification.hasOpenedOnce) {
+        notification.hasOpenedOnce = true;
+        this.unreadCount--;
+      } else {
         this.notificationService.markAsRead(notification.id).subscribe(() => {
           notification.isRead = true;
-          this.unreadCount--;
         });
+      }
       }
     });
   }	

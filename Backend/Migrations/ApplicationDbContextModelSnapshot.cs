@@ -182,7 +182,7 @@ namespace ProyectoCaritas.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CapacityLimit")
+                    b.Property<int?>("CapacityLimit")
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
@@ -491,11 +491,17 @@ namespace ProyectoCaritas.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("BuyerName")
+                        .HasColumnType("longtext");
+
                     b.Property<int>("CenterId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<int>("OriginalCenterId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("PurchaseDate")
                         .HasColumnType("date");
@@ -507,6 +513,8 @@ namespace ProyectoCaritas.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CenterId");
+
+                    b.HasIndex("OriginalCenterId");
 
                     b.ToTable("Purchases");
                 });
@@ -900,7 +908,15 @@ namespace ProyectoCaritas.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ProyectoCaritas.Models.Entities.Center", "OriginalCenter")
+                        .WithMany()
+                        .HasForeignKey("OriginalCenterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Center");
+
+                    b.Navigation("OriginalCenter");
                 });
 
             modelBuilder.Entity("ProyectoCaritas.Models.Entities.Request", b =>

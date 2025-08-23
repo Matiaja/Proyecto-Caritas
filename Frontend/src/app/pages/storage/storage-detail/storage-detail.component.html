@@ -1,53 +1,50 @@
-<div *ngIf="stock && stock.length">
-  <!-- Información del producto -->
-  <div class="container mt-5 w-100 w-md-75">
-    <div class="card shadow-sm">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Detalles del producto: {{ stock[0].product.name }}</h5>
-        <div class="d-flex gap-2">
-          <button class="btn btn-outline-primary btn-sm" (click)="generatePdf()">
-            <i class="fas fa-file-pdf me-1"></i>
-            Generar PDF
-          </button>
-          <button class="btn btn-outline-secondary btn-sm" (click)="goBack()">Volver</button>
-        </div>
+<!-- Información del producto -->
+<div class="container mt-5 w-100 w-md-75">
+  <div class="card shadow-sm" *ngIf="product">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Detalles del producto: {{ product.name }}</h5>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-primary btn-sm" (click)="generatePdf()">
+          <i class="fas fa-file-pdf me-1"></i>
+          Generar PDF
+        </button>
+        <button class="btn btn-outline-secondary btn-sm" (click)="goBack()">Volver</button>
       </div>
-      <div class="card-body row">
-        <div class="col-md-6 mb-3">
-          <strong>Código:</strong> {{ stock[0].product.code }}
-        </div>
-        <div class="col-md-6 mb-3">
-          <strong>ID del producto:</strong> {{ stock[0].productId }}
-        </div>
+    </div>
+    <div class="card-body row">
+      <div class="col-md-6 mb-3">
+        <strong>Código:</strong> {{ product.code }}
+      </div>
+      <div class="col-md-6 mb-3">
+        <strong>ID del producto:</strong> {{ product.id }}
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Filtros -->
-  <div class="container mt-4 w-100 w-md-75">
-    <div class="card p-3 shadow-sm">
-      <div class="row g-3">
-        <div class="col-md-4">
-          <label class="form-label">Tipo de movimiento</label>
-          <select class="form-select" [(ngModel)]="filters.type">
-            <option value="">Todos</option>
-            <option value="Ingreso">Ingreso</option>
-            <option value="Egreso">Egreso</option>
-          </select>
-        </div>
-
-        <div class="col-md-4">
-          <label class="form-label">Fecha desde</label>
-          <input type="date" class="form-control" [(ngModel)]="filters.fromDate" />
-        </div>
-
-        <div class="col-md-4">
-          <label class="form-label">Fecha hasta</label>
-          <input type="date" class="form-control" [(ngModel)]="filters.toDate" />
-        </div>
+<!-- Filtros -->
+<div class="container mt-4 w-100 w-md-75" *ngIf="stock && stock.length">
+  <div class="card p-3 shadow-sm">
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label">Tipo de movimiento</label>
+        <select class="form-select" [(ngModel)]="filters.type" (ngModelChange)="applyFilters()">
+          <option value="">Todos</option>
+          <option value="Ingreso">Ingreso</option>
+          <option value="Egreso">Egreso</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Fecha desde</label>
+        <input type="date" class="form-control" [(ngModel)]="filters.fromDate" (ngModelChange)="applyFilters()" />
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Fecha hasta</label>
+        <input type="date" class="form-control" [(ngModel)]="filters.toDate" (ngModelChange)="applyFilters()" />
       </div>
     </div>
   </div>
+</div>
 
 <div *ngIf="dateRangeInvalid" class="alert alert-warning mt-3 rounded-3">
   La fecha de inicio no puede ser mayor que la fecha de fin.
@@ -61,23 +58,20 @@
         <thead class="table-light">
           <tr>
             <th>Tipo</th>
-            <th>Cantidad</th>
-            <th>Descripción</th>
-            <th>Origen</th>
+            <th>Cant.</th>
+            <th>Desc.</th>
+            <th>Origen/Destino</th>
             <th>Fecha</th>
-            <th>Fecha de expiración</th>
-            <th>Peso</th>
+            <th>Fecha de exp.</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let item of filteredStock">
             <td>
-              <span class="badge rounded-pill"
-                [ngClass]="{
+              <span class="badge rounded-pill" [ngClass]="{
                   'bg-success': item.type === 'Ingreso',
                   'bg-danger': item.type === 'Egreso'
-                }"
-              >
+                }">
                 {{ item.type }}
               </span>
             </td>
@@ -85,8 +79,7 @@
             <td>{{ item.description || '-' }}</td>
             <td>{{ item.origin || '-' }}</td>
             <td>{{ item.date }}</td>
-            <td>{{ item.expirationDate ? (item.expirationDate) : '-' }}</td>
-            <td>{{ item.weight && item.weight > 0 ? item.weight : '-' }}</td>
+            <td>{{ item.expirationDate ? item.expirationDate : '-' }}</td>
           </tr>
           <tr *ngIf="filteredStock.length === 0">
             <td colspan="7" class="text-muted">No hay movimientos con esos filtros.</td>
@@ -96,4 +89,3 @@
     </div>
   </div>
 </div>
-

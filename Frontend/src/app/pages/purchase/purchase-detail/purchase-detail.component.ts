@@ -20,11 +20,12 @@ export class PurchaseDetailComponent implements OnInit {
   expandedDistId: number | null = null;
 
   // tabla items
-  displayedColumns = ['productName', 'quantity', 'remainingQuantity'];
+  displayedColumns = ['productName', 'quantity', 'remainingQuantity', 'description'];
   columnHeaders = {
     productName: 'Producto',
     quantity: 'Cantidad',
-    remainingQuantity: 'Restante'
+    remainingQuantity: 'Restante',
+    description: 'Descripción'
   };
   title = 'Detalle de la compra';
   mobileColumns = ['productName', 'quantity', 'remainingQuantity'];

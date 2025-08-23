@@ -14,6 +14,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { UiTableComponent } from "../../shared/components/ui-table/ui-table.component";
 import { ResponsiveService } from '../../services/responsive/responsive.service';
 import { Router } from '@angular/router';
+import { CenterService } from '../../services/center/center.service';
+import { CenterModel } from '../../models/center.model';
 
 @Component({
   selector: 'app-movement',
@@ -65,11 +67,19 @@ export class MovementComponent implements OnInit {
   dateTo: Date | null = null;
   status: string | null = null;
   productName: string | null = null;
+  centerId: number | null = null;
+  typeCenter: string | null = null;
+
+  movementType = 'donations';
+  showDetail = true;
+
+  centers: CenterModel[] = [];
 
   isMobile = false;
 
   constructor(
     private movementService: MovementService,
+    private centerService: CenterService,
     private responsiveService: ResponsiveService,
     private router: Router
   ) {
@@ -79,6 +89,14 @@ export class MovementComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Si ya hay un valor guardado, usarlo
+    const savedType = localStorage.getItem('movementType');
+    if (savedType) {
+      this.movementType = savedType;
+    }
+    this.centerService.getCenters().subscribe((centers) => {
+        this.centers = centers;
+      });
     this.loadMovements();
   }
 
@@ -95,27 +113,42 @@ export class MovementComponent implements OnInit {
         ).toISOString()
       : undefined,
       status: this.status || undefined,
-      productName: this.productName || undefined
+      productName: this.productName || undefined,
+      centerId: this.centerId || undefined,
+      typeCenter: this.typeCenter || undefined
     };
 
-    this.movementService.getMovements(filters).subscribe({
-      next: (data) => {
-        this.movements = data.map(movement => ({
-          ...movement,
-          updatedDate: new Date(movement.updatedDate).toLocaleDateString('es-ES', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-          }) + ' ' + new Date(movement.updatedDate).toLocaleTimeString('es-ES', {
-            hour: '2-digit',
-            minute: '2-digit',
-          })
-        }));
-      },
-      error: (err) => {
-        console.error('Error al obtener movimientos:', err);
-      }
-    });
+    // Guardar selección actual
+    localStorage.setItem('movementType', this.movementType);
+
+    if (this.movementType === 'donations') {
+      this.showDetail = true;
+      this.movementService.getDonationMovements(filters).subscribe(this.handleResponse, this.handleError);
+    } else if (this.movementType === 'distributions') {
+      this.showDetail = false;
+      this.movementService.getDistributionMovements(filters).subscribe(this.handleResponse, this.handleError);
+    } else {
+      // De almacén directo (endpoint futuro)
+      // this.movementService.getDirectMovements(filters).subscribe(this.handleResponse, this.handleError);
+    }
+  }
+
+  handleResponse = (data: any[]) => {
+    this.movements = data.map(movement => ({
+      ...movement,
+      updatedDate: new Date(movement.updatedDate).toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      }) + ' ' + new Date(movement.updatedDate).toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    }));
+  }
+
+  handleError = (err: any) => {
+    console.error('Error al obtener movimientos:', err);
   }
 
   // Agregar método para determinar el color según el estado
@@ -147,10 +180,14 @@ export class MovementComponent implements OnInit {
     this.dateTo = null;
     this.status = null;
     this.productName = null;
+    this.centerId = null;
+    this.typeCenter = null;
     this.loadMovements();
   }
 
   onSelectMovement(m: Movement) {
-    this.router.navigate(['/movements', m.donationRequestId]);
+    if(this.movementType === 'donations') {
+      this.router.navigate(['/movements', m.donationRequestId]);
+    }
   }
 }

@@ -1,8 +1,10 @@
 @if (isAdmin) {
-<div class="container mt-2 mt-sm-5">
-  <div class="row justify-content-center align-items-center">
+  <div class="d-flex justify-content-center mt-2 mb-1 mt-sm-5 mb-sm-3">
+    <div class="card container w-100 w-md-75 mx-auto shadow p-3">
+<!-- <div class="container mt-2 mt-sm-5">-->
+  <div class="row align-items-center"> 
     <!-- select -->
-    <div class="col-md-6 col-sm-12">
+    <div class="col-lg-8 col-12">
       <div class="row align-items-center">
         <div class="col-12 col-md-auto">
           <label for="selectCenter" class="col-form-label mb-0">Seleccione el centro para ver stock:</label>
@@ -20,7 +22,7 @@
     </div>
 
     <!-- switch -->
-    <div class="col-md-6 col-sm-12 mt-2 mt-md-0 text-center">
+    <div class="col-lg-4 col-12 mt-2 mt-lg-0 text-center">
       @if (selectedCenter === null) {
       <div class="form-check form-switch d-flex justify-content-center align-items-center gap-2">
         <input class="form-check-input" id="checkBreackdown" type="checkbox" role="switch" [(ngModel)]="groupByCenter"
@@ -31,7 +33,7 @@
       </div>
       }
     </div>
-
+    </div>
   </div>
 </div>
 }

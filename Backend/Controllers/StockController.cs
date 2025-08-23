@@ -308,7 +308,7 @@ namespace ProyectoCaritas.Controllers
             // Consulta para obtener DonationRequests pendientes
             var donationRequestsQuery = _context.DonationRequests
                 .Include(dr => dr.OrderLine)
-                .Where(dr => dr.Status == "Aceptada" || dr.Status == "Enviada");
+                .Where(dr => dr.Status == "Aceptada" || dr.Status == "En camino");
 
             var grouped = groupByCenter
                 ? await stocksQuery

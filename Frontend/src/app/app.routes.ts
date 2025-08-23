@@ -36,6 +36,7 @@ import { PurchaseComponent } from './pages/purchase/purchase.component';
 import { PurchaseDetailComponent } from './pages/purchase/purchase-detail/purchase-detail.component';
 import { DistributionComponent } from './pages/purchase/distribution/distribution.component';
 import { PurchaseAddComponent } from './pages/purchase/purchase-add/purchase-add.component';
+import { ProductEditComponent } from './pages/product/product-edit/product-edit.component';
 
 export const routes: Routes = [
   {
@@ -131,6 +132,7 @@ export const routes: Routes = [
     children: [
       { path: '', component: ProductComponent },
       { path: 'add', component: ProductAddComponent, data: { breadcrumb: 'Agregar Producto' } },
+      { path: 'edit/:id', component: ProductEditComponent, data: { breadcrumb: 'Editar Producto' } },
       {
         path: 'detail/:id',
         component: ProductDetailComponent,

@@ -33,7 +33,7 @@ export class ProductAddComponent implements OnInit {
         type: 'text',
         value: '',
         placeholder: 'Ingrese el código del producto',
-        validators: [Validators.required],
+        validators: [],
         errorMessage: 'El código es requerido',
       },
       {
@@ -76,12 +76,27 @@ export class ProductAddComponent implements OnInit {
 
   onSubmit(formData: any): void {
     const payload = {
-      name: formData.name,
+      name: formData.name.trim(),
+      code: formData.code?.trim() || '',
       categoryId: formData.category,
     };
-    this.productService.createProduct(payload).subscribe(() => {
-      this.toastr.success('Producto creado con éxito', 'Exito');
-      this.router.navigate(['/products']);
+    if (!payload.name) {
+      this.toastr.error('El nombre del producto es obligatorio');
+      return;
+    }
+    this.productService.createProduct(payload).subscribe({
+      next: () => {
+        this.toastr.success('Producto creado con éxito', 'Exito');
+        this.router.navigate(['/products']);
+      },
+      error: (error) => {
+        if (error.error && error.error.message) {
+          this.toastr.error(error.error.message, 'Error');
+        } else {
+          this.toastr.error('Error al crear el producto', 'Error');
+        }
+        console.error('Error creating product:', error);
+      },
     });
   }
 

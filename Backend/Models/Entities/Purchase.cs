@@ -12,11 +12,14 @@ namespace ProyectoCaritas.Models.Entities
         [Column(TypeName = "date")]
         public DateTime PurchaseDate { get; set; } // Fecha de compra
         public string Type { get; set; } = "General"; // Tipo de compra (e.g., "PNUD", "Diocesana")
-        public int CenterId { get; set; } // FK a Centro
+        public int CenterId { get; set; } // FK a Centro donde está la compra / bolsón
+        public int OriginalCenterId { get; set; } // FK: centro que generó originalmente la compra
+        public string? BuyerName { get; set; } // Quién compró (persona/responsable)
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // Propiedades de navegación
         public Center Center { get; set; } = null!;
+        public Center OriginalCenter { get; set; } = null!; // Centro original de la compra
         public ICollection<ItemPurchase> Items { get; set; } = new List<ItemPurchase>();
         public ICollection<Distribution> Distributions { get; set; } = new List<Distribution>();
     }
