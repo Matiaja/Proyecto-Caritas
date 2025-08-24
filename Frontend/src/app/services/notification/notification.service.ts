@@ -16,22 +16,42 @@ export class NotificationService implements OnDestroy {
   private notificationsSubject = new BehaviorSubject<any[]>([]);
   public notifications$ = this.notificationsSubject.asObservable();
 
+  private currentToken: string | null = null; // <- trackea el token actual
+
   constructor(private http: HttpClient, private authService: AuthService, private toast: ToastrService) {}
 
   public initializeConnection() {
     const token = this.authService.getToken();
+
+    // Si no hay token (logout), cerramos y limpiamos
     if (!token) {
-      console.error('No hay token disponible');
+      this.teardownConnection();
       return;
     }
 
-    if (this.hubConnection?.state === 'Connected') return;
+    // Si el token cambió, hacemos teardown y reconstruimos
+    if (this.currentToken !== token) {
+      this.teardownConnection();
+      this.currentToken = token;
+      this.buildConnection(token);
+      this.registerHandlers();
+      this.startConnection();
+      return;
+    }
 
-    this.buildConnection(token);
-    this.registerHandlers();
-    this.startConnection();
+    // Si el token es el mismo pero la conexión no está viva, arrancamos
+    if (!this.hubConnection || this.hubConnection.state !== 'Connected') {
+      this.buildConnection(token);
+      this.registerHandlers();
+      this.startConnection();
+    }
   }
-  
+
+  // Llamar esto explícitamente tras login/logout si preferís
+  public reinitializeForCurrentUser() {
+    this.initializeConnection();
+  }
+
   private buildConnection(token: string) {
     this.hubConnection = new HubConnectionBuilder()
       .withUrl(this.notificationHubUrl, {
@@ -62,16 +82,31 @@ export class NotificationService implements OnDestroy {
       }
     });
 
-    this.hubConnection.onreconnecting(() => {
-    });
+    this.hubConnection.onreconnecting(() => { /* opcional */ });
+    this.hubConnection.onreconnected(() => { /* opcional */ });
+  }
 
-    this.hubConnection.onreconnected(() => {
-    });
+  // Cierra conexión y limpia el estado local
+  private teardownConnection() {
+    try {
+      if (this.hubConnection) {
+        this.hubConnection.off('ReceiveNotification');
+        this.hubConnection.stop().catch(() => {});
+      }
+    } catch {}
+    // Limpiar lista (evita mostrar notificaciones del usuario anterior)
+    this.notificationsSubject.next([]);
   }
 
   public loadInitialNotifications() {
-    this.http.get<any[]>(this.baseUrl + 'notifications')
-      .subscribe(notifs => this.notificationsSubject.next(notifs));
+    const url = `${this.baseUrl}notifications?_=${Date.now()}`; // cache-busting
+    this.http.get<any[]>(url, {
+      headers: {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    }).subscribe(notifs => this.notificationsSubject.next(notifs));
   }
 
   public removeNotification(notificationId: number) {
@@ -109,6 +144,6 @@ export class NotificationService implements OnDestroy {
   }
 
   ngOnDestroy() {
-    this.hubConnection?.stop();
+    this.teardownConnection();
   }
 }

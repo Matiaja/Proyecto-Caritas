@@ -226,8 +226,8 @@ export class MovementComponent implements OnInit {
 
         const req: PdfGenerationRequest = {
           title: this.movementType === 'distributions'
-            ? 'Movimientos entre centros - Compras / Bolsones'
-            : 'Movimientos entre centros - Donaciones',
+            ? 'Movimientos - Compras / Bolsones'
+            : 'Movimientos - Donaciones',
           subtitle: 'Listado de movimientos',
           orientation: 'landscape',
           sections: [
@@ -277,7 +277,7 @@ export class MovementComponent implements OnInit {
     const from = this.dateFrom ? new Date(this.dateFrom).toLocaleDateString('es-AR') : null;
     const to = this.dateTo ? new Date(this.dateTo).toLocaleDateString('es-AR') : null;
 
-    let periodo = 'histórico';
+    let periodo = 'Histórico';
     if (from && !to) periodo = `a partir del ${from}`;
     if (!from && to) periodo = `hasta el ${to}`;
     if (from && to) periodo = `entre el ${from} y el ${to}`;

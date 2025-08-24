@@ -48,7 +48,7 @@
     </ui-table>
 
     <ng-template #actionTemplate let-row>
-      <button class="btn btn-assign"
+      <button class="btn btn-assign" *ngIf="isAdmin"
         [ngClass]="isMobile ? 'btn-outline-primary btn-xs mobile-action-btn' : 'btn-outline-primary btn-sm'"
         (click)="assign(row)" [disabled]="request.status !== 'Pendiente' || (row.status !== 'Pendiente' && row.status !== 'Parcial')">
         <svg xmlns="http://www.w3.org/2000/svg" [ngClass]="isMobile ? 'mobile-btn-icon' : ''"  [attr.width]="isMobile ? '16' : '24'" [attr.height]="isMobile ? '16' : '24'"

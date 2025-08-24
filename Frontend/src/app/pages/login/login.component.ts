@@ -43,7 +43,7 @@ export class LoginComponent {
           this.globalStateService.setUserId(data.userId);
 
           localStorage.setItem('authUser', JSON.stringify(data));
-          this.notificationService.initializeConnection();
+          this.notificationService.reinitializeForCurrentUser();
 
           this.router.navigate(['/home']);
           this.errorMessage = null; // Reset error message on successful login
