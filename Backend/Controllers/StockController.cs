@@ -82,6 +82,17 @@ namespace ProyectoCaritas.Controllers
                 });
             }
 
+            // validar fecha no futura
+            if (StockDTO.Date > DateTime.UtcNow)
+            {
+                return BadRequest(new
+                {
+                    Status = "400",
+                    Error = "Bad Request",
+                    Message = "La fecha no puede ser futura."
+                });
+            }
+
             try
             {
 
