@@ -1,4 +1,4 @@
-import { Component, Inject, Injectable, OnInit, Optional, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, Injectable, LOCALE_ID, OnInit, Optional, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray, ReactiveFormsModule } from '@angular/forms';
 import { PurchaseService } from '../../../services/purchase/purchase.service';
 import { ProductService } from '../../../services/product/product.service';
@@ -10,46 +10,22 @@ import { MatInputModule } from '@angular/material/input';
 import { MAT_DATE_LOCALE, DateAdapter, provideNativeDateAdapter } from '@angular/material/core';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, registerLocaleData } from '@angular/common';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import moment from 'moment';
+import { CustomDateAdapter, MY_DATE_FORMATS } from '../../../shared/date-adapter';
+import localeEsAr from '@angular/common/locales/es-AR';
 
-@Injectable()
-export class CustomDateAdapter extends MomentDateAdapter {
-  constructor(@Optional() @Inject(MAT_DATE_LOCALE) dateLocale: string) {
-    super(dateLocale);
-  }
-
-  override parse(value: any): moment.Moment | null {
-    if (value && typeof value === 'string') {
-      // Intenta parsear diferentes formatos
-      const formats = ['DD/MM/YYYY', 'DD-MM-YYYY', 'DD.MM.YYYY', 'D/M/YYYY', 'D-M-YYYY'];
-      const date = moment(value, formats, true);
-      return date.isValid() ? date : null;
-    }
-    return value ? moment(value, moment.ISO_8601, true) : null;
-  }
-}
-
-export const MY_DATE_FORMATS = {
-  parse: {
-    dateInput: 'DD/MM/YYYY',
-  },
-  display: {
-    dateInput: 'DD/MM/YYYY',
-    monthYearLabel: 'MMMM YYYY',
-    dateA11yLabel: 'LL',
-    monthYearA11yLabel: 'MMMM YYYY',
-  },
-};
+registerLocaleData(localeEsAr, 'es-AR');
 
 @Component({
   selector: 'app-purchase-add',
   standalone: true,
   providers: [
-    { provide: DateAdapter, useClass: CustomDateAdapter },
-    { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS },
-    { provide: MAT_DATE_LOCALE, useValue: 'es-ES' },
+  { provide: DateAdapter, useClass: CustomDateAdapter },
+  { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS },
+  { provide: MAT_DATE_LOCALE, useValue: 'es-AR' },
+  { provide: LOCALE_ID, useValue: 'es-AR' }
   ],
   imports: [
     MatFormFieldModule,

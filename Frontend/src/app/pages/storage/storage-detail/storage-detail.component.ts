@@ -19,6 +19,7 @@ import { ToastrService } from 'ngx-toastr';
   styleUrl: './storage-detail.component.css',
 })
 export class StorageDetailComponent implements OnInit {
+  today = new Date().toISOString().split('T')[0];
   product: any = null; // Para almacenar los datos del producto
   stock: any[] = []; // Inicializar como arreglo vacío
 

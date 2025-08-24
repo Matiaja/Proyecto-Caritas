@@ -51,12 +51,12 @@
       
       <div class="col-md-3 col-6 mb-3">
         <label for="fromDate" class="form-label">Desde</label>
-        <input type="date" id="fromDate" [(ngModel)]="fromDate" (change)="onDateChange()" class="form-control">
+        <input type="date" id="fromDate" [(ngModel)]="fromDate" (change)="onDateChange()" class="form-control" [max]="today">
       </div>
       
       <div class="col-md-3 col-6 mb-3">
         <label for="toDate" class="form-label">Hasta</label>
-        <input type="date" id="toDate" [(ngModel)]="toDate" (change)="onDateChange()" class="form-control">
+        <input type="date" id="toDate" [(ngModel)]="toDate" (change)="onDateChange()" class="form-control" [max]="today">
       </div>
     </div>
     

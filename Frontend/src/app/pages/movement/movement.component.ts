@@ -42,6 +42,7 @@ provideNativeDateAdapter()],
   encapsulation: ViewEncapsulation.None
 })
 export class MovementComponent implements OnInit {
+  today: Date = new Date();
   // Datos de la tabla
   movements: Movement[] = [];
   allMovements: Movement[] = [];
@@ -207,7 +208,6 @@ export class MovementComponent implements OnInit {
         this.centerId = null;
       }
     }
-    console.log(this.centerId);
     this.loadMovements();
   }
 

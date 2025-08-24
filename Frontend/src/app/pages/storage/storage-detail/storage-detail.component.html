@@ -36,11 +36,11 @@
       </div>
       <div class="col-md-4">
         <label class="form-label">Fecha desde</label>
-        <input type="date" class="form-control" [(ngModel)]="filters.fromDate" (ngModelChange)="applyFilters()" />
+        <input type="date" class="form-control" [(ngModel)]="filters.fromDate" (ngModelChange)="applyFilters()" [max]="today" />
       </div>
       <div class="col-md-4">
         <label class="form-label">Fecha hasta</label>
-        <input type="date" class="form-control" [(ngModel)]="filters.toDate" (ngModelChange)="applyFilters()" />
+        <input type="date" class="form-control" [(ngModel)]="filters.toDate" (ngModelChange)="applyFilters()" [max]="today" />
       </div>
     </div>
   </div>

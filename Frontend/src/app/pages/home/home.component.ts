@@ -36,6 +36,7 @@ interface Center {
   styleUrl: './home.component.css',
 })
 export class HomeComponent implements OnInit {
+  today: string = new Date().toISOString().split('T')[0];
   stockData: ProductStockSummary[] = [];
   categories: Category[] = [];
   products: Product[] = [];
@@ -173,6 +174,7 @@ export class HomeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.today = new Date().toISOString().split('T')[0];
     if (!(Chart as any).registeredDataLabels) {
       Chart.register(DataLabelsPlugin as unknown as Plugin); (Chart as any).registeredDataLabels = true;
     }
