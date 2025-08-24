@@ -44,6 +44,7 @@ provideNativeDateAdapter()],
 export class MovementComponent implements OnInit {
   // Datos de la tabla
   movements: Movement[] = [];
+  allMovements: Movement[] = [];
   displayedColumns = ['fromCenter', 'toCenter', 'productName', 'quantity', 'status', 'updatedDate'];
   columnHeaders = {
     fromCenter: 'Desde',
@@ -113,19 +114,18 @@ export class MovementComponent implements OnInit {
   }
 
   loadMovements() {
-
     const filters = {
       dateFrom: this.dateFrom ? this.dateFrom.toISOString() : undefined,
       dateTo: this.dateTo
-      ? new Date(
-          this.dateTo.getFullYear(),
-          this.dateTo.getMonth(),
-          this.dateTo.getDate(),
-          23, 59, 59
-        ).toISOString()
-      : undefined,
+        ? new Date(
+            this.dateTo.getFullYear(),
+            this.dateTo.getMonth(),
+            this.dateTo.getDate(),
+            23, 59, 59
+          ).toISOString()
+        : undefined,
       status: this.status || undefined,
-      productName: this.productName || undefined,
+      // productName removed from server filter
       centerId: this.centerId || undefined,
       typeCenter: this.typeCenter || undefined
     };
@@ -133,15 +133,30 @@ export class MovementComponent implements OnInit {
     // Guardar selección actual
     localStorage.setItem('movementType', this.movementType);
 
+    const handleResponseLocal = (data: any[]) => {
+      this.allMovements = data.map(movement => ({
+        ...movement,
+        updatedDate: new Date(movement.updatedDate).toLocaleDateString('es-ES', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+        }) + ' ' + new Date(movement.updatedDate).toLocaleTimeString('es-ES', {
+          hour: '2-digit',
+          minute: '2-digit',
+        })
+      }));
+      this.applyProductFilter();
+    };
+
     if (this.movementType === 'donations') {
       this.showDetail = true;
-      this.movementService.getDonationMovements(filters).subscribe(this.handleResponse, this.handleError);
+      this.movementService.getDonationMovements(filters).subscribe({next: handleResponseLocal, error: this.handleError});
     } else if (this.movementType === 'distributions') {
       this.showDetail = false;
-      this.movementService.getDistributionMovements(filters).subscribe(this.handleResponse, this.handleError);
+      this.movementService.getDistributionMovements(filters).subscribe({next: handleResponseLocal, error: this.handleError});
     } else if (this.movementType === 'storage') {
       this.showDetail = false;
-      this.movementService.getStorageMovements(filters).subscribe(this.handleResponse, this.handleError);
+      this.movementService.getStorageMovements(filters).subscribe({next: handleResponseLocal, error: this.handleError});
     }
   }
 
@@ -194,6 +209,17 @@ export class MovementComponent implements OnInit {
     }
     console.log(this.centerId);
     this.loadMovements();
+  }
+
+  applyProductFilter(): void {
+    if (!this.productName || this.productName.trim() === '') {
+      this.movements = [...this.allMovements];
+    } else {
+      const filterValue = this.productName.trim().toLowerCase();
+      this.movements = this.allMovements.filter(mov =>
+        mov.productName && mov.productName.toLowerCase().includes(filterValue)
+      );
+    }
   }
 
   clearFilters(): void {

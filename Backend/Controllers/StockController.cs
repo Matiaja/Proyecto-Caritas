@@ -433,15 +433,27 @@ namespace ProyectoCaritas.Controllers
         // GET: api/Stocks/product-with-all-stock
         [Authorize]
         [HttpGet("product-with-all-stocks")]
-        public async Task<ActionResult<List<ProductStockDTO>>> GetProductWithAllStocks([FromHeader] string productId)
+        public async Task<ActionResult<List<ProductStockDTO>>> GetProductWithAllStocks(
+            [FromHeader] string productId,
+            [FromHeader] string? centerIdToAvoid
+        )
         {
             /*
             Devuelve la cantidad de stock en todos los centros para un producto específico. 
             */
+
             if (int.TryParse(productId, out int productIdInt))
             {
-                var productWithStock = await _context.Stocks
-                    .Where(s => s.ProductId == productIdInt)
+                IQueryable<Stock> stocksQuery = _context.Stocks
+                    .Where(s => s.ProductId == productIdInt);
+
+                // Si centerIdToAvoid está presente y es válido, excluir ese centro
+                if (!string.IsNullOrEmpty(centerIdToAvoid) && int.TryParse(centerIdToAvoid, out int centerIdToAvoidInt))
+                {
+                    stocksQuery = stocksQuery.Where(s => s.CenterId != centerIdToAvoidInt);
+                }
+
+                var productWithStock = await stocksQuery
                     .Include(s => s.Center)
                     .GroupBy(s => new { s.ProductId, s.Product.Name, s.Product.Code, s.CenterId, CenterName = s.Center.Name })
                     .Select(s => new ProductStockDTO

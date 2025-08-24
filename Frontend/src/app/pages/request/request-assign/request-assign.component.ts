@@ -135,7 +135,7 @@ export class RequestAssignComponent implements OnInit {
 
   loadStocks() {
     if (this.product && this.product.stocks && this.request && this.request.requestingCenter) {
-      this.stockService.getProductInStocks(this.product.id).subscribe({
+      this.stockService.getProductInStocks(this.product.id, this.request.requestingCenterId).subscribe({
         next: async (stocks) => {
           this.stocks = stocks.map(stock => ({
             ...stock,

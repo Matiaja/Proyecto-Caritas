@@ -81,8 +81,10 @@ export class StockService {
     return this.http.get<any[]>(`${this.baseUrl}/stock-by-category`, { headers });
   }
 
-  getProductInStocks(productId: number): Observable<any[]> {
-    const headers = new HttpHeaders().set('productId', productId.toString());
+  getProductInStocks(productId: number, centerIdToAvoid: number): Observable<any[]> {
+    let headers = new HttpHeaders();
+    headers = headers.set('productId', productId.toString());
+    headers = headers.set('centerIdToAvoid', centerIdToAvoid.toString());
     return this.http.get<any[]>(`${this.baseUrl}/product-with-all-stocks`, { headers });
   }
 

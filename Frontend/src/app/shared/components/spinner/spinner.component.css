@@ -2,7 +2,7 @@
 .loading-overlay {
     position: fixed;
     inset: 0;
-    z-index: 10500;
+    z-index: 99990;
     /* alto, por encima de modals/toasts */
     display: flex;
     align-items: center;

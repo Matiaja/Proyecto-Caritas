@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { GenericFormComponent } from '../../../shared/components/generic-form/generic-form.component';
 import { Router } from '@angular/router';
 import { Validators } from '@angular/forms';
@@ -16,7 +16,7 @@ import { ToastrService } from 'ngx-toastr';
   templateUrl: './storage-add.component.html',
   styleUrl: './storage-add.component.css',
 })
-export class StorageAddComponent {
+export class StorageAddComponent implements OnInit {
   formConfig = {
     title: 'Agregar Stock',
     fields: [
@@ -99,6 +99,8 @@ export class StorageAddComponent {
     ],
   };
 
+  products: any[] = [];
+
   constructor(
     private productService: ProductService,
     private stockService: StockService,
@@ -107,7 +109,20 @@ export class StorageAddComponent {
     private toastr: ToastrService
   ) {}
 
+  ngOnInit(): void {
+    this.productService.getProducts().subscribe({
+      next: (products) => {
+        this.products = products;
+      },
+      error: (err) => {
+        console.error('Error loading products:', err);
+        this.products = [];
+      }
+    });
+  }
 
+
+  // En el template, pasar [products]="products" al GenericFormComponent
   updateOriginLabel(typeValue: string): void {
     const originField = this.formConfig.fields.find(field => field.name === 'origin');
     if (originField) {

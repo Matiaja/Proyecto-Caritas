@@ -46,6 +46,7 @@ export class GenericFormComponent implements OnChanges {
   };
 
   @Input() showButtons = true;
+  @Input() products: any[] = [];
 
   @Output() formSubmit = new EventEmitter<any>();
   @Output() formCancel = new EventEmitter<void>();
@@ -125,23 +126,16 @@ export class GenericFormComponent implements OnChanges {
   }
 
   onSearchChange(event: Event, value: string) {
-    const searchTerm = (event.target as HTMLInputElement).value;
+    const searchTerm = (event.target as HTMLInputElement).value?.toLowerCase();
     if (!searchTerm) {
       this.suggestions[value] = [];
       return;
     }
-    this.productService.searchProducts(searchTerm).subscribe(
-      (products) => {
-        this.suggestions[value] = products.map((product: any) => ({
-          value: product.id,
-          label: product.name,
-        }));
-      },
-      (error) => {
-        console.error('Error searching products:', error);
-        this.suggestions[value] = [];
-      }
-    );
+    // Buscar localmente en this.products
+    const filtered = this.products
+      .filter(product => product.name?.toLowerCase().includes(searchTerm))
+      .map(product => ({ value: product.id, label: product.name }));
+    this.suggestions[value] = filtered;
   }
 
   selectSearchResult(field: string, value: any) {

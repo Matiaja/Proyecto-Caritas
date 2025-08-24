@@ -99,7 +99,12 @@
                 (click)="selectSearchResult(field.name, option)"
               >
                 {{ option.label }}
-              </li>
+              </li>              
+            </ul>
+            <ul *ngIf="suggestions[field.name]?.length === 0 && form.get(field.name)?.value?.length > 2"
+              class="list-group position-absolute w-100 bg-white shadow mt-1" style="z-index: 1050; max-height: 200px; overflow-y: auto"
+              >
+              <li class="list-group-item">No se encontraron resultados</li>
             </ul>
           </div>
 
