@@ -18,6 +18,7 @@ import { CenterService } from '../../services/center/center.service';
 import { CenterModel } from '../../models/center.model';
 import { GlobalStateService } from '../../services/global/global-state.service';
 import { AuthService } from '../../auth/auth.service';
+import { PdfService, PdfGenerationRequest } from '../../services/pdf/pdf.service';
 
 @Component({
   selector: 'app-movement',
@@ -82,6 +83,7 @@ export class MovementComponent implements OnInit {
   isMobile = false;
   userCenterId = 0;
   isAdmin = false;
+  isPrinting = false;
 
   constructor(
     private movementService: MovementService,
@@ -89,7 +91,8 @@ export class MovementComponent implements OnInit {
     private responsiveService: ResponsiveService,
     private globalStateService: GlobalStateService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private pdfService: PdfService
   ) {
       this.responsiveService.isMobile$.subscribe((isMobile) => {
         this.isMobile = isMobile;
@@ -114,8 +117,8 @@ export class MovementComponent implements OnInit {
     this.isAdmin = this.authService.isAdmin();
   }
 
-  loadMovements() {
-    const filters = {
+  private getFiltersForApi() {
+    return {
       dateFrom: this.dateFrom ? this.dateFrom.toISOString() : undefined,
       dateTo: this.dateTo
         ? new Date(
@@ -130,6 +133,10 @@ export class MovementComponent implements OnInit {
       centerId: this.centerId || undefined,
       typeCenter: this.typeCenter || undefined
     };
+  }
+
+  loadMovements() {
+    const filters = this.getFiltersForApi();
 
     // Guardar selección actual
     localStorage.setItem('movementType', this.movementType);
@@ -236,5 +243,113 @@ export class MovementComponent implements OnInit {
     if(this.movementType === 'donations') {
       this.router.navigate(['/movements', m.donationRequestId]);
     }
+  }
+
+  // Generar PDF con TODOS los datos (consulta directa a la API con filtros actuales)
+  printMovements(): void {
+    this.isPrinting = true;
+
+    const filters = this.getFiltersForApi();
+    const obs = this.movementType === 'distributions'
+      ? this.movementService.getDistributionMovements(filters)
+      : this.movementService.getDonationMovements(filters);
+
+    obs.subscribe({
+      next: (all) => {
+        const headers = ['Desde', 'Hacia', 'Producto', 'Cantidad', 'Estado', 'Fecha'];
+        const rows = (all || []).map((m: any) => {
+          const dateRaw = m.updatedDate ?? m.lastStatusChangeDate ?? m.assignmentDate;
+          const fecha = dateRaw ? new Date(dateRaw).toLocaleString('es-AR') : '-';
+          return [
+            m.fromCenter ?? '-',
+            m.toCenter ?? '-',
+            m.productName ?? '-',
+            (m.quantity != null ? String(m.quantity) : '-'),
+            m.status ?? '-',
+            fecha
+          ];
+        });
+
+        const filtersKeyValue = this.buildFiltersSummaryKeyValueForMovements();
+
+        const req: PdfGenerationRequest = {
+          title: this.movementType === 'distributions'
+            ? 'Movimientos - Compras / Bolsones'
+            : 'Movimientos - Donaciones',
+          subtitle: 'Listado de movimientos',
+          orientation: 'landscape',
+          sections: [
+            {
+              title: 'Filtros aplicados',
+              keyValuePairs: filtersKeyValue
+            }
+          ],
+          rightNotes: [
+            `Total registros: ${rows.length}`
+          ],
+          tableData: [{
+            title: 'Movimientos',
+            headers,
+            rows
+          }],
+          footer: `Generado el ${new Date().toLocaleString('es-AR')} por Sistema Cáritas`
+        };
+
+        this.pdfService.generatePdf(req).subscribe({
+          next: (blob) => {
+            this.pdfService.openPdfInNewTab(blob);
+            this.isPrinting = false;
+          },
+          error: (err) => {
+            console.error('Error generando PDF', err);
+            this.isPrinting = false;
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Error cargando datos para impresión', err);
+        this.isPrinting = false;
+      }
+    });
+  }
+
+  // Resumen de filtros similar a Home
+  private buildFiltersSummaryKeyValueForMovements(): { key: string; value: string }[] {
+    const result: { key: string; value: string }[] = [];
+
+    result.push({
+      key: 'Tipo de movimiento',
+      value: this.movementType === 'distributions' ? 'Compras / Bolsones' : 'Donaciones'
+    });
+
+    const from = this.dateFrom ? new Date(this.dateFrom).toLocaleDateString('es-AR') : null;
+    const to = this.dateTo ? new Date(this.dateTo).toLocaleDateString('es-AR') : null;
+
+    let periodo = 'Histórico';
+    if (from && !to) periodo = `a partir del ${from}`;
+    if (!from && to) periodo = `hasta el ${to}`;
+    if (from && to) periodo = `entre el ${from} y el ${to}`;
+
+    result.push({ key: 'Período', value: periodo });
+    result.push({ key: 'Estado', value: this.status && this.status !== '' ? this.status : 'Todos' });
+    result.push({ key: 'Producto', value: this.productName && this.productName !== '' ? this.productName : 'Todos' });
+
+    // Centro
+    let centerValue = 'Todos';
+    if (this.centerId != null) {
+      const c = this.centers.find(x => x.id === this.centerId);
+      centerValue = c ? c.name : `Centro #${this.centerId}`;
+    }
+    result.push({ key: 'Centro', value: centerValue });
+
+    // Tipo de centro (si aplica)
+    if (this.centerId != null) {
+      const tc = this.typeCenter === 'from' ? 'Emisor'
+        : this.typeCenter === 'to' ? 'Receptor'
+        : 'Todos';
+      result.push({ key: 'Tipo de centro', value: tc });
+    }
+
+    return result;
   }
 }

@@ -21,6 +21,12 @@
     border-radius: 20px;
 }
 
+.btn-print {
+  padding: 0.375rem 1rem;
+  font-size: 0.875rem;
+  border-radius: 20px;
+}
+
 /* Estilos para la leyenda de estados */
 .status-legend {
     display: flex;

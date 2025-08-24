@@ -4,6 +4,7 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/ro
 import { AuthService } from '../../auth/auth.service';
 import { NotificationComponent } from "../../shared/components/notification/notification.component";
 import { filter } from 'rxjs';
+import { NotificationService } from '../../services/notification/notification.service';
 
 @Component({
   selector: 'app-navbar',
@@ -15,7 +16,8 @@ import { filter } from 'rxjs';
 export class NavbarComponent  {
   constructor(
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private notificationService: NotificationService
   ) {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
@@ -52,6 +54,7 @@ export class NavbarComponent  {
 
   logout() {
     this.authService.logout();
+    this.notificationService.reinitializeForCurrentUser();
     this.router.navigate(['/login']); // Redirigir al login
   }
 

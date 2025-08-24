@@ -73,7 +73,6 @@ export class ProductComponent implements OnInit {
 
   loadCategories() {
     this.categoryService.categories$.subscribe((categories) => {
-      console.log('Categorías recibidas:', categories);
       this.categories = categories;
     });
     this.categoryService.getCategories();

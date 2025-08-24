@@ -7,6 +7,7 @@ import { UiTableComponent } from '../../../shared/components/ui-table/ui-table.c
 import { CommonModule, Location } from '@angular/common';
 import { ResponsiveService } from '../../../services/responsive/responsive.service';
 import { PdfService } from '../../../services/pdf/pdf.service';
+import { AuthService } from '../../../auth/auth.service';
 
 @Component({
   selector: 'app-request-detail',
@@ -48,6 +49,7 @@ export class RequestDetailComponent implements OnInit {
   orderLines: any[] = [];
 
   isMobile = false;
+  isAdmin = false;
 
   constructor(
     private requestService: RequestService,
@@ -56,11 +58,13 @@ export class RequestDetailComponent implements OnInit {
     private router: Router,
     private location: Location,
     private responsiveService: ResponsiveService,
-    private pdfService: PdfService
+    private pdfService: PdfService,
+    private authService: AuthService
   ) {
     this.responsiveService.isMobile$.subscribe((isMobile) => {
       this.isMobile = isMobile;
     });
+    this.isAdmin = this.authService.isAdmin();
   }
 
   ngOnInit(): void {
