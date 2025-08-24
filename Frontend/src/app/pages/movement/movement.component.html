@@ -18,7 +18,7 @@
                     <mat-select [(ngModel)]="movementType" (ngModelChange)="applyFilters()">
                         <mat-option value="donations">Donaciones</mat-option>
                         <mat-option value="distributions">Compras / Bolsones</mat-option>
-                        <!-- <mat-option value="direct">De almacén directo</mat-option> -->
+                        <mat-option value="storage">De almacenamiento</mat-option>
                     </mat-select>
                 </mat-form-field>
             </div>
@@ -54,6 +54,10 @@
                             <mat-option value="Pendiente">Pendiente</mat-option>
                             <mat-option value="Entregado">Entregado</mat-option>
                         }
+                        @if (movementType === 'storage') {
+                            <mat-option value="Egreso">Entregado</mat-option>
+                            <mat-option value="Ingreso">Recibido</mat-option>
+                        }
                     </mat-select>
                 </mat-form-field>
             </div>
@@ -63,18 +67,21 @@
                     <input matInput type="text" [(ngModel)]="productName" (ngModelChange)="applyFilters()">
                 </mat-form-field>
             </div>
+            @if (isAdmin || movementType !== 'storage') {
             <div class="col-12 col-md-6 col-lg-3">
                 <mat-form-field appearance="outline" class="w-100 small-field">
                     <mat-label>Centro</mat-label>
                     <mat-select [(ngModel)]="centerId" (ngModelChange)="applyFilters()">
-                        <mat-option value="">Todos</mat-option>
+                        @if(movementType !== 'storage') {
+                            <mat-option [value]="null">Todos</mat-option>
+                        }
                         <mat-option *ngFor="let center of centers" [value]="center.id">
                             {{ center.name }}
                         </mat-option>
                     </mat-select>
                 </mat-form-field>
             </div>
-            @if (centerId !== null) {
+            @if (centerId !== null && centerId !== undefined) {
                 <div class="col-12 col-md-6 col-lg-3">
                     <mat-form-field appearance="outline" class="w-100 small-field">
                         <mat-label>Tipo de centro</mat-label>
@@ -85,6 +92,7 @@
                         </mat-select>
                     </mat-form-field>
                 </div>
+            }
             }
         </div>
         <div class="row pt-3">
@@ -103,6 +111,7 @@
 </div>
 
 <!-- Leyenda de estados -->
+@if (movementType === 'donations') {
 <div class="d-sm-none">
     <div class="status-legend my-3">
         <div class="status-legend-item">
@@ -119,6 +128,7 @@
         </div>
     </div>
 </div>
+}
 
 <!-- TABLA -->
 <ui-table

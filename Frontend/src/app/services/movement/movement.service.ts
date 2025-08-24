@@ -51,8 +51,8 @@ export class MovementService {
     return this.http.get<Movement[]>(`${this.baseUrl}distributions/movements-centers`, { params });
   }
 
-  /* getDirectMovements(filters?: {
-    ddateFrom?: string;
+  getStorageMovements(filters?: {
+    dateFrom?: string;
     dateTo?: string;
     status?: string;
     productName?: string;
@@ -67,6 +67,6 @@ export class MovementService {
     if (filters?.centerId != null) params = params.set('centerId', filters.centerId.toString());
     if (filters?.centerId != null && filters?.typeCenter) params = params.set('typeCenter', filters.typeCenter);
 
-    return this.http.get<Movement[]>(`${this.baseUrl}directMovements`, { params });
-  } */
+    return this.http.get<Movement[]>(`${this.baseUrl}stocks/movements`, { params });
+  }
 }

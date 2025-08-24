@@ -16,6 +16,8 @@ import { ResponsiveService } from '../../services/responsive/responsive.service'
 import { Router } from '@angular/router';
 import { CenterService } from '../../services/center/center.service';
 import { CenterModel } from '../../models/center.model';
+import { GlobalStateService } from '../../services/global/global-state.service';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-movement',
@@ -51,7 +53,7 @@ export class MovementComponent implements OnInit {
     status: 'Estado',
     updatedDate: 'Fecha'
   };
-  title = 'Movimientos entre centros';
+  title = 'Movimientos';
   mobileColumns = ['fromCenter', 'toCenter', 'productName', 'quantity', 'updatedDate'];
   mobileHeaders = {
     fromCenter: 'Desde',
@@ -76,16 +78,21 @@ export class MovementComponent implements OnInit {
   centers: CenterModel[] = [];
 
   isMobile = false;
+  userCenterId = 0;
+  isAdmin = false;
 
   constructor(
     private movementService: MovementService,
     private centerService: CenterService,
     private responsiveService: ResponsiveService,
+    private globalStateService: GlobalStateService,
+    private authService: AuthService,
     private router: Router
   ) {
       this.responsiveService.isMobile$.subscribe((isMobile) => {
         this.isMobile = isMobile;
       });
+      this.userCenterId = this.globalStateService.getCurrentCenterId();
   }
 
   ngOnInit(): void {
@@ -97,7 +104,12 @@ export class MovementComponent implements OnInit {
     this.centerService.getCenters().subscribe((centers) => {
         this.centers = centers;
       });
+    this.checkAdminRole();
     this.loadMovements();
+  }
+
+  checkAdminRole(): void {
+    this.isAdmin = this.authService.isAdmin();
   }
 
   loadMovements() {
@@ -127,9 +139,9 @@ export class MovementComponent implements OnInit {
     } else if (this.movementType === 'distributions') {
       this.showDetail = false;
       this.movementService.getDistributionMovements(filters).subscribe(this.handleResponse, this.handleError);
-    } else {
-      // De almacén directo (endpoint futuro)
-      // this.movementService.getDirectMovements(filters).subscribe(this.handleResponse, this.handleError);
+    } else if (this.movementType === 'storage') {
+      this.showDetail = false;
+      this.movementService.getStorageMovements(filters).subscribe(this.handleResponse, this.handleError);
     }
   }
 
@@ -172,6 +184,15 @@ export class MovementComponent implements OnInit {
   }
 
   applyFilters(): void {
+    if(this.movementType == 'storage')
+    {
+      if(this.userCenterId !== 0) {
+        this.centerId = this.userCenterId;
+      } else {
+        this.centerId = null;
+      }
+    }
+    console.log(this.centerId);
     this.loadMovements();
   }
 

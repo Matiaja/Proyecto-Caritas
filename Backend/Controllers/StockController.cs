@@ -702,6 +702,86 @@ namespace ProyectoCaritas.Controllers
             return Ok(result);
         }
 
+        // GET: api/Stocks/movements
+        [HttpGet("movements")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<MovementDTO>>> GetMovements(
+            [FromQuery] DateTime? dateFrom = null,
+            [FromQuery] DateTime? dateTo = null,
+            [FromQuery] string status = null,
+            [FromQuery] string productName = null,
+            [FromQuery] int? centerId = null,
+            [FromQuery] string typeCenter = null
+        )
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return Unauthorized();
+
+            var user = await _context.Users.Include(u => u.Center).FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+                return Unauthorized();
+
+            // Validar parámetros
+            if (dateFrom.HasValue && dateTo.HasValue && dateTo < dateFrom)
+                return BadRequest(new { message = "La 'Fecha hasta' no puede ser anterior a la 'Fecha desde'." });
+
+            // Obtengo los stocks con sus relaciones necesarias
+            var query = _context.Stocks
+                .Include(s => s.Center)
+                .Include(s => s.Product)
+                .AsQueryable();
+
+            // Filtros básicos
+            if (dateFrom.HasValue)
+                query = query.Where(s => s.Date >= dateFrom.Value);
+
+            if (dateTo.HasValue)
+                query = query.Where(s => s.Date <= dateTo.Value);
+
+            if (!string.IsNullOrEmpty(status))
+                query = query.Where(s => s.Type == status);
+            // Filtro por nombre de producto dentro del ItemPurchase de cada ItemDistribution
+            if (!string.IsNullOrEmpty(productName))
+            {
+                var productNameLower = productName.ToLower();
+                query = query.Where(s => s.Product != null && s.Product.Name.ToLower().Contains(productNameLower));
+            }
+
+            if (centerId.HasValue)
+            {
+                if (typeCenter == "from")
+                    query = query.Where(s => s.CenterId == centerId && s.Type == "Egreso");
+                else if (typeCenter == "to")
+                    query = query.Where(s => s.CenterId == centerId && s.Type == "Ingreso");
+                else
+                    query = query.Where(s => s.CenterId == centerId);
+            }
+
+            // Filtro por centro si no es admin
+            if (!User.IsInRole("Admin") && user.CenterId != null)
+            {
+                query = query.Where(s => s.CenterId == user.CenterId); // donde es el centro de compra
+            }
+
+            var movements = await query
+                .OrderByDescending(s => s.Date)
+                .Select(s => new MovementDTO
+                {
+                    DonationRequestId = s.Id,
+                    FromCenter = s.Type == "Egreso" ? s.Center.Name ?? "N/A" : s.Origin ?? "N/A",
+                    ToCenter = s.Type == "Egreso" ? s.Origin ?? "N/A" : s.Center.Name ?? "N/A",
+                    ProductName = s.Product != null ? s.Product.Name ?? "N/A" : "N/A",
+                    Quantity = s.Quantity,
+                    Status = s.Type == "Ingreso" ? "Recibido" : "Entregado",
+                    UpdatedDate = s.Date,
+                    AssignmentDate = s.Date
+                })
+                .ToListAsync();
+
+            return Ok(movements);
+        }
+
         private bool StockExists(int id)
         {
             return _context.Stocks.Any(s => s.Id == id);

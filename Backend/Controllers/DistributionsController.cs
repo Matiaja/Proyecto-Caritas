@@ -47,7 +47,7 @@ public class DistributionsController : ControllerBase
         return new DistributionDTO(dist);
     }
 
-    // GET: api/DonationRequests/movements-centers
+    // GET: api/Distributions/movements-centers
     [HttpGet("movements-centers")]
     [Authorize]
     public async Task<ActionResult<IEnumerable<MovementDTO>>> GetMovements(
@@ -76,7 +76,6 @@ public class DistributionsController : ControllerBase
             .Include(i => i.ItemPurchase).ThenInclude(ip => ip.Product)
             .Include(i => i.Distribution).ThenInclude(d => d.Center)
             .Include(i => i.Distribution.Purchase).ThenInclude(p => p.Center)
-            .Where(i => i.Distribution.CenterId != null)
             .AsQueryable();
 
         // Filtros básicos
@@ -119,7 +118,7 @@ public class DistributionsController : ControllerBase
             {
                 DonationRequestId = i.Id,
                 FromCenter = i.Distribution.Purchase.Center.Name ?? "N/A",
-                ToCenter = i.Distribution.Center.Name ?? "N/A",
+                ToCenter = i.Distribution.Center.Name ?? i.Distribution.PersonName ?? "N/A",
                 ProductName = i.ItemPurchase.Product.Name,
                 Quantity = i.Quantity,
                 Status = i.Distribution.Status,
