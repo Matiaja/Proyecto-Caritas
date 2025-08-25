@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { StockReportService, ProductStockSummary, StockHistory } from '../../services/stock-report/stock-report.service';
@@ -12,6 +12,12 @@ import { PdfService } from '../../services/pdf/pdf.service';
 import { NgChartsModule } from 'ng2-charts';
 import { forkJoin } from 'rxjs';
 import { GlobalStateService } from '../../services/global/global-state.service'; // OPCIONAL si existe
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MAT_DATE_LOCALE, MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 
 interface Category {
   id: number;
@@ -31,12 +37,24 @@ interface Center {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgChartsModule],
+  providers: [
+    {provide: MAT_DATE_LOCALE, useValue: 'es-AR'},
+    provideNativeDateAdapter()
+  ],
+  imports: [CommonModule, FormsModule, NgChartsModule,
+    MatSelectModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+  ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
+  encapsulation: ViewEncapsulation.None
 })
 export class HomeComponent implements OnInit {
-  today: string = new Date().toISOString().split('T')[0];
+  today: Date = new Date();
   stockData: ProductStockSummary[] = [];
   categories: Category[] = [];
   products: Product[] = [];
@@ -48,8 +66,8 @@ export class HomeComponent implements OnInit {
   centerId?: number;
   categoryId?: number;
   productId?: number;
-  fromDate?: string;
-  toDate?: string;
+  fromDate?: Date;
+  toDate?: Date;
 
   // Selector de tipo: 'stock' o 'movimientos'
   viewType: 'stock' | 'movimientos' = 'stock';
@@ -174,7 +192,7 @@ export class HomeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.today = new Date().toISOString().split('T')[0];
+    this.today = new Date();
     if (!(Chart as any).registeredDataLabels) {
       Chart.register(DataLabelsPlugin as unknown as Plugin); (Chart as any).registeredDataLabels = true;
     }
@@ -253,8 +271,8 @@ export class HomeComponent implements OnInit {
     const cleanCenterId = this.centerId === undefined ? undefined : this.centerId;
     const cleanCategoryId = this.categoryId === undefined ? undefined : this.categoryId;
     const cleanProductId = this.productId === undefined ? undefined : this.productId;
-    const cleanFromDate = !this.fromDate ? undefined : this.fromDate;
-    const cleanToDate = !this.toDate ? undefined : this.toDate;
+    const cleanFromDate = !this.fromDate ? undefined : this.fromDate.toISOString();
+    const cleanToDate = !this.toDate ? undefined : this.toDate.toISOString();
 
     const obs = this.viewType === 'stock'
       ? this.stockReportService.getStockReport(
@@ -325,10 +343,10 @@ export class HomeComponent implements OnInit {
 
   onDateChange(): void {
     // Handle date changes
-    if (this.fromDate === '') {
+    if (this.fromDate === null) {
       this.fromDate = undefined;
     }
-    if (this.toDate === '') {
+    if (this.toDate === null) {
       this.toDate = undefined;
     }
     this.loadData();
@@ -517,8 +535,8 @@ export class HomeComponent implements OnInit {
     const cleanCenterId = this.centerId === undefined ? undefined : this.centerId;
     const cleanCategoryId = this.categoryId === undefined ? undefined : this.categoryId;
     const cleanProductId = this.productId === undefined ? undefined : this.productId;
-    const cleanFromDate = !this.fromDate ? undefined : this.fromDate;
-    const cleanToDate = !this.toDate ? undefined : this.toDate;
+    const cleanFromDate = !this.fromDate ? undefined : this.fromDate.toISOString();
+    const cleanToDate = !this.toDate ? undefined : this.toDate.toISOString();
 
     const history$ = this.viewType === 'stock'
       ? this.stockReportService.getStockHistory(

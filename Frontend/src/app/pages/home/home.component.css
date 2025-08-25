@@ -42,29 +42,71 @@ h2 {
   border: 1px solid rgba(54, 51, 127, 0.1);
 }
 
-.filters-section label {
-  font-weight: 600;
-  color: #36337f;
-  margin-bottom: 8px;
-  font-size: 0.9rem;
+.custom-mat-form-field {
+  width: 100%;
 }
 
-.filters-section .form-select,
-.filters-section .form-control {
-  border: 2px solid #e2e8f0;
+/* Ajuste para eliminar dobles bordes y mantener el estilo original */
+.custom-mat-form-field .mat-form-field-outline {
   border-radius: 10px;
-  font-size: 0.9rem;
+  /* Coincide con el borde redondeado original */
+  border: 2px solid #e2e8f0;
+  /* Coincide con el borde original */
+}
+
+.custom-mat-form-field .mat-form-field-appearance-outline .mat-form-field-flex {
   padding: 0.6rem 1rem;
-  transition: all 0.3s ease;
+  /* Coincide con el padding original */
 }
 
-.filters-section .form-select:focus,
-.filters-section .form-control:focus {
+.custom-mat-form-field .mat-select-value {
+  font-size: 0.9rem;
+  /* Coincide con el tamaño de fuente original */
+}
+
+.custom-mat-form-field .mat-input-element {
+  font-size: 0.9rem;
+  /* Coincide con el tamaño de fuente original */
+  border-radius: 10px;
+  /* Asegura que el input date tenga bordes redondeados */
+}
+
+.custom-mat-form-field .mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
   border-color: #36337f;
+  /* Coincide con el color de foco original */
   box-shadow: 0 0 0 0.25rem rgba(54, 51, 127, 0.15);
-  outline: none;
+  /* Coincide con la sombra de foco */
 }
 
+.custom-panel {
+  max-height: 200px !important;
+  /* Limita la altura del panel de opciones */
+  overflow-y: auto !important;
+  /* Añade scrollbar si hay más opciones */
+  border-radius: 10px;
+  /* Coincide con el borde redondeado */
+}
+
+/* Estilos para el scrollbar (compatible con WebKit) */
+.custom-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-panel::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.custom-panel::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.custom-panel::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Resto de los estilos existentes (charts-grid, chart-container, etc.) */
 .charts-grid {
   display: grid;
   gap: 25px;
@@ -114,6 +156,7 @@ h2 {
   height: 100% !important;
 }
 
+/* Resto de los estilos (loading-container, no-data-container, etc.) */
 .loading-container {
   display: flex;
   justify-content: center;
@@ -226,56 +269,66 @@ h2 {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto auto auto;
   }
-  
+
   .chart-container:nth-child(1),
   .chart-container:nth-child(2),
   .chart-container:nth-child(3),
   .chart-container:nth-child(4) {
     grid-column: 1;
   }
-  
-  .chart-container:nth-child(1) { grid-row: 1; }
-  .chart-container:nth-child(2) { grid-row: 2; }
-  .chart-container:nth-child(3) { grid-row: 3; }
-  .chart-container:nth-child(4) { grid-row: 4; }
+
+  .chart-container:nth-child(1) {
+    grid-row: 1;
+  }
+
+  .chart-container:nth-child(2) {
+    grid-row: 2;
+  }
+
+  .chart-container:nth-child(3) {
+    grid-row: 3;
+  }
+
+  .chart-container:nth-child(4) {
+    grid-row: 4;
+  }
 }
 
 @media (max-width: 768px) {
   .charts-container {
     padding: 15px;
   }
-  
+
   h2 {
     font-size: 1.5rem;
     margin-bottom: 20px;
   }
-  
+
   .chart-container {
     padding: 20px;
     min-height: 380px;
   }
-  
+
   .chart-container h3 {
     font-size: 1.1rem;
     margin-bottom: 15px;
   }
-  
+
   .chart-wrapper {
     min-height: 280px;
   }
-  
+
   .filters-section {
     padding: 20px;
   }
-  
+
   .filters-section label {
     font-size: 0.85rem;
   }
-  
-  .filters-section .form-select,
-  .filters-section .form-control {
+
+  .custom-mat-form-field .mat-select-value,
+  .custom-mat-form-field .mat-input-element {
     font-size: 0.85rem;
-    padding: 0.5rem 0.75rem;
   }
 }
 
@@ -283,24 +336,24 @@ h2 {
   .charts-container {
     padding: 10px;
   }
-  
+
   h2 {
     font-size: 1.3rem;
   }
-  
+
   .chart-container {
     padding: 15px;
     min-height: 320px;
   }
-  
+
   .chart-wrapper {
     min-height: 220px;
   }
-  
+
   .filters-section {
     padding: 15px;
   }
-  
+
   .filters-section .col-6 {
     margin-bottom: 15px;
   }
@@ -312,6 +365,7 @@ h2 {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -339,4 +393,125 @@ h2 {
   color: #36337f;
   margin-bottom: 20px;
   font-weight: bold;
+}
+
+/* ESTILOS PARA ANGULAR MATERIAL */
+/* Ajustes generales para los campos de formulario MDC */
+.mat-mdc-text-field-wrapper {
+  height: auto !important;
+}
+
+.mat-mdc-form-field-infix {
+  min-height: 38px !important;
+  /* Altura reducida */
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+}
+
+.mdc-text-field--outlined .mdc-notched-outline {
+  height: 38px !important;
+  /* Ajusta la altura del borde */
+}
+
+.mdc-text-field--outlined .mdc-notched-outline__notch {
+  padding-top: 6px !important;
+  /* Ajuste para la etiqueta */
+}
+
+.mat-mdc-text-field-wrapper.mdc-text-field--outlined .mat-mdc-form-field-infix {
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+}
+
+/* Ajustes para el texto dentro de los campos */
+.mat-mdc-input-element {
+  font-size: 0.875rem !important;
+  padding: 4px 0 !important;
+}
+
+/* Ajustes para las etiquetas (labels) */
+.mat-mdc-form-field-label {
+  top: 18px !important;
+  font-size: 0.875rem !important;
+}
+
+.mdc-text-field--outlined.mdc-text-field--with-leading-icon .mdc-text-field__input {
+  padding-left: 6px !important;
+}
+
+/* Ajustes para selects */
+.mat-mdc-select {
+  font-size: 0.875rem !important;
+}
+
+/* Ajustes para datepicker */
+.mat-mdc-icon-button {
+  --mdc-icon-button-state-layer-size: 34px !important;
+  width: 34px !important;
+  height: 34px !important;
+  padding: 4px !important;
+}
+
+/* Ajustes para opciones del select */
+.mat-mdc-option {
+  min-height: 34px !important;
+  font-size: 0.875rem !important;
+}
+
+/* Ajuste específico para el botón del datepicker */
+.mat-mdc-datepicker-toggle .mat-mdc-icon-button {
+  width: 30px !important;
+  height: 30px !important;
+}
+
+/* Sobreescribe las variables CSS primero */
+:root {
+  --mat-form-field-container-vertical-padding: 3px !important;
+  --mat-form-field-filled-with-label-container-padding-top: 3px !important;
+  --mat-form-field-filled-with-label-container-padding-bottom: 3px !important;
+  --mat-form-field-container-height: 38px !important;
+  --mat-form-field-outlined-label-text-populated-size: 14px !important;
+}
+
+/* Estilos específicos para el text field outlined */
+.mat-mdc-text-field-wrapper.mdc-text-field--outlined .mat-mdc-form-field-infix {
+  padding-top: var(--mat-form-field-container-vertical-padding) !important;
+  padding-bottom: var(--mat-form-field-container-vertical-padding) !important;
+  min-height: var(--mat-form-field-container-height) !important;
+}
+
+/* Ajuste fino para el notch del label */
+.mdc-text-field--outlined .mdc-notched-outline__notch {
+  padding-top: 0 !important;
+}
+
+/* Alineación vertical del contenido */
+.mat-mdc-form-field-infix {
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* Ajuste para el input text */
+.mat-mdc-input-element {
+  padding: 0 !important;
+  margin: 0 !important;
+  align-self: center !important;
+}
+
+/* Corrección para cuando tiene label */
+.mdc-text-field--outlined:not(.mdc-text-field--no-label) .mat-mdc-form-field-infix {
+  padding-top: calc(var(--mat-form-field-container-vertical-padding) + 2px) !important;
+  padding-bottom: calc(var(--mat-form-field-container-vertical-padding) - 2px) !important;
+}
+
+/* Ajuste para el espacio del icono (si lo hay) */
+.mdc-text-field--with-leading-icon .mat-mdc-form-field-infix {
+  padding-left: 4px !important;
+}
+
+/* Elimina completamente el espacio del subscript */
+.mat-mdc-form-field-subscript-wrapper {
+  display: none !important;
+  height: 0 !important;
+  min-height: 0 !important;
 }

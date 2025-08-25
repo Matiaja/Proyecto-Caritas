@@ -7,59 +7,79 @@
       </button>
     </div>
   </div>
-  
+
   <!-- Warning for admin if centers failed to load -->
   <div *ngIf="isAdmin && centers.length === 0" class="alert alert-warning" role="alert">
     <i class="fas fa-exclamation-triangle"></i>
-    <strong>Advertencia:</strong> No se pudieron cargar los centros. Los datos mostrados corresponden a su centro asignado.
+    <strong>Advertencia:</strong> No se pudieron cargar los centros. Los datos mostrados corresponden a su centro
+    asignado.
   </div>
-  
+
   <!-- Filtros -->
   <div class="filters-section">
     <div class="row">
       <div class="col-md-3 col-6 mb-3">
-        <label for="typeFilter" class="form-label">Tipo</label>
-        <select id="typeFilter" [(ngModel)]="viewType" (change)="onViewTypeChange()" class="form-select">
-          <option value="stock">Stock</option>
-          <option value="movimientos">Compras y Distribuciones</option>
-        </select>
+        <mat-form-field appearance="outline" class="w-100 custom-mat-form-field">
+          <mat-label>Tipo</mat-label>
+          <mat-select [(ngModel)]="viewType" (selectionChange)="onViewTypeChange()" panelClass="custom-panel">
+            <mat-option value="stock">Stock</mat-option>
+            <mat-option value="movimientos">Compras y Distribuciones</mat-option>
+          </mat-select>
+        </mat-form-field>
       </div>
 
       <div *ngIf="isAdmin" class="col-md-3 col-6 mb-3">
-        <label for="centerFilter" class="form-label">Centro</label>
-        <select id="centerFilter" [(ngModel)]="centerId" (change)="onCenterChange()" class="form-select" [disabled]="centers.length === 0">
-          <option [ngValue]="undefined">{{centers.length === 0 ? 'Centros no disponibles' : 'Todos los centros'}}</option>
-          <option *ngFor="let center of centers" [ngValue]="center.id">{{center.name}}</option>
-        </select>
+        <mat-form-field appearance="outline" class="w-100 custom-mat-form-field">
+          <mat-label>Centro</mat-label>
+          <mat-select [(ngModel)]="centerId" (selectionChange)="onCenterChange()" [disabled]="centers.length === 0"
+            panelClass="custom-panel">
+            <mat-option [value]="undefined">{{centers.length === 0 ? 'Centros no disponibles' : 'Todos los
+              centros'}}</mat-option>
+            <mat-option *ngFor="let center of centers" [value]="center.id">{{center.name}}</mat-option>
+          </mat-select>
+        </mat-form-field>
       </div>
-      
+
       <div class="col-md-3 col-6 mb-3">
-        <label for="categoryFilter" class="form-label">Categoría</label>
-        <select id="categoryFilter" [(ngModel)]="categoryId" (change)="onCategoryChange()" class="form-select">
-          <option [ngValue]="undefined">Todas las categorías</option>
-          <option *ngFor="let category of categories" [ngValue]="category.id">{{category.name}}</option>
-        </select>
+        <mat-form-field appearance="outline" class="w-100 custom-mat-form-field">
+          <mat-label>Categoría</mat-label>
+          <mat-select [(ngModel)]="categoryId" (selectionChange)="onCategoryChange()" panelClass="custom-panel">
+            <mat-option [value]="undefined">Todas las categorías</mat-option>
+            <mat-option *ngFor="let category of categories" [value]="category.id">{{category.name}}</mat-option>
+          </mat-select>
+        </mat-form-field>
       </div>
-      
+
       <div class="col-md-3 col-6 mb-3">
-        <label for="productFilter" class="form-label">Producto</label>
-        <select id="productFilter" [(ngModel)]="productId" (change)="onProductChange()" class="form-select">
-          <option [ngValue]="undefined">Todos los productos</option>
-          <option *ngFor="let product of products" [ngValue]="product.id">{{product.name}}</option>
-        </select>
+        <mat-form-field appearance="outline" class="w-100 custom-mat-form-field">
+          <mat-label>Producto</mat-label>
+          <mat-select [(ngModel)]="productId" (selectionChange)="onProductChange()" panelClass="custom-panel">
+            <mat-option [value]="undefined">Todos los productos</mat-option>
+            <mat-option *ngFor="let product of products" [value]="product.id">{{product.name}}</mat-option>
+          </mat-select>
+        </mat-form-field>
       </div>
-      
+
       <div class="col-md-3 col-6 mb-3">
-        <label for="fromDate" class="form-label">Desde</label>
-        <input type="date" id="fromDate" [(ngModel)]="fromDate" (change)="onDateChange()" class="form-control" [max]="today">
+        <mat-form-field appearance="outline" class="w-100 custom-mat-form-field">
+          <mat-label>Desde</mat-label>
+          <input matInput [matDatepicker]="pickerFrom" [(ngModel)]="fromDate" (dateChange)="onDateChange()"
+            [max]="today">
+          <mat-datepicker-toggle matSuffix [for]="pickerFrom"></mat-datepicker-toggle>
+          <mat-datepicker #pickerFrom></mat-datepicker>
+        </mat-form-field>
       </div>
-      
+
       <div class="col-md-3 col-6 mb-3">
-        <label for="toDate" class="form-label">Hasta</label>
-        <input type="date" id="toDate" [(ngModel)]="toDate" (change)="onDateChange()" class="form-control" [max]="today">
+        <mat-form-field appearance="outline" class="w-100 custom-mat-form-field">
+          <mat-label>Hasta</mat-label>
+          <input matInput [matDatepicker]="pickerTo" [(ngModel)]="toDate" (dateChange)="onDateChange()" [max]="today">
+          <mat-datepicker-toggle matSuffix [for]="pickerTo"></mat-datepicker-toggle>
+          <mat-datepicker #pickerTo></mat-datepicker>
+        </mat-form-field>
       </div>
     </div>
-    
+
     <!-- Clear Filters Button -->
     <div class="row mt-2">
       <div class="col-12 text-end">
@@ -96,10 +116,7 @@
     <div class="chart-container">
       <h3>Stock por Categoría</h3>
       <div class="chart-wrapper">
-        <canvas baseChart 
-                [data]="pieChartData" 
-                [type]="'pie'"
-                [options]="pieChartOptions">
+        <canvas baseChart [data]="pieChartData" [type]="'pie'" [options]="pieChartOptions">
         </canvas>
       </div>
     </div>
@@ -108,10 +125,7 @@
     <div class="chart-container">
       <h3>Top 10 Productos con Mayor Stock</h3>
       <div class="chart-wrapper">
-        <canvas baseChart 
-                [data]="barChartData" 
-                [type]="'bar'"
-                [options]="barChartOptions">
+        <canvas baseChart [data]="barChartData" [type]="'bar'" [options]="barChartOptions">
         </canvas>
       </div>
     </div>
@@ -120,20 +134,19 @@
     <div class="chart-container">
       <h3>Evolución en el Tiempo</h3>
       <div *ngIf="shouldShowTimeChart(); else timeChartMessage" class="chart-wrapper">
-        <canvas baseChart 
-                [data]="lineChartData" 
-                [type]="'line'"
-                [options]="lineChartOptions">
+        <canvas baseChart [data]="lineChartData" [type]="'line'" [options]="lineChartOptions">
         </canvas>
       </div>
       <ng-template #timeChartMessage>
-        <div *ngIf="isAdmin" class="d-flex flex-column align-items-center justify-content-center text-muted p-4" style="height:100%;min-height:220px;">
+        <div *ngIf="isAdmin" class="d-flex flex-column align-items-center justify-content-center text-muted p-4"
+          style="height:100%;min-height:220px;">
           <i class="fas fa-filter fa-2x mb-2"></i>
           <p class="mb-0 text-center" style="font-size: 0.9rem;">
             Para mostrar el grafico de linea de tiempo, filtra por producto, centro y tipo.
           </p>
         </div>
-        <div *ngIf="!isAdmin" class="d-flex flex-column align-items-center justify-content-center text-muted p-4" style="height:100%;min-height:220px;">
+        <div *ngIf="!isAdmin" class="d-flex flex-column align-items-center justify-content-center text-muted p-4"
+          style="height:100%;min-height:220px;">
           <i class="fas fa-filter fa-2x mb-2"></i>
           <p class="mb-0 text-center" style="font-size: 0.9rem;">
             Para mostrar el grafico de linea de tiempo, filtra por producto y tipo.
@@ -146,10 +159,7 @@
     <div class="chart-container">
       <h3>Ingresos vs Egresos</h3>
       <div class="chart-wrapper">
-        <canvas baseChart 
-                [data]="doughnutChartData" 
-                [type]="'doughnut'"
-                [options]="doughnutChartOptions">
+        <canvas baseChart [data]="doughnutChartData" [type]="'doughnut'" [options]="doughnutChartOptions">
         </canvas>
       </div>
     </div>

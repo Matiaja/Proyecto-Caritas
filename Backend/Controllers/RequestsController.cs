@@ -352,7 +352,7 @@ namespace ProyectoCaritas.Controllers
             // Actualizar el estado de las líneas de pedido asociadas
             foreach (var ol in request.OrderLines)
             {
-                if (ol.Status != "Completa" || ol.Status != "Parcial")
+                if (ol.Status != "Completa" && ol.Status != "Parcial")
                 {
                     ol.Status = "Cancelada";
                 }

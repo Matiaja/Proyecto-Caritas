@@ -153,6 +153,10 @@ namespace ProyectoCaritas.Controllers
                         break;
                 }
             }
+            else
+            {
+                productQuery = productQuery.OrderBy(x => x.Product.Name);
+            }
 
             var products = await productQuery
                 .Select(x => new ProductDTO
@@ -276,13 +280,13 @@ namespace ProyectoCaritas.Controllers
                     Message = "El nombre del producto es obligatorio."
                 });
             }
-            if (!System.Text.RegularExpressions.Regex.IsMatch(productDTO.Name, @"^[a-zA-Z\s]+$"))
+            if (!System.Text.RegularExpressions.Regex.IsMatch(productDTO.Name, @"^[a-zA-Z0-9\s]+$"))
             {
                 return BadRequest(new
                 {
                     Status = "400",
                     Error = "Bad Request",
-                    Message = "El nombre del producto solo puede contener letras y espacios."
+                    Message = "El nombre del producto solo puede contener letras, números y espacios."
                 });
             }
 

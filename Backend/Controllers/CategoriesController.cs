@@ -80,15 +80,6 @@ namespace ProyectoCaritas.Controllers
                     Message = "El nombre de la categoría es obligatorio."
                 });
             }
-            if (!System.Text.RegularExpressions.Regex.IsMatch(addCategoryDto.Name, @"^[a-zA-Z\s]+$"))
-            {
-                return BadRequest(new
-                {
-                    Status = "400",
-                    Error = "Bad Request",
-                    Message = "El nombre de la categoría solo puede contener letras y espacios."
-                });
-            }
 
             // capitalize name
             addCategoryDto.Name = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(addCategoryDto.Name.ToLower());
@@ -197,7 +188,7 @@ namespace ProyectoCaritas.Controllers
                 .ToListAsync();
             if (sortBy == null)
             {
-                return categories;
+                return categories.OrderBy(c => c.Name).ToList();
             }
             if (sortBy == "name")
             {
