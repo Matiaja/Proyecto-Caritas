@@ -275,7 +275,7 @@ export class MovementComponent implements OnInit {
         const req: PdfGenerationRequest = {
           title: this.movementType === 'distributions'
             ? 'Movimientos - Compras / Bolsones'
-            : 'Movimientos - Donaciones',
+            : this.movementType === 'storage' ? 'Movimientos - Almacenamiento' : 'Movimientos - Donaciones',
           subtitle: 'Listado de movimientos',
           orientation: 'landscape',
           sections: [
@@ -319,7 +319,7 @@ export class MovementComponent implements OnInit {
 
     result.push({
       key: 'Tipo de movimiento',
-      value: this.movementType === 'distributions' ? 'Compras / Bolsones' : 'Donaciones'
+      value: this.movementType === 'distributions' ? 'Compras / Bolsones' : this.movementType === 'storage' ? 'Almacenamiento' : 'Donaciones'
     });
 
     const from = this.dateFrom ? new Date(this.dateFrom).toLocaleDateString('es-AR') : null;
