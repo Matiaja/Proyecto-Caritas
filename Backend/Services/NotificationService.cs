@@ -151,6 +151,46 @@ public class NotificationService : INotificationService
         }
     }
 
+    public async Task<List<Notification>> CreateRejectionNotification(int orderLineId, int donationRequestId, string userId)
+    {
+        var notifications = new List<Notification>();
+
+        var orderLine = await _context.OrderLines
+            .Include(ol => ol.Product)
+            .Include(ol => ol.Request)
+                .ThenInclude(r => r.RequestingCenter)
+            .FirstOrDefaultAsync(ol => ol.Id == orderLineId);
+
+        var donationRequest = await _context.DonationRequests
+            .Include(dr => dr.AssignedCenter)
+            .FirstOrDefaultAsync(dr => dr.Id == donationRequestId);
+
+        string unitQuantity = FormatQuantity(donationRequest.Quantity);
+        string productName = FormatProductName(orderLine?.Product?.Name, donationRequest.Quantity);
+
+        // Notificación para admin (rechazo)
+        var adminNotification = new Notification
+        {
+            Title = $"Donación rechazada",
+            Message = $"Solicitud #{orderLine?.RequestId} - Pedido #{orderLineId}: el centro \"{donationRequest?.AssignedCenter?.Name}\" rechazó proveer {unitQuantity} de {productName}"
+                + $" para el centro \"{orderLine?.Request?.RequestingCenter?.Name}\".",
+            Type = NotificationType.System,
+            OrderLineId = orderLineId,
+            DonationRequestId = donationRequestId,
+            RecipientCenterId = null, // Admin notifications don't need a recipient center
+            UserId = userId,
+            CreatedAt = DateTime.UtcNow,
+            IsRead = false,
+            Status = "Active"
+        };
+        notifications.Add(adminNotification);
+
+        _context.Notifications.AddRange(adminNotification);
+        await _context.SaveChangesAsync();
+
+        return notifications;
+    }
+
     public async Task<List<Notification>> CreateShippingNotification(int orderLineId, int donationRequestId, string userId)
     {
         var notifications = new List<Notification>();
@@ -286,10 +326,10 @@ public class NotificationService : INotificationService
                 return productName;
             if (productName.EndsWith("ón"))
                 return productName.Substring(0, productName.Length - 2) + "ones";
-            if (productName.EndsWith("a") || productName.EndsWith("e") || productName.EndsWith("i") || productName.EndsWith("o") || productName.EndsWith("u"))
+            if (productName.EndsWith("a") || productName.EndsWith("e") || productName.EndsWith("i") || productName.EndsWith("o") || productName.EndsWith("u") || productName.EndsWith("kg"))
                 return productName + "s";
 
-            return productName + "es";
+            return productName;
         }
         else
         {

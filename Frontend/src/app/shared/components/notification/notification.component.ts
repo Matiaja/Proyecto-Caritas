@@ -80,7 +80,22 @@ export class NotificationComponent implements OnInit, OnDestroy {
   }
 
   rejectAssignment(notification: any) {
-    // Lógica para rechazar
+    const originalNotifications = [...this.notifications];
+    notification.isRead = true; // Marcar como leída inmediatamente
+    this.unreadCount--;
+    this.notificationService.rejectAssignment(notification).subscribe({
+      next: () => {
+        this.updateNotificationInList(notification);
+        this.toastrService.success('Asignación rechazada correctamente');
+      },
+      error: (err) => {
+        console.error('Error al rechazar:', err);
+        notification.isRead = false; // Restaurar el estado de lectura
+        this.notifications = originalNotifications;
+        this.unreadCount = originalNotifications.filter((n: any) => !n.isRead).length;
+        this.toastrService.error(err.error.message ?? 'Error al rechazar la asignación');
+      }
+    });
   }
   
   markAsShipped(notification: any) {
@@ -178,10 +193,10 @@ export class NotificationComponent implements OnInit, OnDestroy {
             return product;
         if (product.endsWith("ón"))
             return product.substring(0, product.length - 2) + "ones";
-        if (product.endsWith("a") || product.endsWith("e") || product.endsWith("i") || product.endsWith("o") || product.endsWith("u"))
+        if (product.endsWith("a") || product.endsWith("e") || product.endsWith("i") || product.endsWith("o") || product.endsWith("u") || product.endsWith("kg"))
             return product + "s";
 
-        return product + "es";
+        return product;
     }
     else
     {

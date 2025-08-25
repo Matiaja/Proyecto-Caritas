@@ -199,6 +199,82 @@ namespace ProyectoCaritas.Controllers
 
         }
 
+        [HttpPost("reject")]
+        [Authorize]
+        public async Task<IActionResult> RejectDonation([FromBody] DataAcceptRequestDto dto)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var notification = await _context.Notifications
+                    .FirstOrDefaultAsync(n =>
+                        n.DonationRequestId == dto.DonationRequestId &&
+                        n.OrderLineId == dto.OrderLineId &&
+                        n.Id == dto.IdNotification &&
+                        n.IsRead == false &&
+                        n.Type == NotificationType.Assignment);
+            if (notification == null) return NotFound("Notification not found.");
+
+            // Iniciar transacción
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                var now = DateTime.UtcNow;
+
+                // Actualizar estado de la donacion
+                await _donationRequestService.UpdateStatus(dto.DonationRequestId, "Rechazada", now);
+
+                // Marcar la notificación relacionada como leída                
+                notification.IsRead = true;
+
+                // Guardar cambios
+                await _context.SaveChangesAsync();
+
+                // Crear notificaciones de rechazo
+                var newNotifications = await _notificationService.CreateRejectionNotification(
+                    dto.OrderLineId,
+                    dto.DonationRequestId,
+                    userId
+                );
+
+                // confirmar transacción
+                await transaction.CommitAsync();
+
+                try
+                {
+                    // notificar via signal r
+                    await _notificationService.SendSignalRNotifications(newNotifications);
+                }
+                catch (Exception ex)
+                {
+                    // Si falla la notificación
+                    // No revertimos la transacción, solo informamos del error en consola
+                    Console.WriteLine("Error al enviar notificaciones via SignalR: " + ex.Message);
+                }
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                // Rollback transaction en caso de error
+                await transaction.RollbackAsync();
+                return BadRequest(new
+                {
+                    Status = 500,
+                    Message = "Error al aceptar la solicitud de donación: " + ex.Message
+                });
+            }
+        }
+
         [HttpPost("ship")]
         [Authorize]
         public async Task<IActionResult> MarkAsShipped([FromBody] DataDonationShippedDTO dto)

@@ -123,6 +123,14 @@ export class NotificationService implements OnDestroy {
     });
   }
 
+  public rejectAssignment(notification: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}notifications/reject`, {
+      orderLineId: notification.orderLineId,
+      donationRequestId: notification.donationRequestId,
+      idNotification: notification.id
+    });
+  }
+
   markAsShipped(notification: any): Observable<any> {
     return this.http.post(`${this.baseUrl}notifications/ship`, {
       orderLineId: notification.orderLineId,
