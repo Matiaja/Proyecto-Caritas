@@ -687,42 +687,43 @@ namespace ProyectoCaritas.Controllers
                     sr.ProductId,
                     sr.ProductName,
                     sr.CategoryId,
-                    sr.CategoryName
+                    sr.CategoryName,
+                    sr.StockAcumulado
                 })
                 .ToListAsync();
 
             // Recalcular stock acumulado considerando múltiples centros
-            var result = new List<StockHistoryDTO>();
-            var stockAcumuladoPorProducto = new Dictionary<int, int>();
+            // var result = new List<StockHistoryDTO>();
+            // var stockAcumuladoPorProducto = new Dictionary<int, int>();
 
-            foreach (var item in stockData.OrderBy(x => x.ProductId).ThenBy(x => x.StockDate))
-            {
-                // Si es un nuevo producto, inicializar el stock acumulado
-                if (!stockAcumuladoPorProducto.ContainsKey(item.ProductId))
-                {
-                    stockAcumuladoPorProducto[item.ProductId] = 0;
-                }
+            // foreach (var item in stockData.OrderBy(x => x.ProductId).ThenBy(x => x.StockDate))
+            // {
+            //     // Si es un nuevo producto, inicializar el stock acumulado
+            //     if (!stockAcumuladoPorProducto.ContainsKey(item.ProductId))
+            //     {
+            //         stockAcumuladoPorProducto[item.ProductId] = 0;
+            //     }
 
-                // Actualizar stock acumulado según el tipo de movimiento
-                int cantidadMovimiento = item.StockType == "Ingreso" ? item.StockQuantity : -item.StockQuantity;
-                stockAcumuladoPorProducto[item.ProductId] += cantidadMovimiento;
+            //     // Actualizar stock acumulado según el tipo de movimiento
+            //     int cantidadMovimiento = item.StockType == "Ingreso" ? item.StockQuantity : -item.StockQuantity;
+            //     stockAcumuladoPorProducto[item.ProductId] += cantidadMovimiento;
 
-                result.Add(new StockHistoryDTO
-                {
-                    StockId = item.StockId,
-                    StockDate = item.StockDate,
-                    StockQuantity = item.StockQuantity,
-                    StockType = item.StockType,
-                    CenterId = item.CenterId,
-                    ProductId = item.ProductId,
-                    ProductName = item.ProductName,
-                    CategoryId = item.CategoryId,
-                    CategoryName = item.CategoryName,
-                    StockAcumulado = stockAcumuladoPorProducto[item.ProductId]
-                });
-            }
+            //     result.Add(new StockHistoryDTO
+            //     {
+            //         StockId = item.StockId,
+            //         StockDate = item.StockDate,
+            //         StockQuantity = item.StockQuantity,
+            //         StockType = item.StockType,
+            //         CenterId = item.CenterId,
+            //         ProductId = item.ProductId,
+            //         ProductName = item.ProductName,
+            //         CategoryId = item.CategoryId,
+            //         CategoryName = item.CategoryName,
+            //         StockAcumulado = stockAcumuladoPorProducto[item.ProductId]
+            //     });
+            // }
 
-            return Ok(result);
+            return Ok(stockData);
         }
 
         // GET: api/Stocks/movements
